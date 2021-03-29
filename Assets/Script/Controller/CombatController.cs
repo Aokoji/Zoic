@@ -8,7 +8,9 @@ public class CombatController : DDOLController<CombatController>
     private CombatView combat = null;
     private GameObject combatScene = null;
     private int stepNum = 0;        //进度代号
+    private float pubPer = 0.05f;
     private bool isstart;
+    private bool iswait;
 
     private List<CombatMessage> messageActor = null;         //跑进度全部单位数据
     private CombatMessage willActionActor = null;      //待操作的单位
@@ -36,6 +38,7 @@ public class CombatController : DDOLController<CombatController>
     public void initController()
     {
         isstart = false;
+        iswait = false;
         messageActor = new List<CombatMessage>();
         //willActionActor = new List<CombatMessage>();
     }
@@ -68,7 +71,7 @@ public class CombatController : DDOLController<CombatController>
         List<CombatMessage> actors = new List<CombatMessage>();
         CombatMessage player1 = new CombatMessage();
         player1.Name = "player";
-        player1.Speed = 80;
+        player1.Speed = 100;
         CombatMessage enemy1 = new CombatMessage();
         enemy1.Name = "enemy";
         enemy1.Speed = 60;
@@ -88,16 +91,6 @@ public class CombatController : DDOLController<CombatController>
         startPrograss();
         //nextStep();
     }
-
-
-
-    private delegate void rpgEvent();
-    private event rpgEvent waitChoice = null;
-    private event rpgEvent analystChoice = null;
-    private event rpgEvent choiceAction = null;
-    private event rpgEvent enemyChoice = null;
-    private event rpgEvent elseNext = null;
-
     //开始跑进度  （速度条）
     private void startPrograss()
     {
@@ -108,19 +101,27 @@ public class CombatController : DDOLController<CombatController>
     IEnumerator doLoadPrograss()
     {
         if (!isstart) yield break;
-        foreach(var item in messageActor)
+        if (iswait)
         {
-            float per = item.Speed / 20/2;  //暂定总长100  100速度 每秒走50  2秒一轮
-            item.CurSpeed += per;
-            if (item.CurSpeed >= 100)
-            {
-                //willActionActor.Add(item);
-                willActionActor = item;
-                item.CurSpeed = 0;
-                break;  //暂且先这样
-            }
+            yield break;
         }
-        checkAction();
+        else
+        {
+            foreach (var item in messageActor)
+            {
+                //暂定总长100  100速度 每秒走100  1秒一轮
+                float per = pubPer * item.Speed;
+                item.CurSpeed += per;
+                if (item.CurSpeed >= 100)
+                {
+                    //willActionActor.Add(item);
+                    willActionActor = item;
+                    item.CurSpeed = 0;
+                    break;  //暂且先这样
+                }
+            }
+            checkAction();
+        }
         yield return new WaitForSeconds(0.05f);
         StartCoroutine(doLoadPrograss());
     }
@@ -130,15 +131,16 @@ public class CombatController : DDOLController<CombatController>
     {
         if (willActionActor != null)
         {
-            isstart = false;
-            Debug.Log("is doing actor" + willActionActor.Name);
+            iswait = true;
+            Debug.Log("is doing actor       " + willActionActor.Name);
         }
         //willActionActor
     }
-    //进行完操作  接着跑进度
-    private void nextStep()
+    //进行完操作  接着跑进度      --测试  需要修改为private
+    public void nextStep()
     {
-        isstart = true;
+        iswait = false;
         willActionActor = null;
+        StartCoroutine(doLoadPrograss());
     }
 }
