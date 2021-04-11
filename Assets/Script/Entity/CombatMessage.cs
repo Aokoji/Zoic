@@ -6,9 +6,10 @@ public class CombatMessage
 {
     private string name;
     private GameObject prefab;
+    private GameObject iconActor;
     private string rank;   //0,1,2,3,4
     private int level;
-    private int maxHp;
+    private int maxHP;
     private int maxMp;
     private int attack;
     private int speed;
@@ -20,6 +21,10 @@ public class CombatMessage
     public float CurSpeed { get => curSpeed; set => curSpeed = value; }
     public int Speed { get => speed; set => speed = value; }
     public string Name { get => name; set => name = value; }
+    public GameObject IconActor { get => iconActor; set => iconActor = value; }
+    public int MaxHP { get => maxHP; set => maxHP = value; }
+    public int MaxMp { get => maxMp; set => maxMp = value; }
+    public int Attack { get => attack; set => attack = value; }
 
     //技能
 }

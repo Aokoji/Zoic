@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        AllUnitData.loadData();
         GameData.initGameData();
         ViewController.Instance.initCreateViewController(); //初始化视图
         CanvasLoad.loadCanvas();
@@ -43,6 +44,14 @@ public class GameManager : MonoBehaviour
         {
             PlayerControl.Instance.setControl(false);
             MainController.Instance.openCombat();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            CombatController.Instance.nextStep();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+
         }
     }
 
