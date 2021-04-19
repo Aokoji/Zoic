@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class CombatMessage 
 {
+    public CombatMessage()
+    {
+        UnitData = new Dictionary<string, int>();
+        UnitData.Add("attack",attack);
+    }
     private string name;
     private GameObject prefab;
     private GameObject iconActor;
@@ -17,6 +22,7 @@ public class CombatMessage
 
     private bool isPlayer;
     private float curSpeed;
+    private Dictionary<string, int> unitData;
 
     public float CurSpeed { get => curSpeed; set => curSpeed = value; }
     public int Speed { get => speed; set => speed = value; }
@@ -25,6 +31,7 @@ public class CombatMessage
     public int MaxHP { get => maxHP; set => maxHP = value; }
     public int MaxMp { get => maxMp; set => maxMp = value; }
     public int Attack { get => attack; set => attack = value; }
+    public Dictionary<string, int> UnitData { get => unitData; set => unitData = value; }
 
     //技能
 }

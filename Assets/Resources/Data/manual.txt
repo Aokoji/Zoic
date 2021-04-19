@@ -1,0 +1,40 @@
+unit
+
+0，id,编号
+1，name,名称
+2，hp,体力
+3，mp,精力
+4，atk,攻击
+5，speed,速度
+6，type,怪物品级  0低级 1普通  2高级  3精英 4领主
+7，adPat,物理百分比减伤
+8，apPat,魔法百分比减伤
+9，strike，暴击
+10，dodge，闪避
+11，state，状态
+
+skill
+0，id,技能编号
+1，name,名称
+2，explain,描述
+3，type,区分类型（场地型1，增益型2，攻击型3）
+4，effect，生效类型（0自身，1己方单体，2己方全体，3敌方单体，4敌方全体，5全体，6除自身外全体,7特殊）
+5，subjoin  效果附加编号（取特殊效果id，无0，毒1，灼烧2，冰冻3，出血4，）
+6，subOdds 附加几率
+7，subCondition  条件附加（取特殊效果id，无0，毒1，灼烧2，冰冻3，出血4，）
+8，subEnhance  条件增幅  （存在该异常状态对技能的增幅）
+9，sustion，持续类型（1固定，2参考型，3刷新型，4累加型）
+10，sustiontime，持续时间
+11，sustionmulti，持续参数（0不参考，1全体人数，2己方人数，3敌方人数，4异常状态敌方人数，5流血敌方人数）
+12，specialEffectType 特殊附加（0无，11荼毒，12强化出血）
+13，specialEffectRefer 特殊附加参考
+14，specialEffectMulti 特殊附加比例
+15，specialEffect 攻击特效
+refer1-5,参考值
+multi1-5,比例
+mixEffect1-3 ，复合调用技能效果
+
+攻击40 速度30
+500
+
+

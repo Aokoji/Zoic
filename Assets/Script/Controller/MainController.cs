@@ -12,7 +12,8 @@ public class MainController : DDOLController<MainController>
 
     public void openCombat()
     {
-        CombatController.instance.openCombat();
+        List<CombatMessage> list=new List<CombatMessage>();
+        CombatController.instance.openCombat(list);
     }
 
 

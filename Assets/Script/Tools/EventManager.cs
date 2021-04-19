@@ -25,4 +25,14 @@ public class EventManager : MonoBehaviour
     {
         Debug.Log("进入战斗场景加载动画");
     }
+
+    public event CombatEvent nextStep = null;
+    public event CombatEvent doattackNext = null;
+    //战斗处理
+    public void doAttackAction(CombatMessage atk, CombatMessage behit, string atkType)
+    {
+        //假装读取了攻击数据
+        //全部进行完之后
+        //nextStep();
+    }
 }
