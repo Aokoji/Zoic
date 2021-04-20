@@ -67,4 +67,9 @@ public class CombatView : MonoBehaviour
         icon.IconActor.transform.position = new Vector2(startPos.transform.position.x - dis, icon.IconActor.transform.position.y);
     }
 
+    public void componentChanges()
+    {//组件变动  面板变动
+        //获取面板组件  分析结果进行加减
+    }
+
 }

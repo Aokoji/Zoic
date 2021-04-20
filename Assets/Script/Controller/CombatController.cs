@@ -33,7 +33,10 @@ public class CombatController : DDOLController<CombatController>
         messageActor = getData();    //获取敌人数据 --测试
         //messageActor = data.actorsData;
         attackAction.initData(messageActor);        //+++要改 为   data
+
         if (combat == null) { initCombat(messageActor); }
+        AnimationController.Instance.combatNextStep = null; //清空动画控制器事件
+        AnimationController.Instance.combatNextStep += nextStep;
         combat.transform.SetAsLastSibling();            //置顶
         initEvent();
 
@@ -42,8 +45,6 @@ public class CombatController : DDOLController<CombatController>
         eventManager.combat += arrangeScence;      //赋予布置场景方法   可多个
         eventManager.combatEnd += combatEnd;
         eventManager.doCombat();            //打开界面
-
-        eventManager.nextStep += nextStep;
 
         ViewController.instance.setCameraVisible("combatcam", true);
         ViewController.instance.setCameraVisible("uicam", false);
@@ -86,19 +87,25 @@ public class CombatController : DDOLController<CombatController>
     }
     //--------------------------------------------------------------------------------测试方法
     public List<CombatMessage> getData()
-    {
+    {//假数据
         List<CombatMessage> actors = new List<CombatMessage>();
         CombatMessage player1 = new CombatMessage();
         player1.Name = "player";
-        player1.Speed = 30;
+        player1.UnitData["attack"] = 12;
+        player1.UnitData["speed"] = 30;
+        player1.UnitData["curHp"] = 150;
+        player1.UnitData["maxHp"] = 150;
         CombatMessage enemy1 = new CombatMessage();
         string[] data1 = AllUnitData.getUnitData(1);
         enemy1.Name = data1[1];
         enemy1.UnitData["attack"]= int.Parse(data1[4]);
-        enemy1.Attack = int.Parse(data1[4]);
-        enemy1.MaxMp = int.Parse(data1[3]);
-        enemy1.MaxHP = int.Parse(data1[2]);
-        enemy1.Speed = int.Parse(data1[5]);
+        enemy1.UnitData["speed"] = int.Parse(data1[5]);
+        enemy1.UnitData["physical"] = int.Parse(data1[2]);
+        enemy1.UnitData["maxHp"] = int.Parse(data1[2]);
+        enemy1.UnitData["curHp"] = int.Parse(data1[2]);
+        enemy1.UnitData["vigor"] = int.Parse(data1[3]);
+        enemy1.UnitData["maxMp"] = int.Parse(data1[3]);
+        enemy1.UnitData["curMp"] = int.Parse(data1[3]);
         actors.Add(player1);
         actors.Add(enemy1);
         //+++还需要存储生成出来的gameobject  需要加一个属性
@@ -114,7 +121,6 @@ public class CombatController : DDOLController<CombatController>
         stepNum = 0;
         Debug.Log("结束加载场景   开始跑速度条");//+++其实改先播放一会等待的展示 或播一个回合开始的小动画
         startPrograss();
-        //nextStep();
     }
     //开始跑进度  （速度条）
     private void startPrograss()
@@ -132,7 +138,7 @@ public class CombatController : DDOLController<CombatController>
             foreach (var item in messageActor)
             {
                 //暂定总长100  标速 40为1s
-                float per = pubPer * item.Speed;
+                float per = pubPer * item.UnitData["speed"];
                 item.CurSpeed += per;
                 combat.setRelative(item);
                 if (item.CurSpeed >= 100)
@@ -154,13 +160,14 @@ public class CombatController : DDOLController<CombatController>
         if (willActionActor != null)
         {
             iswait = true;
-            if (willActionActor.Name != "player")
+            if (willActionActor.Name != "player")//敌人攻击
             {
-                AnalyzeResult aiAction = aiAnalyse.analyseCombatAttack(messageActor,willActionActor);               //轮到敌人攻击  拿到一个攻击数据组
-                //获取一个分析后数据   调用战斗数据缓存器attackAction或combatAction存储缓存数据
-                attackAction.normalAction(aiAction);
-                //+++根据分析结果  调用动画播放器   播放完动画后
-                nextStep();
+                //轮到敌人攻击  拿到一个攻击数据组
+                AnalyzeResult aiAction = aiAnalyse.analyseCombatAttack(messageActor,willActionActor);
+                //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
+                AttackResult animData=attackAction.normalAction(aiAction);
+                //根据计算结果  调用动画播放器   播放完动画后进行下一步
+                //AnimationController.Instance.playCombatBeHit(combat,animData);
             }
             else
             {
@@ -171,7 +178,7 @@ public class CombatController : DDOLController<CombatController>
     //进行完操作  接着跑进度
     public void nextStep()
     {
-        if (checkCombatEnd())
+        if (!checkCombatResult())
         {
             //+++如果结束
             return;
@@ -185,10 +192,10 @@ public class CombatController : DDOLController<CombatController>
     {
         Debug.Log("enemy Attack!!");
     }
-    //+++检查战斗是否结束      包括玩家与敌人
-    public bool checkCombatEnd()
+    //检查战斗是否结束      包括玩家与敌人
+    public bool checkCombatResult()
     {
-        return false;
+        return attackAction.checkCombatResult();
     }
 
 

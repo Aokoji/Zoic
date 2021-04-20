@@ -2,35 +2,59 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CombatMessage 
+public class CombatMessage
 {
     public CombatMessage()
     {
         UnitData = new Dictionary<string, int>();
-        UnitData.Add("attack",attack);
+        UnitData.Add("id", id);
+        UnitData.Add("name", name);
+        UnitData.Add("physical", physical);
+        UnitData.Add("vigor", vigor);
+        UnitData.Add("attack", attack);
+        UnitData.Add("speed", speed);
+        UnitData.Add("type", type);
+        UnitData.Add("adPat", adPat);
+        UnitData.Add("apPat", apPat);
+        UnitData.Add("strike", strike);
+        UnitData.Add("dodge", dodge);
+        UnitData.Add("state", state);
+        UnitData.Add("maxHp", maxHp);
+        UnitData.Add("maxMp", maxMp);
+        UnitData.Add("curHp", curHp);
+        UnitData.Add("curMp", curMp);
     }
+    //--------以下为内部引用量
+    private int id;      //取数据的列表id
     private string name;
-    private GameObject prefab;
-    private GameObject iconActor;
-    private string rank;   //0,1,2,3,4
-    private int level;
-    private int maxHP;
-    private int maxMp;
+    private int physical;
+    private int vigor;
     private int attack;
     private int speed;
-    private int defence;
+    private int type;
+    private int adPat;
+    private int apPat;
+    private int strike;
+    private int dodge;
+    private int[] state;
 
-    private bool isPlayer;
+    private int maxHp;
+    private int maxMp;
+    private int curHp;
+    private int curMp;
+
+    //---------以下为外部引用量
+    private GameObject prefab;
+    private GameObject iconActor;
+    private int level;
+
     private float curSpeed;
+    private bool isPlayer;
     private Dictionary<string, int> unitData;
 
     public float CurSpeed { get => curSpeed; set => curSpeed = value; }
-    public int Speed { get => speed; set => speed = value; }
     public string Name { get => name; set => name = value; }
     public GameObject IconActor { get => iconActor; set => iconActor = value; }
-    public int MaxHP { get => maxHP; set => maxHP = value; }
-    public int MaxMp { get => maxMp; set => maxMp = value; }
-    public int Attack { get => attack; set => attack = value; }
     public Dictionary<string, int> UnitData { get => unitData; set => unitData = value; }
 
     //技能
