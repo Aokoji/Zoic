@@ -11,7 +11,6 @@ public class CombatController : DDOLController<CombatController>
     private GameObject combatScene = null;
     private int stepNum = 0;        //进度代号
     private float pubPer = 0.05f;
-    private bool isstart;
     private bool iswait;
 
     private List<CombatMessage> messageActor = null;         //跑进度全部单位数据
@@ -20,7 +19,6 @@ public class CombatController : DDOLController<CombatController>
     //manager调用  初始化并自动创建单例
     public void initController()
     {
-        isstart = false;
         iswait = false;
         messageActor = new List<CombatMessage>();
         aiAnalyse = new EnemyActionAnalyse();       //ai分析器
@@ -34,7 +32,7 @@ public class CombatController : DDOLController<CombatController>
         //messageActor = data.actorsData;
         attackAction.initData(messageActor);        //+++要改 为   data
 
-        if (combat == null) { initCombat(messageActor); }
+        if (combat == null) { initCombat(ref messageActor); }
         AnimationController.Instance.combatNextStep = null; //清空动画控制器事件
         AnimationController.Instance.combatNextStep += nextStep;
         combat.transform.SetAsLastSibling();            //置顶
@@ -125,13 +123,11 @@ public class CombatController : DDOLController<CombatController>
     //开始跑进度  （速度条）
     private void startPrograss()
     {
-        isstart = true;
         StartCoroutine(doLoadPrograss());
     }
 
     IEnumerator doLoadPrograss()
     {
-        if (!isstart) yield break;
         if (iswait) yield break;
         else
         {
@@ -167,7 +163,7 @@ public class CombatController : DDOLController<CombatController>
                 //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
                 AttackResult animData=attackAction.normalAction(aiAction);
                 //根据计算结果  调用动画播放器   播放完动画后进行下一步
-                //AnimationController.Instance.playCombatBeHit(combat,animData);
+                AnimationController.Instance.playCombatBeHit(combat,animData);
             }
             else
             {
@@ -180,7 +176,7 @@ public class CombatController : DDOLController<CombatController>
     {
         if (!checkCombatResult())
         {
-            //+++如果结束
+            //+++如果结束  执行结算判断  胜利或失败  继续结算动画
             return;
         }
         iswait = false;
@@ -200,12 +196,18 @@ public class CombatController : DDOLController<CombatController>
 
 
     //////////////////-----------------------------------------EVENT----------------------
-    ///
+    
     private void playerDoAttack()
     {
-        //+++获取combat （view）中的攻击选择类型  参考本身面板  调用attackAction进行攻击操作      +++需要提前启用一个attackAction或combatAction  记录本次战斗缓存数据
-        //假设进行了攻击  action记录过数据  
-        //+++调用动画播放器  播放动画
+        AnalyzeResult aiAction = new AnalyzeResult();//模拟一个ai动作数据
+        aiAction.selfNum = "";
+        aiAction.skillID ="";
+        aiAction.skillType = "";
+        aiAction.takeNum = "";
+        //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
+        AttackResult animData = attackAction.normalAction(aiAction);
+        //根据计算结果  调用动画播放器   播放完动画后进行下一步
+        AnimationController.Instance.playCombatBeHit(combat, animData);
         nextStep();
         //eventManager.doattackNext(combat.playerActor, combat.chooseActor);
     }

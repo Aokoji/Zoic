@@ -18,9 +18,11 @@ public class CombatView : MonoBehaviour
 
     private List<GameObject> icons = null;              //速度条数据
     private List<CombatMessage> _Data = null;       //全部数据
-    public CombatMessage chooseActor = null;       //选择中的目标
     public CombatMessage playerActor = null;        //玩家本体
     private float distance; //总的进度条长度
+
+    public int chooseSkill;                 //选择的技能   目标(仅限单体) 其他类型有自动识别
+    public int chooseActor;             //在选择攻击目标时  或 释放环境技能确定窗时  提前赋值
 
     public void initMethod()
     {
@@ -56,18 +58,41 @@ public class CombatView : MonoBehaviour
     private void showAttackPanel()
     {//显示攻击面板
         //给chooseActor赋值
+        //开放目标点击控制  实时改变点击缓存内容
     }
     private void cancelAttackPanel()
     {//关闭攻击面板
         chooseActor = null;
     }
+    private void attackButtonClick()
+    {
+        //进入二级界面
+        chooseActor = 0;
+        chooseSkill = playerActor.attackID;
+    }
+    private void propButtonClick()
+    {
+
+    }
+    private void skillButtonClick()
+    {
+
+    }
+    private void fleeButtonClick()
+    {
+
+    }
+
+
+
+    //实时设置各个图标跑的进度
     public void setRelative(CombatMessage icon)
-    {//实时设置各个图标跑的进度
+    {
         float dis = distance / 100 * icon.CurSpeed;
         icon.IconActor.transform.position = new Vector2(startPos.transform.position.x - dis, icon.IconActor.transform.position.y);
     }
-
-    public void componentChanges()
+    //动画调用
+    public void componentChanges()      
     {//组件变动  面板变动
         //获取面板组件  分析结果进行加减
     }
