@@ -17,6 +17,7 @@ public class CombatView : MonoBehaviour
     public Button attackCancel;         //攻击取消
 
     private List<GameObject> icons = null;              //速度条数据
+    private List<GameObject> actorBody = null;
     private List<CombatMessage> _Data = null;       //全部数据
     public CombatMessage playerActor = null;        //玩家本体
     private float distance; //总的进度条长度
@@ -32,6 +33,7 @@ public class CombatView : MonoBehaviour
     private void initUI()
     {
         icons = new List<GameObject>();
+        actorBody = new List<GameObject>();
         distance = startPos.transform.position.x - endPos.transform.position.x;
     }
     private void initBaseButtonEvent()
@@ -52,7 +54,17 @@ public class CombatView : MonoBehaviour
             loadactor.SetActive(true);       //todo  待修改
             item.IconActor = loadactor;
             icons.Add(loadactor);
-            if (item.Name == "player") playerActor = item;
+            if (item.Name == "player") {
+                item.isPlayer = true;
+                playerActor = item;
+            }
+            //加载单位
+            GameObject actorBody= Resources.Load<GameObject>("Entity/combatActor");
+            GameObject loadactorBody = Instantiate(actorBody);
+            loadactorBody.name = item.Name;
+            loadactorBody.SetActive(true);
+            item.prefab = loadactorBody;
+            actorBody.Add(loadactorBody);
         }
     }
     private void showAttackPanel()
