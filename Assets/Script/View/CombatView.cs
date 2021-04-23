@@ -8,7 +8,7 @@ public class CombatView : MonoBehaviour
     public GameObject startPos;         //头像条起点
     public GameObject endPos;           //头像条终点
     public GameObject line;                 //头像条
-    public GameObject[] enemySlots;   //敌对槽位
+    public Transform[] enemySlots;   //敌对槽位
     public GameObject playSlots;        //玩家槽位
     public Button attack;
     public Button skill;
@@ -38,7 +38,7 @@ public class CombatView : MonoBehaviour
         icons = new List<GameObject>();
         actorBody = new List<GameObject>();
         distance = startPos.transform.position.x - endPos.transform.position.x;
-        enemySlots = GetComponentByChildrens<Transform>();
+        enemySlots = GetComponentsInChildren<Transform>();
     }
     private void initBaseButtonEvent()
     {//初始化自身基础按钮的功能   不包含最终的二级或深级界面功能按钮
@@ -62,22 +62,22 @@ public class CombatView : MonoBehaviour
             item.IconActor = loadactor;
             icons.Add(loadactor);
             if (item.Name == "player") {
-                item.isPlayer = true;
+                item.IsPlayer = true;
                 playerActor = item;
             }
             //加载单位
-            GameObject actorBody= Resources.Load<GameObject>("Entity/combatActor");
-            GameObject loadactorBody = Instantiate(actorBody);
+            GameObject actorbody= Resources.Load<GameObject>("Entity/combatActor");
+            GameObject loadactorBody = Instantiate(actorbody);
             loadactorBody.name = item.Name;
-            loadactorBody.SetActive(true);
-            item.prefab = loadactorBody;
+            loadactorBody.SetActive(false);
+            item.Prefab = loadactorBody;
             actorBody.Add(loadactorBody);
         }
-        setSceneLayout();//布置场景
     }
-    //布置场景
-    private void setSceneLayout()
+    //外部调用  布置场景 
+    public void setSceneLayout()
     {
+        // 加载人物
         int num = 1;
         //目前敌对单位最多三个
         foreach(var item in actorBody)
@@ -88,9 +88,14 @@ public class CombatView : MonoBehaviour
             }
             else
             {
-                item.transform.SetParent();
+                item.transform.SetParent(enemySlots[num].transform);
             }
+            item.SetActive(true);
         }
+    }
+    public bool playEnterScene()
+    {
+        return true;
     }
 
     private void showAttackPanel()
@@ -100,13 +105,16 @@ public class CombatView : MonoBehaviour
     }
     private void cancelAttackPanel()
     {//关闭攻击面板
-        chooseActor = null;
+        chooseActor = -1;
     }
     private void attackButtonClick()
     {
         //进入二级界面
         chooseActor = 0;
-        chooseSkill = playerActor.attackID;
+        chooseSkill = playerActor.AttackID;
+        //无效化 基础四个按钮  
+        //弹出攻击面板
+        showAttackPanel();
     }
     private void propButtonClick()
     {

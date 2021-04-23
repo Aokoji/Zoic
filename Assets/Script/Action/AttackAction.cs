@@ -99,7 +99,7 @@ public class AttackAction
         foreach (var taken in takeActors)
         {
             float pat = (int)Mathf.Round((float)taken.UnitData[AllUnitData.getEncode("7")]) / 100;     //+++需要新增技能攻击类型（ad  ap）
-            int hit = (int)finalNum * (1 - pat);
+            int hit = (int)(finalNum * (1 - pat));
             int phy = taken.UnitData["curHp"] - hit;
             settleExtraSubjoin();   //++++计算攻击特效附加伤害
             if (phy <= 0)
@@ -133,21 +133,20 @@ public class AttackAction
     //目标击败
     public void settleActorDead(CombatMessage actor)
     {
-        iterator<CombatMessage> iter = dataList.iterator();
-        while (iter.hasNext())
+        for(int i = 0; i < dataList.Count; i++)
         {
-            CombatMessage item = iter.next();
-            if (item.Name == actor.Name)
+            if (dataList[i].Name == actor.Name)
             {
                 //+++增加战利品
-                iter.remove();
+                dataList.Remove(dataList[i]);
+                i--;
             }
         }
     }
     //检查战斗结果
     public bool checkCombatResult()
     {
-        if (dataList.Count == 1 && dataList[0].Name = "player")
+        if (dataList.Count == 1 && dataList[0].Name == "player")
             return true;  //如果只剩玩家  则玩家胜利
         else
             return false;

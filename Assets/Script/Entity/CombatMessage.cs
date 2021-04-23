@@ -8,7 +8,6 @@ public class CombatMessage
     {
         UnitData = new Dictionary<string, int>();
         UnitData.Add("id", id);
-        UnitData.Add("name", name);
         UnitData.Add("physical", physical);
         UnitData.Add("vigor", vigor);
         UnitData.Add("attack", attack);
@@ -18,7 +17,6 @@ public class CombatMessage
         UnitData.Add("apPat", apPat);
         UnitData.Add("strike", strike);
         UnitData.Add("dodge", dodge);
-        UnitData.Add("state", state);
         UnitData.Add("maxHp", maxHp);
         UnitData.Add("maxMp", maxMp);
         UnitData.Add("curHp", curHp);
@@ -52,10 +50,15 @@ public class CombatMessage
     private bool isPlayer;
     private Dictionary<string, int> unitData;
 
+    private int attackID;
+
     public float CurSpeed { get => curSpeed; set => curSpeed = value; }
     public string Name { get => name; set => name = value; }
     public GameObject IconActor { get => iconActor; set => iconActor = value; }
     public Dictionary<string, int> UnitData { get => unitData; set => unitData = value; }
+    public bool IsPlayer { get => isPlayer; set => isPlayer = value; }
+    public GameObject Prefab { get => prefab; set => prefab = value; }
+    public int AttackID { get => attackID; set => attackID = value; }
 
     //技能
 }

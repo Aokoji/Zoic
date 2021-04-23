@@ -9,7 +9,6 @@ public class CombatController : DDOLController<CombatController>
     private AttackAction attackAction;              //战斗缓存器
     private CombatView combat = null;
     private GameObject combatScene = null;
-    private int stepNum = 0;        //进度代号
     private float pubPer = 0.05f;
     private bool iswait;
 
@@ -32,8 +31,8 @@ public class CombatController : DDOLController<CombatController>
         //messageActor = data.actorsData;
         attackAction.initData(messageActor);        //+++要改 为   data
 
-        if (combat == null) { initCombat(ref messageActor); }
-        AnimationController.Instance.combatNextStep = null; //清空动画控制器事件
+        if (combat == null) { initCombat(messageActor); }
+        AnimationController.Instance.cleanNextStepAction(); //清空动画控制器事件
         AnimationController.Instance.combatNextStep += nextStep;
         combat.transform.SetAsLastSibling();            //置顶
         initEvent();
@@ -74,7 +73,9 @@ public class CombatController : DDOLController<CombatController>
     //布置场景
     public void arrangeScence()
     {
-        //布置场景数据  测试方法
+        //布置场景数据
+        combat.setSceneLayout();
+        AnimationController.Instance.playCombatSceneTransform(combat, 0);   //  0    默认转场
         Debug.Log("布置场景数据");
     }
     //事件
@@ -106,7 +107,6 @@ public class CombatController : DDOLController<CombatController>
         enemy1.UnitData["curMp"] = int.Parse(data1[3]);
         actors.Add(player1);
         actors.Add(enemy1);
-        //+++还需要存储生成出来的gameobject  需要加一个属性
         return actors;
     }
     //------------------------------------------------------------------------------
@@ -116,8 +116,7 @@ public class CombatController : DDOLController<CombatController>
     }
     public void combatEnd()
     {
-        stepNum = 0;
-        Debug.Log("结束加载场景   开始跑速度条");//+++其实改先播放一会等待的展示 或播一个回合开始的小动画
+        Debug.Log("结束加载场景 ");//+++其实改先播放一会等待的展示 或播一个回合开始的小动画
         startPrograss();
     }
     //开始跑进度  （速度条）
@@ -176,6 +175,7 @@ public class CombatController : DDOLController<CombatController>
     {
         if (!checkCombatResult())
         {
+            combatSettle();
             //+++如果结束  执行结算判断  胜利或失败  继续结算动画
             return;
         }
@@ -184,14 +184,16 @@ public class CombatController : DDOLController<CombatController>
         StartCoroutine(doLoadPrograss());
     }
 
-    public void enemyAttack()
-    {
-        Debug.Log("enemy Attack!!");
-    }
     //检查战斗是否结束      包括玩家与敌人
     public bool checkCombatResult()
     {
         return attackAction.checkCombatResult();
+    }
+
+    //战斗结算
+    private void combatSettle()
+    {
+
     }
 
 
@@ -200,15 +202,14 @@ public class CombatController : DDOLController<CombatController>
     private void playerDoAttack()
     {
         AnalyzeResult aiAction = new AnalyzeResult();//模拟一个ai动作数据
-        aiAction.selfNum = "";
-        aiAction.skillID ="";
-        aiAction.skillType = "";
-        aiAction.takeNum = "";
+        aiAction.selfNum = 0;
+        aiAction.skillID =0;
+        aiAction.skillType = 0;
+        aiAction.takeNum = 0;
         //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
         AttackResult animData = attackAction.normalAction(aiAction);
         //根据计算结果  调用动画播放器   播放完动画后进行下一步
         AnimationController.Instance.playCombatBeHit(combat, animData);
-        nextStep();
         //eventManager.doattackNext(combat.playerActor, combat.chooseActor);
     }
 
