@@ -5,25 +5,28 @@ using UnityEngine.UI;
 
 public class CombatView : MonoBehaviour
 {
-    public GameObject startPos;
-    public GameObject endPos;
-    public GameObject line;
+    public GameObject startPos;         //头像条起点
+    public GameObject endPos;           //头像条终点
+    public GameObject line;                 //头像条
+    public GameObject[] enemySlots;   //敌对槽位
+    public GameObject playSlots;        //玩家槽位
     public Button attack;
     public Button skill;
     public Button bag;
     public Button run;
 
-    public Button attackConfirm;        //攻击确认
+    public Button attackConfirm;        //攻击确认  假设使用统一的确认取消按钮   不同层级之间要隔离  深层的子集打开时外层点击不再生效(也就是说 加panel)
     public Button attackCancel;         //攻击取消
 
     private List<GameObject> icons = null;              //速度条数据
     private List<GameObject> actorBody = null;
     private List<CombatMessage> _Data = null;       //全部数据
     public CombatMessage playerActor = null;        //玩家本体
-    private float distance; //总的进度条长度
-
     public int chooseSkill;                 //选择的技能   目标(仅限单体) 其他类型有自动识别
     public int chooseActor;             //在选择攻击目标时  或 释放环境技能确定窗时  提前赋值
+
+    private float distance; //总的进度条长度
+    private int ENEMY_NUM = 3;
 
     public void initMethod()
     {
@@ -35,11 +38,15 @@ public class CombatView : MonoBehaviour
         icons = new List<GameObject>();
         actorBody = new List<GameObject>();
         distance = startPos.transform.position.x - endPos.transform.position.x;
+        enemySlots = GetComponentByChildrens<Transform>();
     }
     private void initBaseButtonEvent()
     {//初始化自身基础按钮的功能   不包含最终的二级或深级界面功能按钮
-        attack.onClick.AddListener(showAttackPanel);    //攻击二级分窗显示
-        attack.onClick.AddListener(cancelAttackPanel);    //攻击二级分窗消失
+        attack.onClick.AddListener(attackButtonClick);
+        skill.onClick.AddListener(skillButtonClick);
+        bag.onClick.AddListener(propButtonClick);
+        run.onClick.AddListener(fleeButtonClick);
+        attackCancel.onClick.AddListener(cancelAttackPanel);    //攻击二级分窗显示
     }
     public void initItemData(List<CombatMessage> data)
     {//+++需要创建头像图标    单位实体  并存储
@@ -66,7 +73,26 @@ public class CombatView : MonoBehaviour
             item.prefab = loadactorBody;
             actorBody.Add(loadactorBody);
         }
+        setSceneLayout();//布置场景
     }
+    //布置场景
+    private void setSceneLayout()
+    {
+        int num = 1;
+        //目前敌对单位最多三个
+        foreach(var item in actorBody)
+        {
+            if (item.name == "player")
+            {
+                item.transform.SetParent(playSlots.transform);
+            }
+            else
+            {
+                item.transform.SetParent();
+            }
+        }
+    }
+
     private void showAttackPanel()
     {//显示攻击面板
         //给chooseActor赋值
