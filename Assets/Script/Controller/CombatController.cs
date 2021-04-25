@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,15 +37,14 @@ public class CombatController : DDOLController<CombatController>
         AnimationController.Instance.combatNextStep += nextStep;
         combat.transform.SetAsLastSibling();            //置顶
         initEvent();
-
+        ViewController.instance.setCameraVisible("combatcam", true);
+        ViewController.instance.setCameraVisible("uicam", false);
         eventManager = new EventManager();      //战斗触发器
         eventManager.combatStart += combatStart;
         eventManager.combat += arrangeScence;      //赋予布置场景方法   可多个
         eventManager.combatEnd += combatEnd;
         eventManager.doCombat();            //打开界面
-
-        ViewController.instance.setCameraVisible("combatcam", true);
-        ViewController.instance.setCameraVisible("uicam", false);
+        PubTool.Instance.addStep(startPrograss);    //加入序列
     }
     //内部调用          创建UI
     public void initCombat(List<CombatMessage> data)
@@ -74,8 +74,8 @@ public class CombatController : DDOLController<CombatController>
     public void arrangeScence()
     {
         //布置场景数据
-        combat.setSceneLayout();
-        AnimationController.Instance.playCombatSceneTransform(combat, 0);   //  0    默认转场
+        combat.setSceneLayout(0);
+        //AnimationController.Instance.playCombatSceneTransform(combat, 0);   //  0    默认转场
         Debug.Log("布置场景数据");
     }
     //事件
@@ -109,20 +109,20 @@ public class CombatController : DDOLController<CombatController>
         actors.Add(enemy1);
         return actors;
     }
-    //------------------------------------------------------------------------------
-    public void combatStart()
+    //-------------------------------------------------内部逻辑-----------------------------
+    private void combatStart()
     {
         //ViewController.instance.setMainUIActive(false);
     }
-    public void combatEnd()
+    private void combatEnd()
     {
         Debug.Log("结束加载场景 ");//+++其实改先播放一会等待的展示 或播一个回合开始的小动画
-        startPrograss();
     }
     //开始跑进度  （速度条）
-    private void startPrograss()
+    private void startPrograss(Action callback)
     {
         StartCoroutine(doLoadPrograss());
+        callback();
     }
 
     IEnumerator doLoadPrograss()
@@ -183,25 +183,21 @@ public class CombatController : DDOLController<CombatController>
         willActionActor = null;
         StartCoroutine(doLoadPrograss());
     }
-
     //检查战斗是否结束      包括玩家与敌人
     public bool checkCombatResult()
     {
-        return attackAction.checkCombatResult();
+        return attackAction.checkCombatContinue();
     }
-
     //战斗结算
     private void combatSettle()
     {
-
+        combat.playSettleAnim(attackAction.checkCombatResult());
     }
-
-
     //////////////////-----------------------------------------EVENT----------------------
     
     private void playerDoAttack()
     {
-        AnalyzeResult aiAction = new AnalyzeResult();//模拟一个ai动作数据
+        AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
         aiAction.selfNum = 0;
         aiAction.skillID =0;
         aiAction.skillType = 0;

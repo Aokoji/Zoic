@@ -9,8 +9,12 @@ public class AllUnitData
     //public static Dictionary<string, unitMessage> allUnitData;
     static List<string[]> allUnitData = new List<string[]>();           //单位信息
     static List<string[]> allSkillData = new List<string[]>();           //技能基础参数信息
+    static List<string[]> allSpoilData = new List<string[]>();         //单位爆率清单
+    static List<string[]> allGoodData = new List<string[]>();        //所有物品清单
     private static string unitPath = "Assets/Resources/Data//unitMessage.txt";
     private static string skillPath = "Assets/Resources/Data//skillMessage.txt";
+    private static string spoilPath = "Assets/Resources/Data//spoilMessage.txt";
+    private static string goodPath = "Assets/Resources/Data//goodMessage.txt";
     private static Dictionary<string, string> natureName = new Dictionary<string, string>();
     public static void loadtext()   //写文件1   测试
     {
@@ -59,10 +63,15 @@ public class AllUnitData
         sr.Dispose();
         Debug.Log("end");
     }
+    /// <summary>
+    /// 加载静态数据(全部读取,不包括存档)
+    /// </summary>
     public static void loadData()
-    {   //读取怪物配置
+    {   //读取配置
         loadUnit();
         loadSkill();
+        loadSpoil();
+        loadGood();
         setnatureName();
     }
     private static void loadUnit()
@@ -85,7 +94,6 @@ public class AllUnitData
         sr.Close();
         sr.Dispose();
     }
-
     private static void loadSkill()
     {
         StreamReader sr;
@@ -102,6 +110,46 @@ public class AllUnitData
         while ((str = sr.ReadLine()) != null)
         {
             allSkillData.Add(str.Split('\t'));
+        }
+        sr.Close();
+        sr.Dispose();
+    }
+    private static void loadSpoil()
+    {
+        StreamReader sr;
+        if (File.Exists(spoilPath))
+        {
+            sr = File.OpenText(spoilPath);
+        }
+        else
+        {
+            Debug.LogError("读取静态spoil数据异常!!!!");
+            return;
+        }
+        string str;
+        while ((str = sr.ReadLine()) != null)
+        {
+            allSpoilData.Add(str.Split('\t'));
+        }
+        sr.Close();
+        sr.Dispose();
+    }
+    private static void loadGood()
+    {
+        StreamReader sr;
+        if (File.Exists(goodPath))
+        {
+            sr = File.OpenText(goodPath);
+        }
+        else
+        {
+            Debug.LogError("读取静态goods数据异常!!!!");
+            return;
+        }
+        string str;
+        while ((str = sr.ReadLine()) != null)
+        {
+            allGoodData.Add(str.Split('\t'));
         }
         sr.Close();
         sr.Dispose();
@@ -133,6 +181,14 @@ public class AllUnitData
     public static string[] getSkillData(int i)
     {       //根据编号获取技能数据
         return allSkillData[i];
+    }
+    public static string[] getGoodData(int i)
+    {       //根据编号获取物品数据
+        return allGoodData[i];
+    }
+    public static string[] getSpoilData(int i)
+    {       //根据编号获取爆率数据
+        return allSpoilData[i];
     }
 
 }

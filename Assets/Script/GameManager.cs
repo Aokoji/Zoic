@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 //游戏管理器
@@ -34,7 +35,7 @@ public class GameManager : MonoBehaviour
 
     private void initTools()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -51,11 +52,23 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-
+            testFunction();
         }
     }
 
-
+    private void testFunction()
+    {
+        void aa(Action step)
+        {
+            Debug.Log("=================aaa");
+            PubTool.Instance.laterDo(1, delegate ()
+            {
+                step();
+            });
+        }
+        PubTool.Instance.addStep(aa);
+        PubTool.Instance.addStep(aa);
+    }
 
     
 }

@@ -16,19 +16,14 @@ public class EventManager : MonoBehaviour
     public void doCombat()
     {
         combatStart();
-        enterCombat();
         //告知场景控制器
         combat();   //加载战斗数据
         combatEnd();
     }
-    public void enterCombat()
-    {
-        Debug.Log("进入战斗场景加载动画");
-    }
 
     public event CombatEvent nextStep = null;
     public event CombatEvent doattackNext = null;
-    //战斗处理
+    //战斗处理      (不用了)
     public void doAttackAction(CombatMessage atk, CombatMessage behit, string atkType)
     {
         //假装读取了攻击数据

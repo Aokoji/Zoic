@@ -13,16 +13,18 @@ public class AttackAction
     int SKILL_TYPE = 3;
     int REFER_START = 16;   //参考值开始下标
     int REFER_INTREVAL = 5; //取比例间隔
+    int REWORD_NUM = 8;//最高掉落数
 
     public void initData(List<CombatMessage> data)
     {
         dataList = data;
+        atkResult = new AttackResult();
+        spoils = new spoilsResult();
     }
     //----------------------------------总处理---------------------------------------------------------------------------
     //普通的战斗处理
     public AttackResult normalAction(AnalyzeResult action)
     {
-        atkResult = new AttackResult();
         string type = AllUnitData.getSkillData(action.skillID)[SKILL_TYPE];//获取技能类型
         switch (type)
         {
@@ -138,12 +140,24 @@ public class AttackAction
             if (dataList[i].Name == actor.Name)
             {
                 //+++增加战利品
+                comulativeReword(dataList[i].UnitData["id"]);
                 dataList.Remove(dataList[i]);
                 i--;
             }
         }
     }
-    //检查战斗结果
+    public bool checkCombatContinue()
+    {//判断游戏结束
+        if (dataList.Count == 1 && dataList[0].Name == "player")
+            return false;
+        foreach(var item in dataList)
+        {
+            if (item.Name == "player")
+                return true;
+        }
+        return false;
+    }
+    //检查战斗结果胜利方
     public bool checkCombatResult()
     {
         if (dataList.Count == 1 && dataList[0].Name == "player")
@@ -151,7 +165,18 @@ public class AttackAction
         else
             return false;
     }
-
+    private void comulativeReword(int id)
+    {//计算累积奖励
+        int num = 0;    //最终个数
+        int[] nums=new int[8];
+        for(int i = 0; i < REWORD_NUM; i++)
+        {
+            nums[i] = int.Parse(AllUnitData.getSpoilData(id)[1+i]);    //+++奖励数量几率参数
+            //下标1 2 3 4 5 6 7 8 是个数倍率
+        }
+        Random.Range(0, 1000);
+        
+    }
 }
 
 //返回类   攻击结果  返回给动画组

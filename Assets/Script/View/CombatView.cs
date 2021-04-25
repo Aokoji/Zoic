@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,7 +10,7 @@ public class CombatView : MonoBehaviour
     public GameObject endPos;           //头像条终点
     public GameObject line;                 //头像条
     public Transform[] enemySlots;   //敌对槽位
-    public GameObject playSlots;        //玩家槽位
+    public Transform playSlots;        //玩家槽位
     public Button attack;
     public Button skill;
     public Button bag;
@@ -27,6 +28,7 @@ public class CombatView : MonoBehaviour
 
     private float distance; //总的进度条长度
     private int ENEMY_NUM = 3;
+    private int sceneShowType;
 
     public void initMethod()
     {
@@ -49,7 +51,7 @@ public class CombatView : MonoBehaviour
         attackCancel.onClick.AddListener(cancelAttackPanel);    //攻击二级分窗显示
     }
     public void initItemData(List<CombatMessage> data)
-    {//+++需要创建头像图标    单位实体  并存储
+    {//创建头像图标    单位实体  并存储
         _Data = data;
         foreach (var item in data)
         {
@@ -75,7 +77,7 @@ public class CombatView : MonoBehaviour
         }
     }
     //外部调用  布置场景 
-    public void setSceneLayout()
+    public void setSceneLayout(int type)
     {
         // 加载人物
         int num = 1;
@@ -92,12 +94,56 @@ public class CombatView : MonoBehaviour
             }
             item.SetActive(true);
         }
+        sceneShowType = type;
+        //切换场景方法
+        PubTool.Instance.addStep(playEnterScene);
+        //人物出场短暂动画
+        PubTool.Instance.addStep(playActorFirstStage);
+        //面板出现短暂动画
+        PubTool.Instance.addStep(playPanelFirstStage);
     }
-    public bool playEnterScene()
+    //---------------------------------------------出场动画--------------------------------
+    private void playEnterScene(Action callback)
     {
-        return true;
+        //+++调用animation控制器的播放动画
+        //sceneShowType
+        callback();
     }
+    private void playActorFirstStage(Action callback)
+    {
+        callback();
+    }
+    private void playPanelFirstStage(Action callback)
+    {
+        callback();
+    }
+    //-------------------------------------------出场动画end------------------------------
 
+    //------------------------------------------结算动画-------------------------------------
+    public void playSettleAnim(bool result)
+    {
+        if (result)
+        {//玩家胜利
+            playPlayerSettle();
+        }
+        else
+        {//gameover 也不是  其实就是送回家
+            playGameOverAnim();
+        }
+    }
+    private void playGameOverAnim()
+    {
+        //播放胜利动作
+        //出结算面板
+    }
+    private void playPlayerSettle()
+    {
+        //播放失败动作
+        //出结算面板和回家提示
+    }
+    //------------------------------------------结算动画end---------------------------------
+
+    //-----------------------------------按钮控制---------------------------------
     private void showAttackPanel()
     {//显示攻击面板
         //给chooseActor赋值
@@ -142,5 +188,11 @@ public class CombatView : MonoBehaviour
     {//组件变动  面板变动
         //获取面板组件  分析结果进行加减
     }
-
+    //  todo
+    //  人物动画  入场poss 攻击 技能 胜利 停止  待机  over
+    //  敌人动画  入场poss  攻击 技能 胜利 停止  待机 over
+    //  场景入场动画切换场景
+    //  面板弹出动画  子窗口界面打开弹出
+    //  over结算  胜利结算  窗口弹出
+    //  
 }
