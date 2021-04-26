@@ -97,6 +97,7 @@ public class CombatController : DDOLController<CombatController>
         CombatMessage enemy1 = new CombatMessage();
         string[] data1 = AllUnitData.getUnitData(1);
         enemy1.Name = data1[1];
+        enemy1.UnitData["id"]= int.Parse(data1[0]);
         enemy1.UnitData["attack"]= int.Parse(data1[4]);
         enemy1.UnitData["speed"] = int.Parse(data1[5]);
         enemy1.UnitData["physical"] = int.Parse(data1[2]);
@@ -157,6 +158,7 @@ public class CombatController : DDOLController<CombatController>
             iswait = true;
             if (willActionActor.Name != "player")//敌人攻击
             {
+                Debug.Log("【敌人攻击】");
                 //轮到敌人攻击  拿到一个攻击数据组
                 AnalyzeResult aiAction = aiAnalyse.analyseCombatAttack(messageActor,willActionActor);
                 //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
@@ -167,12 +169,14 @@ public class CombatController : DDOLController<CombatController>
             else
             {
                 //+++dosomething  轮到玩家操作
+                Debug.Log("【玩家攻击】");
             }
         }
     }
     //进行完操作  接着跑进度
     public void nextStep()
     {
+        Debug.Log("开始计算速度..");
         if (!checkCombatResult())
         {
             combatSettle();
@@ -195,13 +199,13 @@ public class CombatController : DDOLController<CombatController>
     }
     //////////////////-----------------------------------------EVENT----------------------
     
-    private void playerDoAttack()
+    public void playerDoAttack()
     {
         AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
         aiAction.selfNum = 0;
-        aiAction.skillID =0;
-        aiAction.skillType = 0;
-        aiAction.takeNum = 0;
+        aiAction.skillID =2;
+        aiAction.skillType = 3;
+        aiAction.takeNum = 1;
         //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
         AttackResult animData = attackAction.normalAction(aiAction);
         //根据计算结果  调用动画播放器   播放完动画后进行下一步

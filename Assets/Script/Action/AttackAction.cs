@@ -13,7 +13,7 @@ public class AttackAction
     int SKILL_TYPE = 3;
     int REFER_START = 16;   //参考值开始下标
     int REFER_INTREVAL = 5; //取比例间隔
-    int REWORD_NUM = 8;//最高掉落数
+    int REWORD_NUM = 10;//最高掉落数  9-1=8
 
     public void initData(List<CombatMessage> data)
     {
@@ -89,6 +89,7 @@ public class AttackAction
     {//执行伤害技能效果
         int finalNum = 0;
         List<int> hitCountSum = new List<int>();      //伤害次数
+        //计算攻击
         for (int i = 0; i < 5; i++)
         {
             if (skill[REFER_START + i] == "-1") break;
@@ -98,6 +99,7 @@ public class AttackAction
             finalNum += hitnum;                             //累加结果
             hitCountSum.Add(hitnum);
         }
+        //计算作用目标伤害
         foreach (var taken in takeActors)
         {
             float pat = (int)Mathf.Round((float)taken.UnitData[AllUnitData.getEncode("7")]) / 100;     //+++需要新增技能攻击类型（ad  ap）
@@ -107,6 +109,7 @@ public class AttackAction
             if (phy <= 0)
             {
                 //判定目标死亡
+                settleActorDead(taken);
             }
             else
             {
@@ -139,8 +142,8 @@ public class AttackAction
         {
             if (dataList[i].Name == actor.Name)
             {
-                //+++增加战利品
-                comulativeReword(dataList[i].UnitData["id"]);
+                //增加战利品
+                if (actor.Name != "player") comulativeReword(actor.UnitData["id"]);
                 dataList.Remove(dataList[i]);
                 i--;
             }
@@ -165,18 +168,56 @@ public class AttackAction
         else
             return false;
     }
+
+    //-------------------计算累积奖励
     private void comulativeReword(int id)
-    {//计算累积奖励
+    {
         int num = 0;    //最终个数
-        int[] nums=new int[8];
-        for(int i = 0; i < REWORD_NUM; i++)
+        int[] nums=new int[9];
+        //计算数量
+        for(int i = 1; i < REWORD_NUM; i++)
         {
-            nums[i] = int.Parse(AllUnitData.getSpoilData(id)[1+i]);    //+++奖励数量几率参数
-            //下标1 2 3 4 5 6 7 8 是个数倍率
+            nums[i-1] = int.Parse(AllUnitData.getSpoilData(id)[i]);    //+++奖励数量几率参数
+            //下标 1 2 3 4 5 6 7 8 9是个数倍率  接受1位小数  即0.5%
         }
-        Random.Range(0, 1000);
-        
+        int tem = Random.Range(0, 1000);
+        int ratherNum = 0;
+        for(int i = 0; i < nums.Length; i++)
+        {
+            ratherNum += nums[i]*10;
+            if (tem < ratherNum)
+            {
+                tem = i;
+                break;
+            }
+        }
+        //逐个计算概率
+        for(int i = 0; i < tem; i++)
+        {
+            //添加结果
+            int rewordID = randomReword(id);
+            spoils.spoils.Add(rewordID);
+            Debug.Log("【掉落物品】"+AllUnitData.getGoodData(rewordID)[1]);
+        }
     }
+    private int randomReword(int id)
+    {//从可获得物品中随机一个(有保底)  调该方法时意味着比得一个
+        int tem = Random.Range(0, 1000);
+        string[] nums = AllUnitData.getSpoilData(id);
+        int ratherNum = 0;
+        for(int i = REWORD_NUM; i < nums.Length-3; i += 2)
+        {
+            ratherNum += int.Parse(nums[i + 1]) * 10;
+            if (tem < ratherNum)
+            {
+                return int.Parse(nums[i]);
+            }
+        }
+        tem = Random.Range(0, 2);
+        if (tem == 0) return int.Parse(nums[nums.Length - 2]);
+        else return int.Parse(nums[nums.Length - 1]);
+    }
+    //---------类结束----------------
 }
 
 //返回类   攻击结果  返回给动画组
@@ -194,7 +235,7 @@ public class AttackResult
 //返回类  存储类   当局战利品结算
 public class spoilsResult
 {
-    public List<int> spoils;    //战利品id表
+    public List<int> spoils=new List<int>();    //战利品id表
     public int coins;       //结算货币（待定）
 }
 

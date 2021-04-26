@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System;
+//using System;
 using System.Collections.Generic;
 using UnityEngine;
 //游戏管理器
@@ -48,14 +48,14 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            CombatController.Instance.nextStep();
+            CombatController.Instance.playerDoAttack();
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            testFunction();
+            Debug.Log(Random.Range(0, 2));
         }
     }
-
+    /*
     private void testFunction()
     {
         void aa(Action step)
@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
         }
         PubTool.Instance.addStep(aa);
         PubTool.Instance.addStep(aa);
-    }
+    }*/
 
     
 }

@@ -33,7 +33,7 @@ public class CombatView : MonoBehaviour
     public void initMethod()
     {
         initUI();
-        initBaseButtonEvent();
+        //initBaseButtonEvent();
     }
     private void initUI()
     {
@@ -86,11 +86,11 @@ public class CombatView : MonoBehaviour
         {
             if (item.name == "player")
             {
-                item.transform.SetParent(playSlots.transform);
+                //item.transform.SetParent(playSlots.transform);
             }
             else
             {
-                item.transform.SetParent(enemySlots[num].transform);
+                //item.transform.SetParent(enemySlots[num].transform);
             }
             item.SetActive(true);
         }
@@ -122,13 +122,16 @@ public class CombatView : MonoBehaviour
     //------------------------------------------结算动画-------------------------------------
     public void playSettleAnim(bool result)
     {
+        Debug.Log("【战斗结束】");
         if (result)
         {//玩家胜利
             playPlayerSettle();
+            Debug.Log("【玩家胜利】");
         }
         else
         {//gameover 也不是  其实就是送回家
             playGameOverAnim();
+            Debug.Log("【战斗失败】");
         }
     }
     private void playGameOverAnim()

@@ -17,6 +17,7 @@ public class AnimationController : DDOLController<AnimationController>
     public event CombatAction combatNextStep = null;
     public void cleanNextStepAction()
     {//清空下一步事件
+        if (combatNextStep == null) return;
         Delegate[] delArray = combatNextStep.GetInvocationList();
         for(int i = 0; i < delArray.Length; i++)
         {
@@ -62,7 +63,8 @@ public class AnimationController : DDOLController<AnimationController>
 
     public void playCombatBeHit(CombatView combat,AttackResult result)
     {//播放被击动画  并调用合适的视图面板变动
-
+        Debug.Log("【播放攻击动画】攻击方:"+result.sourceActor.Name+"    受击方:"+result.takenActor[0].Name+"   伤害结算:"+result.hitCount[0]);
+        Debug.Log("【战斗数据】"+ result.sourceActor.Name + "："+result.sourceActor.UnitData["curHp"]+"    "+ result.takenActor[0].Name + "："+result.takenActor[0].UnitData["curHp"]);
         //全部播放完成后
         combatNextStep();
     }
