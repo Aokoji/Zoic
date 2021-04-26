@@ -120,13 +120,15 @@ public class CombatView : MonoBehaviour
     //-------------------------------------------出场动画end------------------------------
 
     //------------------------------------------结算动画-------------------------------------
-    public void playSettleAnim(bool result)
+    public void playSettleAnim(bool result,Action callback)
     {
         Debug.Log("【战斗结束】");
         if (result)
         {//玩家胜利
             playPlayerSettle();
             Debug.Log("【玩家胜利】");
+            //动画播放完后
+            callback();
         }
         else
         {//gameover 也不是  其实就是送回家

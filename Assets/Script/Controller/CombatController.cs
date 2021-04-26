@@ -8,8 +8,8 @@ public class CombatController : DDOLController<CombatController>
     public EventManager eventManager;           //注册一个事件处理器
     private EnemyActionAnalyse aiAnalyse;       //注册一个ai行为解析分析
     private AttackAction attackAction;              //战斗缓存器
-    private CombatView combat = null;
-    private GameObject combatScene = null;
+    private CombatView combat;
+    private GameObject combatScene;
     private float pubPer = 0.05f;
     private bool iswait;
 
@@ -19,6 +19,8 @@ public class CombatController : DDOLController<CombatController>
     //manager调用  初始化并自动创建单例
     public void initController()
     {
+        combat = null;
+        combatScene = null;
         iswait = false;
         messageActor = new List<CombatMessage>();
         aiAnalyse = new EnemyActionAnalyse();       //ai分析器
@@ -37,8 +39,8 @@ public class CombatController : DDOLController<CombatController>
         AnimationController.Instance.combatNextStep += nextStep;
         combat.transform.SetAsLastSibling();            //置顶
         initEvent();
-        ViewController.instance.setCameraVisible("combatcam", true);
-        ViewController.instance.setCameraVisible("uicam", false);
+        ViewController.instance.setCameraVisible("combatcam", true);        //强制显示战斗场景相机（单显示）
+        //ViewController.instance.setCameraVisible("uicam", false);               //补充添加战斗ui相机
         eventManager = new EventManager();      //战斗触发器
         eventManager.combatStart += combatStart;
         eventManager.combat += arrangeScence;      //赋予布置场景方法   可多个
@@ -195,7 +197,17 @@ public class CombatController : DDOLController<CombatController>
     //战斗结算
     private void combatSettle()
     {
-        combat.playSettleAnim(attackAction.checkCombatResult());
+        combat.playSettleAnim(attackAction.checkCombatResult(),exitCombat);
+    }
+    //退出
+    public void exitCombat()
+    {
+        ObjectUtil.Destroy(combat);
+        ObjectUtil.Destroy(combatScene);
+        ViewController.Instance.removeCameraDictionary("combatcam");
+        //返回主视角
+        ViewController.instance.showMainCam();      //切主相机
+        initController();
     }
     //////////////////-----------------------------------------EVENT----------------------
     

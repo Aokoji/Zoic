@@ -20,7 +20,12 @@ public class ViewController : DDOLController<ViewController>
         {
             cameraView.Add(name, cam);
         }
-    }                                                
+    }          
+    public void removeCameraDictionary(string name)
+    {
+        if (cameraView.ContainsKey(name))  cameraView.Remove(name);
+
+    }
     /// <summary>设置相机显示  
     /// </summary>
     /// <param name="name">相机字典中的名称</param>
@@ -44,6 +49,11 @@ public class ViewController : DDOLController<ViewController>
         }
     }
 
+    public void showMainCam()
+    {
+        setCameraVisible("maincam", true);
+        setCameraVisible("uicam", false);
+    }
 
     //初始化视图1            ui 界面
     public MainView initCreateMainView()

@@ -99,17 +99,28 @@ public class AttackAction
             finalNum += hitnum;                             //累加结果
             hitCountSum.Add(hitnum);
         }
+        string skillPat = skill[REFER_START + 6 + REFER_INTREVAL];
         //计算作用目标伤害
         foreach (var taken in takeActors)
         {
-            float pat = (int)Mathf.Round((float)taken.UnitData[AllUnitData.getEncode("7")]) / 100;     //+++需要新增技能攻击类型（ad  ap）
+            float pat;
+            if(skillPat=="0") pat = (int)Mathf.Round((float)taken.UnitData[AllUnitData.getEncode("7")]) / 100;     //分析技能攻击类型（ad  ap）
+            else pat = (int)Mathf.Round((float)taken.UnitData[AllUnitData.getEncode("8")]) / 100;
             int hit = (int)(finalNum * (1 - pat));
             int phy = taken.UnitData["curHp"] - hit;
             settleExtraSubjoin();   //++++计算攻击特效附加伤害
             if (phy <= 0)
             {
-                //判定目标死亡
-                settleActorDead(taken);
+                if (checkImmortalState())
+                {
+                    taken.UnitData["curHp"] = 1;
+                }
+                else
+                {
+                    //判定目标死亡
+                    taken.UnitData["curHp"] = 0;
+                    settleActorDead(taken);
+                }
             }
             else
             {
@@ -127,7 +138,7 @@ public class AttackAction
     //行动结算  结算附加效果等 的值
     public void settleOnceAction()
     {
-
+        
     }
     //--------------------------------------------第三级调用-工具类、计算类方法----------------------------------------------------------------------------
     //计算攻击特效附加
@@ -167,6 +178,11 @@ public class AttackAction
             return true;  //如果只剩玩家  则玩家胜利
         else
             return false;
+    }
+    //计算特殊状态 不屈
+    private bool checkImmortalState()
+    {
+        return false;
     }
 
     //-------------------计算累积奖励
