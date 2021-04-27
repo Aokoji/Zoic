@@ -92,10 +92,11 @@ public class CombatController : DDOLController<CombatController>
         List<CombatMessage> actors = new List<CombatMessage>();
         CombatMessage player1 = new CombatMessage();
         player1.Name = "player";
-        player1.UnitData["attack"] = 12;
+        player1.UnitData["attack"] = 121;
         player1.UnitData["speed"] = 30;
         player1.UnitData["curHp"] = 150;
         player1.UnitData["maxHp"] = 150;
+        player1.IsPlayer = true;
         CombatMessage enemy1 = new CombatMessage();
         string[] data1 = AllUnitData.getUnitData(1);
         enemy1.Name = data1[1];
@@ -108,6 +109,7 @@ public class CombatController : DDOLController<CombatController>
         enemy1.UnitData["vigor"] = int.Parse(data1[3]);
         enemy1.UnitData["maxMp"] = int.Parse(data1[3]);
         enemy1.UnitData["curMp"] = int.Parse(data1[3]);
+        enemy1.IsPlayer = false;
         actors.Add(player1);
         actors.Add(enemy1);
         return actors;

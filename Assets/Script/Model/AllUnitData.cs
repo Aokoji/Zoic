@@ -11,10 +11,10 @@ public class AllUnitData
     static List<string[]> allSkillData = new List<string[]>();           //技能基础参数信息
     static List<string[]> allSpoilData = new List<string[]>();         //单位爆率清单
     static List<string[]> allGoodData = new List<string[]>();        //所有物品清单
-    private static string unitPath = "Assets/Resources/Data//unitMessage.txt";
-    private static string skillPath = "Assets/Resources/Data//skillMessage.txt";
-    private static string spoilPath = "Assets/Resources/Data//spoilMessage.txt";
-    private static string goodPath = "Assets/Resources/Data//goodMessage.txt";
+    private static string unitPath = "Assets/Resources/Data//unitMessage.csv";
+    private static string skillPath = "Assets/Resources/Data//skillMessage.csv";
+    private static string spoilPath = "Assets/Resources/Data//spoilMessage.csv";
+    private static string goodPath = "Assets/Resources/Data//goodMessage.csv";
     private static Dictionary<string, string> natureName = new Dictionary<string, string>();
     public static void loadtext()   //写文件1   测试
     {
@@ -109,7 +109,7 @@ public class AllUnitData
         string str;
         while ((str = sr.ReadLine()) != null)
         {
-            allSkillData.Add(str.Split('\t'));
+            allSkillData.Add(str.Split(','));
         }
         sr.Close();
         sr.Dispose();
@@ -129,7 +129,7 @@ public class AllUnitData
         string str;
         while ((str = sr.ReadLine()) != null)
         {
-            allSpoilData.Add(str.Split('\t'));
+            allSpoilData.Add(str.Split(','));
         }
         sr.Close();
         sr.Dispose();
@@ -149,7 +149,7 @@ public class AllUnitData
         string str;
         while ((str = sr.ReadLine()) != null)
         {
-            allGoodData.Add(str.Split('\t'));
+            allGoodData.Add(str.Split(','));
         }
         sr.Close();
         sr.Dispose();

@@ -27,9 +27,9 @@ skill
 10，sustiontime，持续时间
 11，sustionmulti，持续参数（0不参考，1全体人数，2己方人数，3敌方人数，4异常状态敌方人数，5流血敌方人数）
 12，specialEffectType 特殊附加（0无，11荼毒，12强化出血）
-13，specialEffectRefer 特殊附加参考
-14，specialEffectMulti 特殊附加比例
-15，specialEffect 攻击特效
+13，specialEffectRefer 特殊附加参考（分辨末尾是0自己或1敌人)
+14，damageTypes 伤害类型
+15，specialEffect 攻击特效(是否附带，不是是否是)
 refer1-5,参考值
 multi1-5,比例
 mixEffect1-3 ，复合调用技能效果

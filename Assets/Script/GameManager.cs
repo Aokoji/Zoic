@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            PlayerControl.Instance.setControl(false);
+            //PlayerControl.Instance.setControl(false);
             MainController.Instance.openCombat();
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
