@@ -11,7 +11,9 @@ unit
 8，apPat,魔法百分比减伤
 9，strike，暴击
 10，dodge，闪避
-11，state，状态
+11，当前体力(初始时与最大值相同)
+12，当前精力
+13，state，状态
 
 skill
 0，id,技能编号
@@ -23,18 +25,25 @@ skill
 6，subOdds 附加几率
 7，subCondition  条件附加（取特殊效果id，无0，毒1，灼烧2，冰冻3，出血4，）
 8，subEnhance  条件增幅  （存在该异常状态对技能的增幅）
-9，sustion，持续类型（1固定，2参考型，3刷新型，4累加型）
+9，sustion，持续类型（1固定，2参考型(不可替代型)，3刷新型，4累加型）
 10，sustiontime，持续时间
-11，sustionmulti，持续参数（0不参考，1全体人数，2己方人数，3敌方人数，4异常状态敌方人数，5流血敌方人数）
-12，specialEffectType 特殊附加（0无，11荼毒，12强化出血）
-13，specialEffectRefer 特殊附加参考（分辨末尾是0自己或1敌人)
+11，sustionmulti，持续参数（0不参考，1全体人数，2己方人数，3敌方人数，4异常状态敌方人数，5流血敌方人数）（目前只接受加法）
+12，specialEffectType 特殊附加（0无，1荼毒，2强化出血）
+13，specialEffectRefer 特殊附加参考（分辨末尾是0自己或1敌人)(好像没用上  留空字段)
 14，damageTypes 伤害类型
 15，specialEffect 攻击特效(是否附带，不是是否是)
 refer1-5,参考值
 multi1-5,比例
 mixEffect1-3 ，复合调用技能效果
 
-攻击40 速度30
-500
 
+
+
+extra
+0，id
+1，name
+2，攻击类型（目标类型）0自身，1敌方
+3，参考
+4，参数
+5，持续
 

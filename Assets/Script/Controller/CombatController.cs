@@ -95,7 +95,6 @@ public class CombatController : DDOLController<CombatController>
         player1.UnitData["attack"] = 121;
         player1.UnitData["speed"] = 30;
         player1.UnitData["curHp"] = 150;
-        player1.UnitData["maxHp"] = 150;
         player1.IsPlayer = true;
         CombatMessage enemy1 = new CombatMessage();
         string[] data1 = AllUnitData.getUnitData(1);
@@ -104,10 +103,8 @@ public class CombatController : DDOLController<CombatController>
         enemy1.UnitData["attack"]= int.Parse(data1[4]);
         enemy1.UnitData["speed"] = int.Parse(data1[5]);
         enemy1.UnitData["physical"] = int.Parse(data1[2]);
-        enemy1.UnitData["maxHp"] = int.Parse(data1[2]);
         enemy1.UnitData["curHp"] = int.Parse(data1[2]);
         enemy1.UnitData["vigor"] = int.Parse(data1[3]);
-        enemy1.UnitData["maxMp"] = int.Parse(data1[3]);
         enemy1.UnitData["curMp"] = int.Parse(data1[3]);
         enemy1.IsPlayer = false;
         actors.Add(player1);
@@ -217,7 +214,7 @@ public class CombatController : DDOLController<CombatController>
     {
         AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
         aiAction.selfNum = 0;
-        aiAction.skillID =2;
+        aiAction.skillID =7;
         aiAction.skillType = 3;
         aiAction.takeNum = 1;
         //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据

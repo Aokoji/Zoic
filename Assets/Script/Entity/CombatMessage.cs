@@ -17,8 +17,6 @@ public class CombatMessage
         UnitData.Add("apPat", apPat);
         UnitData.Add("strike", strike);
         UnitData.Add("dodge", dodge);
-        UnitData.Add("maxHp", maxHp);
-        UnitData.Add("maxMp", maxMp);
         UnitData.Add("curHp", curHp);
         UnitData.Add("curMp", curMp);
     }
@@ -73,12 +71,19 @@ public class abnormalState
 {//状态表  buff  debuff        (普通buff)
     public int id;  //异常状态id(包括正面状态)
     public int round;// 剩余回合
+    public int refer;//能力参数
+    public int perHit;//每回合数值(伤害/回复)
+    public int effectAbility;   //影响能力
+    public int effectMulti;     //影响参数
+    public bool isEffect;   //是否已作用
 }
 public class specialAttackExtra
 {//特殊攻击附加
     public int id;//特殊附加编号
-    public int target;//参考目标（目标或自己）
+    public int target;//作用范围
     public int refer;   //参考
     public int multi;   //倍率
     public int constant;    //固定值参数
+    public int round;
+    public int type;            //下标2类型
 }

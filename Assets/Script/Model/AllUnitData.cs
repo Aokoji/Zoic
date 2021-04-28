@@ -4,18 +4,23 @@ using UnityEngine;
 using System.IO;
 using System.Text;
 
-public class AllUnitData
+public class AllUnitData:MonoBehaviour
 {
     //public static Dictionary<string, unitMessage> allUnitData;
     static List<string[]> allUnitData = new List<string[]>();           //单位信息
     static List<string[]> allSkillData = new List<string[]>();           //技能基础参数信息
     static List<string[]> allSpoilData = new List<string[]>();         //单位爆率清单
     static List<string[]> allGoodData = new List<string[]>();        //所有物品清单
+    static List<string[]> allAbnormalData = new List<string[]>();        //所有异常列表
+    static List<string[]> allExtraData = new List<string[]>();        //所有攻击特殊列表
     private static string unitPath = "Assets/Resources/Data//unitMessage.csv";
     private static string skillPath = "Assets/Resources/Data//skillMessage.csv";
     private static string spoilPath = "Assets/Resources/Data//spoilMessage.csv";
     private static string goodPath = "Assets/Resources/Data//goodMessage.csv";
+    private static string abnormalPath = "Assets/Resources/Data//abnormalMessage.csv";
+    private static string extraPath = "Assets/Resources/Data//extraMessage.csv";
     private static Dictionary<string, string> natureName = new Dictionary<string, string>();
+    private static Dictionary<List<string[]>, string> loadMessage = new Dictionary<List<string[]>, string>();
     public static void loadtext()   //写文件1   测试
     {
         StreamWriter sw;
@@ -68,91 +73,47 @@ public class AllUnitData
     /// </summary>
     public static void loadData()
     {   //读取配置
-        loadUnit();
-        loadSkill();
-        loadSpoil();
-        loadGood();
+        loadMessage.Add(allUnitData, unitPath);
+        loadMessage.Add(allSkillData, skillPath);
+        loadMessage.Add(allSpoilData, spoilPath);
+        loadMessage.Add(allGoodData, goodPath);
+        loadMessage.Add(allAbnormalData, abnormalPath);
+        loadMessage.Add(allExtraData, extraPath);
+        //加载数据
+        loadPath();
         setnatureName();
     }
-    private static void loadUnit()
+    private static void loadPath()
     {
-        StreamReader sr;
-        if (File.Exists(unitPath))
+        StreamReader sr=null;
+        foreach(var item in loadMessage)
         {
-            sr = File.OpenText(unitPath);
+            if (File.Exists(item.Value))
+            {
+                sr = File.OpenText(item.Value);
+            }
+            else
+            {
+                Debug.LogError("读取静态数据异常!!!!"+item.Value);
+                return;
+            }
+            string str;
+            while ((str = sr.ReadLine()) != null)
+            {
+                item.Key.Add(str.Split(','));
+            }
+            sr.Close();
+        }
+        if (sr != null)
+        {
+            sr.Dispose();
         }
         else
         {
-            Debug.LogError("读取静态unit数据异常!!!!");
+            Debug.LogError("静态数据加载异常!!!!");
             return;
         }
-        string str;
-        while ((str = sr.ReadLine()) != null)
-        {
-            allUnitData.Add(str.Split(','));
-        }
-        sr.Close();
-        sr.Dispose();
-    }
-    private static void loadSkill()
-    {
-        StreamReader sr;
-        if (File.Exists(skillPath))
-        {
-            sr = File.OpenText(skillPath);
-        }
-        else
-        {
-            Debug.LogError("读取静态skill数据异常!!!!");
-            return;
-        }
-        string str;
-        while ((str = sr.ReadLine()) != null)
-        {
-            allSkillData.Add(str.Split(','));
-        }
-        sr.Close();
-        sr.Dispose();
-    }
-    private static void loadSpoil()
-    {
-        StreamReader sr;
-        if (File.Exists(spoilPath))
-        {
-            sr = File.OpenText(spoilPath);
-        }
-        else
-        {
-            Debug.LogError("读取静态spoil数据异常!!!!");
-            return;
-        }
-        string str;
-        while ((str = sr.ReadLine()) != null)
-        {
-            allSpoilData.Add(str.Split(','));
-        }
-        sr.Close();
-        sr.Dispose();
-    }
-    private static void loadGood()
-    {
-        StreamReader sr;
-        if (File.Exists(goodPath))
-        {
-            sr = File.OpenText(goodPath);
-        }
-        else
-        {
-            Debug.LogError("读取静态goods数据异常!!!!");
-            return;
-        }
-        string str;
-        while ((str = sr.ReadLine()) != null)
-        {
-            allGoodData.Add(str.Split(','));
-        }
-        sr.Close();
-        sr.Dispose();
+
     }
     private static void setnatureName()
     {
@@ -167,7 +128,9 @@ public class AllUnitData
         natureName.Add("8","apPat");
         natureName.Add("9","strike");
         natureName.Add("10","dodge");
-        natureName.Add("11","state");
+        natureName.Add("11", "curHp");
+        natureName.Add("12", "curMp");
+        natureName.Add("13","state");
     }
     public static string getEncode(string num)
     {
@@ -190,7 +153,14 @@ public class AllUnitData
     {       //根据编号获取爆率数据
         return allSpoilData[i];
     }
-
+    public static string[] getAbnormalData(int i)
+    {       //根据编号获取异常状态数据
+        return allAbnormalData[i];
+    }
+    public static string[] getExtraData(int i)
+    {       //根据编号获取异常状态数据
+        return allExtraData[i];
+    }
 }
 public class unitMessage
 {
