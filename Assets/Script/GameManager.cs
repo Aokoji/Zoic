@@ -48,11 +48,12 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            CombatController.Instance.playerDoAttack();
+            CombatController.Instance.playerDoAttack2();
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            Debug.Log(Random.Range(0, 2));
+            CombatController.Instance.playerDoAttack1();
+            //Debug.Log(Random.Range(0, 2));
         }
     }
     /*

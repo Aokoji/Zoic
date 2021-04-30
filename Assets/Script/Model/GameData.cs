@@ -19,6 +19,7 @@ public class GameData
     }
 
     private Vector2 lastBornPos;
+    private float coinMovement = 0.2f;
 
     private void initData()
     {
@@ -31,6 +32,7 @@ public class GameData
 
 
     public Vector2 LastBornPos { get => lastBornPos; set => lastBornPos = value; }
+    public float CoinMovement { get => coinMovement; set => coinMovement = value; }
 
     //外部初始化调用方法
     public static void initGameData() { gamedata = null; }

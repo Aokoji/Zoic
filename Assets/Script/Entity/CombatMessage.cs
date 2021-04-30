@@ -7,6 +7,7 @@ public class CombatMessage
     public CombatMessage()
     {
         UnitData = new Dictionary<string, int>();
+        SkillData = new Dictionary<int, int>();
         UnitData.Add("id", id);
         UnitData.Add("physical", physical);
         UnitData.Add("vigor", vigor);
@@ -50,19 +51,23 @@ public class CombatMessage
     private bool isPlayer;
     private bool isDead;
     private Dictionary<string, int> unitData;
+    private Dictionary<int, skillDetail> skillData;//技能id  等级
+    private EnemyActionAnalyse analyse = new EnemyActionAnalyse();//ai分析器
 
     private int attackID;
 
     public float CurSpeed { get => curSpeed; set => curSpeed = value; }
     public string Name { get => name; set => name = value; }
     public GameObject IconActor { get => iconActor; set => iconActor = value; }
-    public Dictionary<string, int> UnitData { get => unitData; set => unitData = value; }
     public bool IsPlayer { get => isPlayer; set => isPlayer = value; }
     public GameObject Prefab { get => prefab; set => prefab = value; }
     public int AttackID { get => attackID; set => attackID = value; }
     public List<abnormalState> Abnormal { get => abnormal; set => abnormal = value; }
     public List<specialAttackExtra> AtkExtra { get => atkExtra; set => atkExtra = value; }
     public bool IsDead { get => isDead; set => isDead = value; }
+    public Dictionary<string, int> UnitData { get => unitData; set => unitData = value; }
+    public Dictionary<int, skillDetail> SkillData { get => skillData; set => skillData = value; }
+    public EnemyActionAnalyse Analyse { get => analyse; set => analyse = value; }
 
     //技能
 }
@@ -86,4 +91,12 @@ public class specialAttackExtra
     public int constant;    //固定值参数
     public int round;
     public int type;            //下标2类型
+    public int actOn;   //作用于
+    public int specialRefer;   //特殊参考
+}
+public class skillDetail
+{
+    public int level;
+    public int coolDown;
+    public int aiType;
 }

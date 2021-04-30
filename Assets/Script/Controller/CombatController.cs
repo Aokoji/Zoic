@@ -6,7 +6,6 @@ using UnityEngine;
 public class CombatController : DDOLController<CombatController>
 {
     public EventManager eventManager;           //注册一个事件处理器
-    private EnemyActionAnalyse aiAnalyse;       //注册一个ai行为解析分析
     private AttackAction attackAction;              //战斗缓存器
     private CombatView combat;
     private GameObject combatScene;
@@ -23,7 +22,6 @@ public class CombatController : DDOLController<CombatController>
         combatScene = null;
         iswait = false;
         messageActor = new List<CombatMessage>();
-        aiAnalyse = new EnemyActionAnalyse();       //ai分析器
         attackAction = new AttackAction();
         //willActionActor = new List<CombatMessage>();
     }
@@ -106,6 +104,12 @@ public class CombatController : DDOLController<CombatController>
         enemy1.UnitData["curHp"] = int.Parse(data1[2]);
         enemy1.UnitData["vigor"] = int.Parse(data1[3]);
         enemy1.UnitData["curMp"] = int.Parse(data1[3]);
+        skillDetail skill = new skillDetail();
+        skill.aiType = 901;
+        skill.coolDown = 0;
+        skill.level = 1;
+        enemy1.SkillData.Add(1, skill);
+        enemy1.Analyse.skillAnalyze(enemy1);
         enemy1.IsPlayer = false;
         actors.Add(player1);
         actors.Add(enemy1);
@@ -161,7 +165,7 @@ public class CombatController : DDOLController<CombatController>
             {
                 Debug.Log("【敌人攻击】");
                 //轮到敌人攻击  拿到一个攻击数据组
-                AnalyzeResult aiAction = aiAnalyse.analyseCombatAttack(messageActor,willActionActor);
+                AnalyzeResult aiAction = willActionActor.Analyse.analyseCombatAttack(messageActor, willActionActor);
                 //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
                 AttackResult animData=attackAction.normalAction(aiAction);
                 //根据计算结果  调用动画播放器   播放完动画后进行下一步
@@ -214,8 +218,21 @@ public class CombatController : DDOLController<CombatController>
     {
         AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
         aiAction.selfNum = 0;
-        aiAction.skillID =7;
-        aiAction.skillType = 3;
+        aiAction.skillID =6;
+        aiAction.skillType = 102;
+        aiAction.takeNum = 0;
+        //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
+        AttackResult animData = attackAction.normalAction(aiAction);
+        //根据计算结果  调用动画播放器   播放完动画后进行下一步
+        AnimationController.Instance.playCombatBeHit(combat, animData);
+        //eventManager.doattackNext(combat.playerActor, combat.chooseActor);
+    }
+    public void playerDoAttack1()
+    {
+        AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
+        aiAction.selfNum = 0;
+        aiAction.skillID = 2;
+        aiAction.skillType = 103;
         aiAction.takeNum = 1;
         //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
         AttackResult animData = attackAction.normalAction(aiAction);
@@ -223,7 +240,16 @@ public class CombatController : DDOLController<CombatController>
         AnimationController.Instance.playCombatBeHit(combat, animData);
         //eventManager.doattackNext(combat.playerActor, combat.chooseActor);
     }
-
+    public void playerDoAttack2()
+    {
+        AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
+        aiAction.selfNum = 0;
+        aiAction.skillID = 4;
+        aiAction.skillType = 103;
+        aiAction.takeNum = 1;
+        AttackResult animData = attackAction.normalAction(aiAction);
+        AnimationController.Instance.playCombatBeHit(combat, animData);
+    }
 
 
 

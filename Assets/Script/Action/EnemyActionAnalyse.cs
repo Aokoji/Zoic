@@ -4,16 +4,25 @@ using UnityEngine;
 
 public class EnemyActionAnalyse
 {
-    public delegate void AnalyseEvent();
-    public event AnalyseEvent combatNextStep = null;
+    private List<int> atkType;          //攻击型
+    private List<int> beneficialType;   //有利型
+    private List<int> specialType;      //特殊
+    private List<int> cureType;         //恢复
+    private List<int> defType;          //防御
+    private List<int> priorityType;         //优先型
+    public EnemyActionAnalyse()
+    {
+        initList();
+    }
 
     public AnalyzeResult analyseCombatAttack(List<CombatMessage> list,CombatMessage item)
     {
         AnalyzeResult result = new AnalyzeResult();
         //+++可能需要设置目标  或者多加一个目标分析
+        //技能解析
+        //skillAnalyze(item);
         //分析行动
         //调用eventManager的攻击方法
-
 
         //测试
         for (int i=0;i< list.Count;i++) { 
@@ -29,6 +38,31 @@ public class EnemyActionAnalyse
         return result;
     }
 
+    private void initList()
+    {
+        atkType=new List<int>();
+        beneficialType = new List<int>();
+        specialType = new List<int>();
+        cureType = new List<int>();
+        defType = new List<int>();
+        priorityType = new List<int>();
+    }
+    public void skillAnalyze(CombatMessage item)
+    {//技能解析
+        foreach(var skill in item.SkillData)
+        {
+            int id = skill.Key;
+            switch (AllUnitData.getSkillData(id)[33])
+            {
+                case "901": atkType.Add(id); break;
+                case "902": beneficialType.Add(id); break;
+                case "903": defType.Add(id); break;
+                case "904": cureType.Add(id); break;
+                case "905": priorityType.Add(id); break;
+                case "906": specialType.Add(id); break;
+            }
+        }
+    }
     private void existAnalyze(int id)
     {//生存分析
         

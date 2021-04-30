@@ -25,7 +25,7 @@ public class PubTool : DDOLController<PubTool>
         action();
     }
 
-    //序列方法函数    测试通过
+    //序列方法函数
     private void updateStep()
     {
         stepAllow = stepList.Count > 0;
