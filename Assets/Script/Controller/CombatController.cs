@@ -52,7 +52,8 @@ public class CombatController : DDOLController<CombatController>
         GameObject baseain = Resources.Load<GameObject>("Entity/CombatUI");
         var baseMain = Instantiate(baseain);
         baseMain.name = "CombatView";
-        baseMain.transform.SetParent(CanvasLoad.canvasui.transform, false);
+        //baseMain.transform.SetParent(CanvasLoad.canvasui.transform, false);
+        baseMain.transform.position=CanvasLoad.canvasui.transform.position;
         var mainview = baseMain.GetComponent<CombatView>();
         mainview.gameObject.SetActive(true);       //todo  待修改
         combat = mainview;
@@ -90,6 +91,7 @@ public class CombatController : DDOLController<CombatController>
         List<CombatMessage> actors = new List<CombatMessage>();
         CombatMessage player1 = new CombatMessage();
         player1.Name = "player";
+        player1.IconName = "player";
         player1.UnitData["attack"] = 121;
         player1.UnitData["speed"] = 30;
         player1.UnitData["curHp"] = 150;
@@ -97,6 +99,7 @@ public class CombatController : DDOLController<CombatController>
         CombatMessage enemy1 = new CombatMessage();
         string[] data1 = AllUnitData.getUnitData(1);
         enemy1.Name = data1[1];
+        enemy1.IconName = data1[1];
         enemy1.UnitData["id"]= int.Parse(data1[0]);
         enemy1.UnitData["attack"]= int.Parse(data1[4]);
         enemy1.UnitData["speed"] = int.Parse(data1[5]);
@@ -204,8 +207,8 @@ public class CombatController : DDOLController<CombatController>
     }
     //退出
     public void exitCombat()
-    {
-        ObjectUtil.Destroy(combat);
+    {//先关相机并且删掉  再打开主相机  否则相机冲突
+        ObjectUtil.Destroy(combat.gameObject);
         ObjectUtil.Destroy(combatScene);
         ViewController.Instance.removeCameraDictionary("combatcam");
         //返回主视角

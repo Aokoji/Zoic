@@ -7,7 +7,7 @@ public class CombatMessage
     public CombatMessage()
     {
         UnitData = new Dictionary<string, int>();
-        SkillData = new Dictionary<int, int>();
+        SkillData = new Dictionary<int, skillDetail>();
         UnitData.Add("id", id);
         UnitData.Add("physical", physical);
         UnitData.Add("vigor", vigor);
@@ -24,6 +24,7 @@ public class CombatMessage
     //--------以下为内部引用量
     private int id;      //取数据的列表id
     private string name;
+    private string iconName;
     private int physical;
     private int vigor;
     private int attack;
@@ -68,6 +69,7 @@ public class CombatMessage
     public Dictionary<string, int> UnitData { get => unitData; set => unitData = value; }
     public Dictionary<int, skillDetail> SkillData { get => skillData; set => skillData = value; }
     public EnemyActionAnalyse Analyse { get => analyse; set => analyse = value; }
+    public string IconName { get => iconName; set => iconName = value; }
 
     //技能
 }

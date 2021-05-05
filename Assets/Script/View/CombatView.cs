@@ -15,11 +15,12 @@ public class CombatView : MonoBehaviour
     public Button skill;
     public Button bag;
     public Button run;
+    public GameObject[] actorIcon;
 
     public Button attackConfirm;        //攻击确认  假设使用统一的确认取消按钮   不同层级之间要隔离  深层的子集打开时外层点击不再生效(也就是说 加panel)
     public Button attackCancel;         //攻击取消
 
-    private List<GameObject> icons = null;              //速度条数据
+    //private List<GameObject> icons = null;              //速度条数据
     private List<GameObject> actorBody = null;
     private List<CombatMessage> _Data = null;       //全部数据
     public CombatMessage playerActor = null;        //玩家本体
@@ -37,10 +38,9 @@ public class CombatView : MonoBehaviour
     }
     private void initUI()
     {
-        icons = new List<GameObject>();
+        //icons = new List<GameObject>();
         actorBody = new List<GameObject>();
         distance = startPos.transform.position.x - endPos.transform.position.x;
-        enemySlots = GetComponentsInChildren<Transform>();
     }
     private void initBaseButtonEvent()
     {//初始化自身基础按钮的功能   不包含最终的二级或深级界面功能按钮
@@ -53,23 +53,32 @@ public class CombatView : MonoBehaviour
     public void initItemData(List<CombatMessage> data)
     {//创建头像图标    单位实体  并存储
         _Data = data;
+        int count = 0;
         foreach (var item in data)
         {
-            GameObject actor = Resources.Load<GameObject>("Entity/actorIcon");
+            actorIcon[count].transform.position = startPos.transform.position;
+            actorIcon[count].SetActive(true);
+            /*
+            GameObject actor = Resources.Load<GameObject>("Entity/combat/actorIcon");
             GameObject loadactor = Instantiate(actor);
             loadactor.name = item.Name;
-            loadactor.transform.SetParent(line.transform);
+            //loadactor.transform.SetParent(line.transform);
+            loadactor.transform.SetParent(transform);
             loadactor.transform.position = startPos.transform.position;
+            loadactor.transform.lossyScale.Set(1, 1,1);
             loadactor.SetActive(true);       //todo  待修改
-            item.IconActor = loadactor;
-            icons.Add(loadactor);
+            */
+            item.IconActor = actorIcon[count];
             if (item.Name == "player") {
                 item.IsPlayer = true;
                 playerActor = item;
             }
+            count++;
             //加载单位
-            GameObject actorbody= Resources.Load<GameObject>("Entity/combatActor");
+            GameObject actorbody= Resources.Load<GameObject>("Entity/combat/combatActor");
             GameObject loadactorBody = Instantiate(actorbody);
+            SpriteRenderer spr = loadactorBody.GetComponentInChildren<SpriteRenderer>();
+            spr.sprite = Resources.Load("Picture/load/" + item.IconName,typeof(Sprite)) as Sprite;  //换图
             loadactorBody.name = item.Name;
             loadactorBody.SetActive(false);
             item.Prefab = loadactorBody;
@@ -80,19 +89,22 @@ public class CombatView : MonoBehaviour
     public void setSceneLayout(int type)
     {
         // 加载人物
-        int num = 1;
+        int num = 0;
         //目前敌对单位最多三个
-        foreach(var item in actorBody)
+        foreach(var item in _Data)
         {
-            if (item.name == "player")
+            if (item.Name == GameData.Data.PLAYER)
             {
-                //item.transform.SetParent(playSlots.transform);
+                item.Prefab.transform.SetParent(playSlots.transform);
+                item.Prefab.transform.position=playSlots.transform.position;
             }
             else
             {
-                //item.transform.SetParent(enemySlots[num].transform);
+                item.Prefab.transform.SetParent(enemySlots[num].transform);
+                item.Prefab.transform.position=enemySlots[num].transform.position;
+                num++;
             }
-            item.SetActive(true);
+            item.Prefab.SetActive(true);
         }
         sceneShowType = type;
         //切换场景方法

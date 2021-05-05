@@ -20,6 +20,7 @@ public class GameData
 
     private Vector2 lastBornPos;
     private float coinMovement = 0.2f;
+    public string PLAYER = "player";
 
     private void initData()
     {

@@ -11,7 +11,7 @@ public class AnimationController : DDOLController<AnimationController>
     {
 
     }
-
+    private string NONE = "none";
     //外部调用
     public delegate void CombatAction();
     public event CombatAction combatNextStep = null;
@@ -25,7 +25,7 @@ public class AnimationController : DDOLController<AnimationController>
         }
     }
     //外部调用 播放组件动画
-    public void playAnimation(GameObject obj, string aniName,Action callBack)
+    public void playAnimation(GameObject obj, string aniName,bool loop,Action callBack)
     {
         Animator anim = obj.GetComponent<Animator>();
         float time=getAnimTime(anim, aniName);
@@ -35,7 +35,12 @@ public class AnimationController : DDOLController<AnimationController>
             return;
         }
         anim.Play(aniName);
-        PubTool.Instance.laterDo(time, callBack);
+        void action()
+        {
+            if(!loop) anim.Play(NONE);
+            callBack();
+        }
+        PubTool.Instance.laterDo(time, action);
     }
     //工具  获取动画时长
     private float getAnimTime(Animator anim, string aniName)
@@ -73,7 +78,12 @@ public class AnimationController : DDOLController<AnimationController>
         {
 
         }
-        combatNextStep();
+        void action()
+        {
+            combatNextStep();
+        }
+        playAnimation(result.sourceActor.Prefab.GetComponentInChildren<Animator>().gameObject, "testAction",false, action);
+
     }
 
     public void playCombatSceneTransform(CombatView combat,int type)
