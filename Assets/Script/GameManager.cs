@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            CombatController.Instance.playerDoAttack1();
+            CombatController.Instance.combat.addContext();
             //Debug.Log(Random.Range(0, 2));
         }
     }

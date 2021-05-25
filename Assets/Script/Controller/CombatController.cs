@@ -7,7 +7,7 @@ public class CombatController : DDOLController<CombatController>
 {
     public EventManager eventManager;           //注册一个事件处理器
     private AttackAction attackAction;              //战斗缓存器
-    private CombatView combat;
+    public CombatView combat;
     private GameObject combatScene;
     private float pubPer = 0.05f;
     private bool iswait;
@@ -83,7 +83,7 @@ public class CombatController : DDOLController<CombatController>
     public void initEvent()
     {
         //+++各种战斗确认界面通用一个确认和取消  在点击方法中根据view层 选择状态区分触发攻击的操作事件
-        //combat.attackConfirm.onClick.AddListener(playerDoAttack);    //攻击并触发下一步
+        combat.attackConfirm.onClick.AddListener(playerDoAttack);    //攻击并触发下一步
     }
     //--------------------------------------------------------------------------------测试方法
     public List<CombatMessage> getData()
@@ -92,10 +92,12 @@ public class CombatController : DDOLController<CombatController>
         CombatMessage player1 = new CombatMessage();
         player1.Name = "player";
         player1.IconName = "player";
-        player1.UnitData["attack"] = 121;
+        player1.UnitData["attack"] = 12;
         player1.UnitData["speed"] = 30;
         player1.UnitData["curHp"] = 150;
         player1.IsPlayer = true;
+        player1.NumID = 0;
+        player1.AttackID = 2;
         CombatMessage enemy1 = new CombatMessage();
         string[] data1 = AllUnitData.getUnitData(1);
         enemy1.Name = data1[1];
@@ -114,6 +116,7 @@ public class CombatController : DDOLController<CombatController>
         enemy1.SkillData.Add(1, skill);
         enemy1.Analyse.skillAnalyze(enemy1);
         enemy1.IsPlayer = false;
+        enemy1.NumID = 1;
         actors.Add(player1);
         actors.Add(enemy1);
         return actors;
@@ -177,6 +180,7 @@ public class CombatController : DDOLController<CombatController>
             else
             {
                 //+++dosomething  轮到玩家操作
+                combat.playerRound();
                 Debug.Log("【玩家攻击】");
             }
         }
@@ -220,10 +224,10 @@ public class CombatController : DDOLController<CombatController>
     public void playerDoAttack()
     {
         AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
-        aiAction.selfNum = 0;
-        aiAction.skillID =6;
-        aiAction.skillType = 102;
-        aiAction.takeNum = 0;
+        aiAction.selfNum = combat.playerActor.NumID;
+        aiAction.skillID =combat.chooseSkill;
+        aiAction.skillType =int.Parse( AllUnitData.getSkillData(combat.chooseSkill)[3]);
+        aiAction.takeNum = combat.chooseActor;
         //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
         AttackResult animData = attackAction.normalAction(aiAction);
         //根据计算结果  调用动画播放器   播放完动画后进行下一步

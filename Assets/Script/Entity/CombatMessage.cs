@@ -42,6 +42,7 @@ public class CombatMessage
     private int curMp;
 
     //---------以下为外部引用量
+    private int numID;
     private GameObject prefab;
     private GameObject iconActor;
     private int level;
@@ -70,6 +71,7 @@ public class CombatMessage
     public Dictionary<int, skillDetail> SkillData { get => skillData; set => skillData = value; }
     public EnemyActionAnalyse Analyse { get => analyse; set => analyse = value; }
     public string IconName { get => iconName; set => iconName = value; }
+    public int NumID { get => numID; set => numID = value; }
 
     //技能
 }

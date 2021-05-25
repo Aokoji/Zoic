@@ -17,6 +17,11 @@ public class CombatView : MonoBehaviour
     public Button run;
     public GameObject[] actorIcon;
 
+    public GameObject baseControl;
+    public GameObject mask;
+    public GameObject tanban;
+    public GameObject messageContext;   //二级弹窗
+
     public Button attackConfirm;        //攻击确认  假设使用统一的确认取消按钮   不同层级之间要隔离  深层的子集打开时外层点击不再生效(也就是说 加panel)
     public Button attackCancel;         //攻击取消
 
@@ -31,16 +36,22 @@ public class CombatView : MonoBehaviour
     private int ENEMY_NUM = 3;
     private int sceneShowType;
 
+    private bool isChooseOneActor = false;      //决定选择单个目标的显示箭头 点击是否生效
+
+
     public void initMethod()
     {
         initUI();
-        //initBaseButtonEvent();
+        initBaseButtonEvent();
     }
     private void initUI()
     {
         //icons = new List<GameObject>();
         actorBody = new List<GameObject>();
         distance = startPos.transform.position.x - endPos.transform.position.x;
+        mask.gameObject.SetActive(false);
+        baseControl.SetActive(false);
+        tanban.SetActive(false);
     }
     private void initBaseButtonEvent()
     {//初始化自身基础按钮的功能   不包含最终的二级或深级界面功能按钮
@@ -48,7 +59,7 @@ public class CombatView : MonoBehaviour
         skill.onClick.AddListener(skillButtonClick);
         bag.onClick.AddListener(propButtonClick);
         run.onClick.AddListener(fleeButtonClick);
-        attackCancel.onClick.AddListener(cancelAttackPanel);    //攻击二级分窗显示
+        attackCancel.onClick.AddListener(cancelConfirmPanel);    //攻击二级分窗显示
     }
     public void initItemData(List<CombatMessage> data)
     {//创建头像图标    单位实体  并存储
@@ -69,10 +80,7 @@ public class CombatView : MonoBehaviour
             loadactor.SetActive(true);       //todo  待修改
             */
             item.IconActor = actorIcon[count];
-            if (item.Name == "player") {
-                item.IsPlayer = true;
-                playerActor = item;
-            }
+
             count++;
             //加载单位
             GameObject actorbody= Resources.Load<GameObject>("Entity/combat/combatActor");
@@ -83,6 +91,17 @@ public class CombatView : MonoBehaviour
             loadactorBody.SetActive(false);
             item.Prefab = loadactorBody;
             actorBody.Add(loadactorBody);
+            loadactorBody.GetComponent<CombatActorItem>().chooseArrowChange(false);
+
+            if (item.Name == "player")
+            {
+                item.IsPlayer = true;
+                playerActor = item;
+            }
+            else
+            {
+                loadactorBody.AddComponent<Button>().onClick.AddListener(clickChoose);      //+++添加点击事件
+            }
         }
     }
     //外部调用  布置场景 
@@ -131,6 +150,41 @@ public class CombatView : MonoBehaviour
     }
     //-------------------------------------------出场动画end------------------------------
 
+    //----------------------------------------数据设置----------------------------------
+    public GameObject addContext()    //测试
+    {
+        GameObject obj = Resources.Load<GameObject>("Entity/combat/itembar");
+        GameObject content = Instantiate(obj);
+        var items=messageContext.GetComponentsInChildren<ComponentScript1>();
+        content.transform.SetParent(messageContext.transform);
+        content.transform.localScale=new Vector3(1, 1, 1);
+        content.transform.position = items[items.Length - 1].transform.position-new Vector3(0,0.8f,0);
+        return content;
+    }
+    public void deduceContextLast()
+    {
+
+    }
+    public void clearContext()
+    {
+
+    }
+    public void addContextByData(string data)
+    {
+        GameObject row = addContext();
+        //+++设置数据
+    }
+    public void showContext(List<string> data)  //+++需要写一个数据类型存储显示信息
+    {
+        foreach(var item in data)
+        {
+            addContextByData(item);
+        }
+    }
+
+
+    //----------------------------------------数据end---------------------------------
+
     //------------------------------------------结算动画-------------------------------------
     public void playSettleAnim(bool result,Action callback)
     {
@@ -160,24 +214,43 @@ public class CombatView : MonoBehaviour
     }
     //------------------------------------------结算动画end---------------------------------
 
-    //-----------------------------------按钮控制---------------------------------
-    private void showAttackPanel()
+    //-----------------------------------按钮 面板控制---------------------------------
+    //外部调用  玩家回合  出现基础面板
+    public void playerRound()
+    {
+        baseControl.SetActive(true);
+        mask.SetActive(false);
+        tanban.SetActive(false);
+    }
+
+    private void showConfirmPanel()
     {//显示攻击面板
+        //显示攻击面板的话会替代掉原先控制按钮的位置
+        mask.transform.SetAsLastSibling();
+        tanban.transform.SetAsLastSibling();
+        mask.SetActive(false);
+        tanban.SetActive(true);
         //给chooseActor赋值
         //开放目标点击控制  实时改变点击缓存内容
     }
-    private void cancelAttackPanel()
+    private void cancelConfirmPanel()
     {//关闭攻击面板
         chooseActor = -1;
+        baseControl.SetActive(true);
+        tanban.SetActive(false);
+        clearArrowState();
     }
     private void attackButtonClick()
     {
+        isChooseOneActor = true;    //允许出现选择箭头
         //进入二级界面
-        chooseActor = 0;
         chooseSkill = playerActor.AttackID;
         //无效化 基础四个按钮  
+        baseControl.SetActive(false);
+        //刷新箭头指向状态（就是待选目标的状态  重置为可选目标）
+        resetArrowState();
         //弹出攻击面板
-        showAttackPanel();
+        showConfirmPanel();
     }
     private void propButtonClick()
     {
@@ -191,7 +264,40 @@ public class CombatView : MonoBehaviour
     {
 
     }
-
+    //选择目标的点击事件
+    private void clickChoose()
+    {
+        if (!isChooseOneActor) return;
+        Debug.Log("choose");
+        var item=UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+        item.GetComponent<CombatActorItem>().chooseArrowChange(true);
+    }
+    private void resetArrowState()
+    {
+        bool isreset = false;
+        int count = 0;
+        foreach(var item in _Data)
+        {
+            item.Prefab.GetComponent<CombatActorItem>().chooseArrowChange(false);
+            if (!isreset)
+            {
+                if(!item.IsDead && !item.IsPlayer)
+                {
+                    isreset = true;
+                    chooseActor = count;
+                    item.Prefab.GetComponent<CombatActorItem>().chooseArrowChange(true);
+                }
+            }
+            count++;
+        }
+    }
+    private void clearArrowState()
+    {
+        foreach(var item in _Data)
+        {
+            item.Prefab.GetComponent<CombatActorItem>().chooseArrowChange(false);
+        }
+    }
 
 
     //实时设置各个图标跑的进度
