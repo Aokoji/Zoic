@@ -7,7 +7,15 @@ public class PubTool : DDOLController<PubTool>
     private bool stepLock = false;                      //方法执行中锁
     private bool stepAllow = true;                      //方法执行信号
     private List<Action<Action>> stepList = new List<Action<Action>>();     //公用方法序列
+    private StreamWriter sw = null;
+    private string logPath = "Assets/Resources/Data//eventLog.txt";
+    private FileInfo logfile;
 
+    private void Start()
+    {
+        logfile = new FileInfo(logPath);
+        sw = logfile.AppendText();
+    }
     private void Update()
     {
         updateStep();
@@ -59,6 +67,21 @@ public class PubTool : DDOLController<PubTool>
         stepList.Clear();
         stepLock = false;
         stepAllow = false;
+    }
+    /// <summary>
+    /// 操作日志
+    /// </summary>
+    public void addLog(string context)
+    {
+        //if (!File.Exists(logPath))
+        //{
+        //    File.Create(logPath);
+        //}
+        sw.WriteLine(context + "\n");
+        //File.WriteAllLines(logPath, context, Encoding.UTF8);    //存在则覆盖  试试
+
+        //sw.Close();
+        //sw.Dispose();
     }
 
 }
