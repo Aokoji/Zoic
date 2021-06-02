@@ -109,12 +109,11 @@ public class CombatController : DDOLController<CombatController>
         enemy1.UnitData["curHp"] = int.Parse(data1[2]);
         enemy1.UnitData["vigor"] = int.Parse(data1[3]);
         enemy1.UnitData["curMp"] = int.Parse(data1[3]);
-        skillDetail skill = new skillDetail();
-        skill.aiType = 901;
-        skill.coolDown = 0;
-        skill.level = 1;
-        enemy1.SkillData.Add(1, skill);
-        enemy1.Analyse.skillAnalyze(enemy1);
+        skillSave skill = new skillSave();
+        skill.skillLevel = 1;
+        skill.skillID = 1;
+        enemy1.SkillData.Add(skill);
+        enemy1.Analyse.skillAnalyze(enemy1.SkillData);
         enemy1.IsPlayer = false;
         enemy1.NumID = 1;
         actors.Add(player1);

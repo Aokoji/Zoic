@@ -7,7 +7,7 @@ public class CombatMessage
     public CombatMessage()
     {
         UnitData = new Dictionary<string, int>();
-        SkillData = new Dictionary<int, skillDetail>();
+        //SkillData = new Dictionary<int, skillDetail>();
         UnitData.Add("id", id);
         UnitData.Add("physical", physical);
         UnitData.Add("vigor", vigor);
@@ -20,6 +20,7 @@ public class CombatMessage
         UnitData.Add("dodge", dodge);
         UnitData.Add("curHp", curHp);
         UnitData.Add("curMp", curMp);
+        UnitData.Add("defence", def);
     }
     //--------以下为内部引用量
     private int id;      //取数据的列表id
@@ -34,26 +35,27 @@ public class CombatMessage
     private int apPat;
     private int strike;
     private int dodge;
-    private int[] state;
 
     private int maxHp;
     private int maxMp;
     private int curHp;
     private int curMp;
+    private int def;
 
     //---------以下为外部引用量
-    private int numID;
+    private int numID;          //战斗中list序号  玩家默认为0
     private GameObject prefab;
     private GameObject iconActor;
     private int level;
     private List<abnormalState> abnormal=new List<abnormalState>();
     private List<specialAttackExtra> atkExtra = new List<specialAttackExtra>();
+    private List<skillSave> skillData = new List<skillSave>();  //技能
 
     private float curSpeed;
     private bool isPlayer;
     private bool isDead;
     private Dictionary<string, int> unitData;
-    private Dictionary<int, skillDetail> skillData;//技能id  等级
+    //private Dictionary<int, skillDetail> skillData;//技能id  等级
     private EnemyActionAnalyse analyse = new EnemyActionAnalyse();//ai分析器
 
     private int attackID;
@@ -66,9 +68,9 @@ public class CombatMessage
     public int AttackID { get => attackID; set => attackID = value; }
     public List<abnormalState> Abnormal { get => abnormal; set => abnormal = value; }
     public List<specialAttackExtra> AtkExtra { get => atkExtra; set => atkExtra = value; }
+    public List<skillSave> SkillData { get => skillData; set => skillData = value; }
     public bool IsDead { get => isDead; set => isDead = value; }
     public Dictionary<string, int> UnitData { get => unitData; set => unitData = value; }
-    public Dictionary<int, skillDetail> SkillData { get => skillData; set => skillData = value; }
     public EnemyActionAnalyse Analyse { get => analyse; set => analyse = value; }
     public string IconName { get => iconName; set => iconName = value; }
     public int NumID { get => numID; set => numID = value; }
@@ -97,10 +99,4 @@ public class specialAttackExtra
     public int type;            //下标2类型
     public int actOn;   //作用于
     public int specialRefer;   //特殊参考
-}
-public class skillDetail
-{
-    public int level;
-    public int coolDown;
-    public int aiType;
 }

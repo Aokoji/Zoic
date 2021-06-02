@@ -47,11 +47,11 @@ public class EnemyActionAnalyse
         defType = new List<int>();
         priorityType = new List<int>();
     }
-    public void skillAnalyze(CombatMessage item)
+    public void skillAnalyze(List<skillSave> item)
     {//技能解析
-        foreach(var skill in item.SkillData)
+        foreach(var skill in item)
         {
-            int id = skill.Key;
+            int id = skill.skillID;
             switch (AllUnitData.getSkillData(id)[33])
             {
                 case "901": atkType.Add(id); break;
