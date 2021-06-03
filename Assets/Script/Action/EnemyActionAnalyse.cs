@@ -10,30 +10,38 @@ public class EnemyActionAnalyse
     private List<int> cureType;         //恢复
     private List<int> defType;          //防御
     private List<int> priorityType;         //优先型
+    private CombatMessage player;
+    // 内部结构体  分析详情
+    private struct AnalyzeDetail
+    {
+        int advantageLevel; //优势等级  0-10 平均5
+        int advantageType; //优势类型  0均势  1属性优势 
+        bool advantageJudge;  //优势评判
+
+    }
     public EnemyActionAnalyse()
     {
         initList();
     }
 
-    public AnalyzeResult analyseCombatAttack(List<CombatMessage> list,CombatMessage item)
+    public AnalyzeResult analyseCombatAttack(List<CombatMessage> list,CombatMessage item, CombatMessage play)
     {
+        player = play;
         AnalyzeResult result = new AnalyzeResult();
-        //+++可能需要设置目标  或者多加一个目标分析
+        //可能需要设置目标  或者多加一个目标分析
         //技能解析
-        //skillAnalyze(item);
+        skillAnalyze(item.SkillData);
         //分析行动
-        //调用eventManager的攻击方法
 
+        //派发攻击事件
+
+        //如果是伤害型技能  或 指向性debuff
         //测试
-        for (int i=0;i< list.Count;i++) { 
-            if (list[i].Name == "player")
-                result.takeNum = i;
-            if (list[i].Name == item.Name)
-                result.selfNum = i;
-        }//测试
-        result.skillID = 1;//测试
-        result.skillType = 3;//测试
-
+        result.takeNum = player.NumID;
+        result.selfNum = item.NumID;
+        int skillid = item.AttackID;//测试
+        result.skillID =skillid; 
+        result.skillType = int.Parse(AllUnitData.getSkillData(skillid)[3]);
         //combatNextStep();
         return result;
     }
@@ -63,14 +71,15 @@ public class EnemyActionAnalyse
             }
         }
     }
-    private void existAnalyze(int id)
-    {//生存分析
-        
-    }
     private void tendencyAnalyze(int id)
     {//优势分析  状态倾向分析
 
     }
+    private void existAnalyze(int id)
+    {//生存分析
+        
+    }
+
     private void conditionAnalyze(int id)
     {//状态分析
 

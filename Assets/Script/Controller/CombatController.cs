@@ -28,11 +28,8 @@ public class CombatController : DDOLController<CombatController>
     //外部调用  打开界面
     public void openCombat(List<CombatMessage> data)    //+++处理传进来的数据  敌人 玩家 战斗类型（野怪 boss或精英剧情等） 战斗场景等配置
     {
-        messageActor = getData();    //获取敌人数据 --测试
-        //messageActor = data.actorsData;
-        attackAction.initData(messageActor);        //+++要改 为   data
-
-        if (combat == null) { initCombat(messageActor); }
+        attackAction.initData(data);
+        if (combat == null) { initCombat(data); }
         AnimationController.Instance.cleanNextStepAction(); //清空动画控制器事件
         AnimationController.Instance.combatNextStep += nextStep;
         combat.transform.SetAsLastSibling();            //置顶
@@ -85,41 +82,6 @@ public class CombatController : DDOLController<CombatController>
         //+++各种战斗确认界面通用一个确认和取消  在点击方法中根据view层 选择状态区分触发攻击的操作事件
         combat.attackConfirm.onClick.AddListener(playerDoAttack);    //攻击并触发下一步
     }
-    //--------------------------------------------------------------------------------测试方法
-    public List<CombatMessage> getData()
-    {//假数据
-        List<CombatMessage> actors = new List<CombatMessage>();
-        CombatMessage player1 = new CombatMessage();
-        player1.Name = "player";
-        player1.IconName = "player";
-        player1.UnitData["attack"] = 12;
-        player1.UnitData["speed"] = 30;
-        player1.UnitData["curHp"] = 150;
-        player1.IsPlayer = true;
-        player1.NumID = 0;
-        player1.AttackID = 2;
-        CombatMessage enemy1 = new CombatMessage();
-        string[] data1 = AllUnitData.getUnitData(1);
-        enemy1.Name = data1[1];
-        enemy1.IconName = data1[1];
-        enemy1.UnitData["id"]= int.Parse(data1[0]);
-        enemy1.UnitData["attack"]= int.Parse(data1[4]);
-        enemy1.UnitData["speed"] = int.Parse(data1[5]);
-        enemy1.UnitData["physical"] = int.Parse(data1[2]);
-        enemy1.UnitData["curHp"] = int.Parse(data1[2]);
-        enemy1.UnitData["vigor"] = int.Parse(data1[3]);
-        enemy1.UnitData["curMp"] = int.Parse(data1[3]);
-        skillSave skill = new skillSave();
-        skill.skillLevel = 1;
-        skill.skillID = 1;
-        enemy1.SkillData.Add(skill);
-        enemy1.Analyse.skillAnalyze(enemy1.SkillData);
-        enemy1.IsPlayer = false;
-        enemy1.NumID = 1;
-        actors.Add(player1);
-        actors.Add(enemy1);
-        return actors;
-    }
     //-------------------------------------------------内部逻辑-----------------------------
     private void combatStart()
     {
@@ -170,7 +132,7 @@ public class CombatController : DDOLController<CombatController>
             {
                 Debug.Log("【敌人攻击】");
                 //轮到敌人攻击  拿到一个攻击数据组
-                AnalyzeResult aiAction = willActionActor.Analyse.analyseCombatAttack(messageActor, willActionActor);
+                AnalyzeResult aiAction = willActionActor.Analyse.analyseCombatAttack(messageActor, willActionActor,combat.playerActor);
                 //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
                 AttackResult animData=attackAction.normalAction(aiAction);
                 //根据计算结果  调用动画播放器   播放完动画后进行下一步

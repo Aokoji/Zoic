@@ -15,11 +15,13 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        PubTool.Instance.addLogger("游戏启动");
         AllUnitData.loadData();
         GameData.initGameData();
         ViewController.Instance.initCreateViewController(); //初始化视图
         CanvasLoad.loadCanvas();
         PlayerControl.Instance.initCreatePlayer();          //初始化玩家
+        PlayerManager.Instance.loadPlayerManager();     //加载玩家管理器
         MainController.Instance.initController();
         CombatController.Instance.initController();
         initTools();
@@ -45,7 +47,8 @@ public class GameManager : MonoBehaviour
         {
             //PlayerControl.Instance.setControl(false);
             //MainController.Instance.openCombat();
-            List<CombatMessage> list = new List<CombatMessage>();
+            List<int> list = new List<int>();
+            list.Add(1);
             MainController.Instance.SendMessage("receiveCombatInformation", list, SendMessageOptions.DontRequireReceiver);
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -54,9 +57,32 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            CombatController.Instance.combat.addContext();
+            PubTool.Instance.addLogger("ceshi");
             //Debug.Log(Random.Range(0, 2));
         }
+    }
+
+    //----------------------------------------------------------------公共事件--------------------------------------------
+    private void OnApplicationFocus(bool focus)
+    {
+        if (focus)
+        {
+            Time.timeScale = 0f;
+            AudioListener.pause = true;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            AudioListener.pause = false;
+        }
+    }
+    private void OnApplicationPause(bool pause)
+    {
+        PubTool.Instance.addLogger( "游戏暂停");
+    }
+    private void OnApplicationQuit()
+    {
+        PubTool.Instance.addLogger( "游戏退出\n\n\n\n-----------------------------------------------------------------");
     }
     /*
     private void testFunction()
@@ -73,5 +99,5 @@ public class GameManager : MonoBehaviour
         PubTool.Instance.addStep(aa);
     }*/
 
-    
+
 }

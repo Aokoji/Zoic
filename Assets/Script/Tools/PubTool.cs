@@ -2,19 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.IO;
 public class PubTool : DDOLController<PubTool>
 {
     private bool stepLock = false;                      //方法执行中锁
     private bool stepAllow = true;                      //方法执行信号
     private List<Action<Action>> stepList = new List<Action<Action>>();     //公用方法序列
     private StreamWriter sw = null;
-    private string logPath = "Assets/Resources/Data//eventLog.txt";
-    private FileInfo logfile;
+    //private string logPath = "Assets/Resources/Data//eventLog.txt";
+    //private FileInfo logfile;
 
     private void Start()
     {
-        logfile = new FileInfo(logPath);
-        sw = logfile.AppendText();
+        //logfile = new FileInfo(logPath);
     }
     private void Update()
     {
@@ -71,17 +71,22 @@ public class PubTool : DDOLController<PubTool>
     /// <summary>
     /// 操作日志
     /// </summary>
-    public void addLog(string context)
+    public void addLogger(string context)
     {
-        //if (!File.Exists(logPath))
-        //{
-        //    File.Create(logPath);
-        //}
-        sw.WriteLine(context + "\n");
-        //File.WriteAllLines(logPath, context, Encoding.UTF8);    //存在则覆盖  试试
-
-        //sw.Close();
-        //sw.Dispose();
+        if (!Directory.Exists("Logs")) Directory.CreateDirectory("Logs");       //根目录存在Logs文件夹   不存在则创建
+        string path=Path.Combine("Logs", "mainLog.txt");
+        string mess = DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss    ") + context + "\n";
+        File.AppendAllText(path, mess);
+    }
+    /// <summary>
+    /// 战斗记录操作日志
+    /// </summary>
+    public void addCombatLogger(string type, string context)
+    {
+        if (!Directory.Exists("Logs/combat")) Directory.CreateDirectory("Logs/combat");       // 不存在则创建
+        string path = Path.Combine("Logs/combat",  "combatLog.txt");
+        string mess = DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss    ") + context + "\n";
+        File.AppendAllText(path, mess);
     }
 
 }

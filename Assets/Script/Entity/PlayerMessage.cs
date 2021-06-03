@@ -31,7 +31,7 @@ public class PlayerMessage
     public List<skillSave> skills=new List<skillSave>();
 
 }
-
+[System.Serializable]
 public class skillSave
 {
     public int skillID;
