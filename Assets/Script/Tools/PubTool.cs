@@ -84,7 +84,7 @@ public class PubTool : DDOLController<PubTool>
     public void addCombatLogger(string type, string context)
     {
         if (!Directory.Exists("Logs/combat")) Directory.CreateDirectory("Logs/combat");       // 不存在则创建
-        string path = Path.Combine("Logs/combat",  "combatLog.txt");
+        string path = Path.Combine("Logs/combat", type + ".txt");
         string mess = DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss    ") + context + "\n";
         File.AppendAllText(path, mess);
     }

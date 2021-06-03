@@ -20,7 +20,9 @@ public class CombatView : MonoBehaviour
     public GameObject baseControl;
     public GameObject mask;
     public GameObject tanban;
-    public GameObject messageContext;   //二级弹窗
+    public GameObject messageFather;    //技能弹窗父级
+    public GameObject messageContext;   //二级技能弹窗
+    public GameObject skillThirdFather;     //技能三级父级
 
     public Button attackConfirm;        //攻击确认  假设使用统一的确认取消按钮   不同层级之间要隔离  深层的子集打开时外层点击不再生效(也就是说 加panel)
     public Button attackCancel;         //攻击取消
@@ -52,6 +54,8 @@ public class CombatView : MonoBehaviour
         mask.gameObject.SetActive(false);
         baseControl.SetActive(false);
         tanban.SetActive(false);
+        messageFather.SetActive(false);
+        skillThirdFather.SetActive(false);
     }
     private void initBaseButtonEvent()
     {//初始化自身基础按钮的功能   不包含最终的二级或深级界面功能按钮
@@ -60,6 +64,7 @@ public class CombatView : MonoBehaviour
         bag.onClick.AddListener(propButtonClick);
         run.onClick.AddListener(fleeButtonClick);
         attackCancel.onClick.AddListener(cancelConfirmPanel);    //攻击二级分窗显示
+        messageFather.GetComponentInChildren<Button>().onClick.AddListener(closeSkillScene);
     }
     public void initItemData(List<CombatMessage> data)
     {//创建头像图标    单位实体  并存储
@@ -67,6 +72,7 @@ public class CombatView : MonoBehaviour
         int count = 0;
         foreach (var item in data)
         {
+            if (count > 3) break;
             actorIcon[count].transform.position = startPos.transform.position;
             actorIcon[count].SetActive(true);
             /*
@@ -93,9 +99,8 @@ public class CombatView : MonoBehaviour
             actorBody.Add(loadactorBody);
             loadactorBody.GetComponent<CombatActorItem>().chooseArrowChange(false);
 
-            if (item.Name == "player")
+            if (item.IsPlayer)
             {
-                item.IsPlayer = true;
                 playerActor = item;
             }
             else
@@ -103,7 +108,24 @@ public class CombatView : MonoBehaviour
                 loadactorBody.AddComponent<Button>().onClick.AddListener(clickChoose);      //+++添加点击事件
             }
         }
+        initLayout();
     }
+    //初始化界面布局数据及内容
+    private void initLayout()
+    {
+        clearContext();     //清理技能列表
+        foreach(var skill in playerActor.SkillData)
+        {
+            GameObject bar = addContext();
+            Text[] conts=bar.GetComponentsInChildren<Text>();
+            conts[0].text = AllUnitData.getSkillData(skill.skillID)[1];     //技能名称
+            conts[1].text = skill.skillLevel+"";     //等级
+            conts[2].text = AllUnitData.getSkillData(skill.skillID)[29];     //体力消耗
+            conts[3].text = AllUnitData.getSkillData(skill.skillID)[30];     //精力消耗
+        }
+    }
+
+
     //外部调用  布置场景 
     public void setSceneLayout(int type)
     {
@@ -112,7 +134,7 @@ public class CombatView : MonoBehaviour
         //目前敌对单位最多三个
         foreach(var item in _Data)
         {
-            if (item.Name == GameData.Data.PLAYER)
+            if (item.IsPlayer)
             {
                 item.Prefab.transform.SetParent(playSlots.transform);
                 item.Prefab.transform.position=playSlots.transform.position;
@@ -167,7 +189,22 @@ public class CombatView : MonoBehaviour
     }
     public void clearContext()
     {
-
+        var list = messageContext.GetComponentsInChildren<ComponentScript1>();
+        for (int i = list.Length-1; i >= 1; i--)
+        {
+            if (list[i] != null)
+            {
+                Destroy(list[i]);
+            }
+        }
+    }
+    public void hideContext()
+    {
+        messageFather.SetActive(false);
+    }
+    public void showContext()
+    {
+        messageFather.SetActive(true);
     }
     public void addContextByData(string data)
     {
@@ -236,8 +273,10 @@ public class CombatView : MonoBehaviour
     private void cancelConfirmPanel()
     {//关闭攻击面板
         chooseActor = -1;
+        isChooseOneActor = false;
         baseControl.SetActive(true);
         tanban.SetActive(false);
+        skillThirdFather.SetActive(false);
         clearArrowState();
     }
     private void attackButtonClick()
@@ -258,11 +297,27 @@ public class CombatView : MonoBehaviour
     }
     private void skillButtonClick()
     {
-
+        lockBaseButton(true);
+        showContext();
     }
     private void fleeButtonClick()
     {
 
+    }
+
+    //关闭二级  技能页面
+    private void closeSkillScene()
+    {
+        lockBaseButton(false);
+        hideContext();
+    }
+    //锁基础按钮
+    private void lockBaseButton(bool islock)
+    {
+        attack.enabled = !islock;
+        skill.enabled = !islock;
+        bag.enabled = !islock;
+        run.enabled = !islock;
     }
     //选择目标的点击事件
     private void clickChoose()
@@ -291,6 +346,7 @@ public class CombatView : MonoBehaviour
             count++;
         }
     }
+    //清理选择目标箭头
     private void clearArrowState()
     {
         foreach(var item in _Data)

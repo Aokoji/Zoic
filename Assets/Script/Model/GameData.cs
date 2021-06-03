@@ -42,7 +42,9 @@ public class GameData
     //data公共量初始化
     private void initData() {
         LastBornPos = new Vector2(PlayerPrefs.GetFloat("lastBornPosX", 0), PlayerPrefs.GetFloat("lastBornPosY", 0));
-        loadGameMessageData();
+        //loadGameMessageData();
+        dataplaymessage = new DataPlayMessage();
+        dataplaymessage.combatIDCount = 1;
         loadPlayerData();
     }
 
@@ -59,12 +61,13 @@ public class GameData
         if (!Directory.Exists("Assets/Resources/Data/game")) Directory.CreateDirectory("Assets/Resources/Data/game");
         if (!File.Exists(Application.dataPath + gameDataLoadPath))
         {
+            /*
             if (File.Exists(Application.dataPath + gameDataLoadSign))
             {
                 Debug.LogError("游戏配置错误!");
                 PubTool.Instance.addLogger("游戏配置错误!");
                 Application.Quit();
-            }
+            }*/
             initGameDataMessage();             //没有档则创建档
             PubTool.Instance.addLogger("创建游戏配置");
         }
@@ -142,6 +145,10 @@ public class GameData
         playermessage.speed = 30;
         playermessage.adPat = 0;
         playermessage.apPat = 0;
+        skillSave skill1 = new skillSave();
+        skill1.skillID = 4;
+        skill1.skillLevel = 1;
+        playermessage.skills.Add(skill1);
         BinaryFormatter bin = new BinaryFormatter();
         FileStream file = File.Create(Application.dataPath + baseDataLoadPath);
         bin.Serialize(file, playermessage);

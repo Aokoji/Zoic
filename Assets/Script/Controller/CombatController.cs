@@ -11,6 +11,7 @@ public class CombatController : DDOLController<CombatController>
     private GameObject combatScene;
     private float pubPer = 0.05f;
     private bool iswait;
+    private string logname;
 
     private List<CombatMessage> messageActor = null;         //跑进度全部单位数据
     private CombatMessage willActionActor = null;      //待操作的单位
@@ -26,10 +27,12 @@ public class CombatController : DDOLController<CombatController>
         //willActionActor = new List<CombatMessage>();
     }
     //外部调用  打开界面
-    public void openCombat(List<CombatMessage> data)    //+++处理传进来的数据  敌人 玩家 战斗类型（野怪 boss或精英剧情等） 战斗场景等配置
+    public void openCombat(List<CombatMessage> data,string logName)    //处理传进来的数据  敌人 玩家 战斗类型（野怪 boss或精英剧情等） 战斗场景等配置
     {
-        attackAction.initData(data);
-        if (combat == null) { initCombat(data); }
+        logname = logName;
+        messageActor = data;
+        attackAction.initData(messageActor);
+        if (combat == null) { initCombat(messageActor); }
         AnimationController.Instance.cleanNextStepAction(); //清空动画控制器事件
         AnimationController.Instance.combatNextStep += nextStep;
         combat.transform.SetAsLastSibling();            //置顶
@@ -94,6 +97,7 @@ public class CombatController : DDOLController<CombatController>
     //开始跑进度  （速度条）
     private void startPrograss(Action callback)
     {
+        PubTool.instance.addCombatLogger(logname, "开始游戏进度");
         StartCoroutine(doLoadPrograss());
         callback();
     }
@@ -128,7 +132,7 @@ public class CombatController : DDOLController<CombatController>
         if (willActionActor != null)
         {
             iswait = true;
-            if (willActionActor.Name != "player")//敌人攻击
+            if (!willActionActor.IsPlayer)//敌人攻击
             {
                 Debug.Log("【敌人攻击】");
                 //轮到敌人攻击  拿到一个攻击数据组

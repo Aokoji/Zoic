@@ -39,11 +39,12 @@ public class MainController : DDOLController<MainController>
             list.Add(item);
             id++;
         }
+        string combatname = "combat" + GameData.Data.DataPlaymessage.combatIDCount;
         PubTool.instance.addLogger("遭遇战斗,战斗序号：combat"+GameData.Data.DataPlaymessage.combatIDCount);
-        PubTool.instance.addCombatLogger("combat" + GameData.Data.DataPlaymessage.combatIDCount, "进入战斗");
+        PubTool.instance.addCombatLogger(combatname, "进入战斗");
         GameData.Data.DataPlaymessage.combatIDCount++;
         GameData.Data.saveGameMessageData();
-        CombatController.instance.openCombat(list);
+        CombatController.instance.openCombat(list, combatname);
     }
 
 
@@ -87,7 +88,7 @@ public class MainController : DDOLController<MainController>
         mess.UnitData["dodge"] = int.Parse(enemy[10]);
         mess.UnitData["curHp"] = int.Parse(enemy[2]);
         mess.UnitData["curMp"] = int.Parse(enemy[3]);
-        mess.UnitData["defence"] = int.Parse(enemy[13]);
+        mess.UnitData["defence"] = int.Parse(enemy[11]);
         mess.IconName = enemy[1];
         mess.IsPlayer = false;
         skillSave skill;

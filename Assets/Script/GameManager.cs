@@ -63,9 +63,9 @@ public class GameManager : MonoBehaviour
     }
 
     //----------------------------------------------------------------公共事件--------------------------------------------
-    private void OnApplicationFocus(bool focus)
+    /*private void OnApplicationFocus(bool focus)
     {
-        if (focus)
+        if (!focus)
         {
             Time.timeScale = 0f;
             AudioListener.pause = true;
@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 1f;
             AudioListener.pause = false;
         }
-    }
+    }*/
     private void OnApplicationPause(bool pause)
     {
         PubTool.Instance.addLogger( "游戏暂停");
