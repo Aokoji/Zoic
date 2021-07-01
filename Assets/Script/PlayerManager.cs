@@ -13,12 +13,17 @@ public class PlayerManager : DDOLController<PlayerManager>
     //玩家升级
     public void levelUp()
     {
-
+        EventTransfer.instance.levelUpAction(); //派发升级事件
     }
     //升级技能
     public void upgradeSkill(int skillID)
     {
 
+    }
+    //获得技能点
+    public void getSkillPoint()
+    {
+        EventTransfer.instance.getSkillAction();    //派发获得事件
     }
     //获得经验
     public void addExp(int num)
