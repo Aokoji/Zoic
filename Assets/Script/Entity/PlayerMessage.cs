@@ -28,6 +28,7 @@ public class PlayerMessage
 
 
     public int attackID;               //攻击默认序号
+    public int skillPoint;          //技能点
     public List<skillSave> skills=new List<skillSave>();
 
 }

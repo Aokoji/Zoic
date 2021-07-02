@@ -5,22 +5,53 @@ using UnityEngine;
 //公共事件监听与派发
 public class EventTransfer : DDOLController<EventTransfer>
 {
+    public void initEvent()
+    {
+        
+    }
     //升级事件  （任何升级）
     private delegate void UpgradeEvent();
+    //操作事件
+    private delegate void OperationEvent();
 
     /// <summary>
     /// 升级事件
     /// </summary>
     private event UpgradeEvent levelUp =null;
-    public void levelUpAction() { levelUp(); }  // 升级
+    public void levelUpAction() {
+        //GameData.Data.levelUp();
+        levelUp(); // 升级
+    } 
 
     /// <summary>
     /// 获得技能点
     /// </summary>
     private event UpgradeEvent skillGet = null;
-    public void getSkillAction() { skillGet(); } 
+    public void getSkillAction() {
+        GameData.Data.skillPointGot();
+        skillGet();
+    }
+    
 
 
+
+    /// <summary>
+    /// 存档
+    /// </summary>
+    private event OperationEvent saveLoad = null;
+    public void doSaveLoad() {
+        GameData.Data.saveLoad();
+        saveLoad();
+    }
+    /// <summary>
+    /// 存档配置（自动存档）
+    /// </summary>
+    private event OperationEvent saveGameMessage = null;
+    public void doSaveGameMessage()
+    {
+        GameData.Data.saveGameMessageData();
+        saveGameMessage();
+    }
 
     /*
      

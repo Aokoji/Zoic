@@ -28,10 +28,17 @@ public class GameData
     private string gameDataLoadSign = "/Resources/Data/sign.dll";
     private Vector2 lastBornPos;
     private float coinMovement = 0.2f;          //金币奖励浮动倍率  80%-120%
+    private int expBase = 40;                           //等级经验基数
+    private int hpBase = 150;
+    private int mpBase = 30;
+    private int atkBase = 12;
+    private int defBase = 2;
     public string PLAYER = "player";
-    private PlayerMessage playermessage;        //玩家数据
-    private DataPlayMessage dataplaymessage;           //游戏配置数据
 
+
+
+    private DataPlayMessage dataplaymessage;           //游戏配置数据
+    private PlayerMessage playermessage;        //-----------------------------------------------玩家数据----------
 
     //外部初始化调用方法
     public static void initGameData()
@@ -53,6 +60,79 @@ public class GameData
     public PlayerMessage Playermessage { get => playermessage; set => playermessage = value; }
     public DataPlayMessage DataPlaymessage { get => dataplaymessage; set => dataplaymessage = value; }
 
+    //事件调用  升级
+    public void levelUp()
+    {
+        actorGrowthCurve(playermessage.level);
+        playermessage.level++;
+        PubTool.Instance.addLogger("人物升级!" + playermessage.level);
+    }
+    //事件调用  获得技能点
+    public void skillPointGot()
+    {
+        playermessage.skillPoint++;
+    }
+    //外部调用 获得经验
+    public int addExp(int num)
+    {
+        int curExp = playermessage.expcur + num;
+        int finalLevel = 0;
+        while (curExp >= playermessage.expmax)
+        {
+            curExp -= playermessage.expmax;
+            levelUp();  //升级
+            finalLevel++;
+            levelExp(playermessage.level);  //加经验上限
+        }
+        playermessage.expcur = curExp;
+        return finalLevel;
+    }
+
+
+
+
+
+
+
+
+
+    //---------------------------------------------------------------------升级配置-----------------------
+    //人物成长曲线
+    private void actorGrowthCurve(int level)
+    {
+        //暂时不用    log(1+x^2+2*x)+2^(x/20)+x^2/1000-1    半s型曲线
+        //人物成长曲线公式1-100   0-50multi     2^(x/20)+x/5-1    持续增长型
+        //生命曲线  30multi        2^(x/24)+x/8-1    
+        //精力曲线  20multi        x/6+log(x)+1/2
+        //攻击曲线  50multi        2^(x/20)+x/5-1
+        //防御曲线  25multi        x/4
+        //经验曲线  125multi      2^(x/15)+x/4+x^(1/4)-1          +0.1*等级
+
+        //体力提升  额外回复+20%
+        int numPer = (int)Math.Floor((Math.Pow(2, (level + 1) / 24) + (level + 1) / 8 - 1) - (Math.Pow(2, level / 24) + level / 8 - 1)) * hpBase;
+        playermessage.hpmax += numPer;
+        playermessage.hpcur += numPer + (int)(playermessage.hpmax * 0.2);
+        if (playermessage.hpcur > playermessage.hpmax)
+            playermessage.hpcur = playermessage.hpmax;
+        //精力提升  额外恢复+30%
+        numPer = (int)Math.Floor((Math.Log(level + 1) + (level + 1) / 6 + 1 / 2) - (Math.Log(level) + level / 6 + 1 / 2)) * mpBase;
+        playermessage.mpmax += numPer;
+        playermessage.mpcur += numPer + (int)(playermessage.hpmax * 0.3);
+        if (playermessage.mpcur > playermessage.mpmax)
+            playermessage.mpcur = playermessage.mpmax;
+        //攻防提升
+        numPer = (int)Math.Floor((Math.Pow(2, (level + 1) / 20) + (level + 1) / 5 - 1) - (Math.Pow(2, level / 20) + level / 5 - 1)) * atkBase;
+        playermessage.atk += numPer;
+        numPer = (int)((level + 1.0) / 4 - level / 4) * defBase;
+        playermessage.def += numPer;
+    }
+    //加经验上限
+    private void levelExp(int level)
+    {
+        double maxexp = expBase * (Math.Pow(2, level / 15) + level / 4 + Math.Pow(level, 1 / 4) - 1 + level / 10);
+        playermessage.expmax = (int)Math.Floor(maxexp);
+    }
+    //-----------------------------------------------------------------------------存储配置-----------------------------------------
     // 加载游戏部分配置数据       （自动加载）
     private void loadGameMessageData()
     {
@@ -132,19 +212,21 @@ public class GameData
         playermessage = new PlayerMessage();
         playermessage.isFirstIn = true;
         playermessage.level = 1;
-        playermessage.hpmax = 150;
-        playermessage.hpcur = 150;
-        playermessage.mpmax = 30;
-        playermessage.mpcur = 30;
+        playermessage.hpmax = hpBase;
+        playermessage.hpcur = hpBase;
+        playermessage.mpmax = mpBase;
+        playermessage.mpcur = mpBase;
         playermessage.expcur = 0;
-        playermessage.expmax = 50;
-        playermessage.atk = 12;
-        playermessage.def = 2;
+        playermessage.expmax = expBase;
+        playermessage.atk = atkBase;
+        playermessage.def = defBase;
         playermessage.strike = 0;
         playermessage.dodge = 0;
         playermessage.speed = 30;
         playermessage.adPat = 0;
         playermessage.apPat = 0;
+
+        playermessage.skillPoint = 1;
         skillSave skill1 = new skillSave();
         skill1.skillID = 4;
         skill1.skillLevel = 1;
