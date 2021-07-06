@@ -94,9 +94,11 @@ public class MainController : DDOLController<MainController>
         skillSave skill;
         List<skillSave> list = new List<skillSave>();
         string[] skills = AllUnitData.getUnitSkillData(id);
-        mess.AttackID = int.Parse(skills[1]);
-        for(int i = 2; i < skills.Length; i+=2)
+        mess.AttackID = int.Parse(skills[2]);
+        mess.SkillOdds = int.Parse(skills[1]);
+        for(int i = 3; i < skills.Length; i++)
         {
+            if (skills[i].Equals(0)) break;
             skill = new skillSave();
             skill.skillID = int.Parse(skills[i]);
             skill.skillLevel = int.Parse(skills[i+1]);

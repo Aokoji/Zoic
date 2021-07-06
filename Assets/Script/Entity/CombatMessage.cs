@@ -59,6 +59,7 @@ public class CombatMessage
     private EnemyActionAnalyse analyse = new EnemyActionAnalyse();//ai分析器
 
     private int attackID;
+    private int skillOdds;  //技能概率
 
     public float CurSpeed { get => curSpeed; set => curSpeed = value; }
     public string Name { get => name; set => name = value; }
@@ -74,6 +75,7 @@ public class CombatMessage
     public EnemyActionAnalyse Analyse { get => analyse; set => analyse = value; }
     public string IconName { get => iconName; set => iconName = value; }
     public int NumID { get => numID; set => numID = value; }
+    public int SkillOdds { get => skillOdds; set => skillOdds = value; }
 
     //技能
 }

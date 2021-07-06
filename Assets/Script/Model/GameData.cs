@@ -26,7 +26,6 @@ public class GameData
     private string baseDataLoadPath = "/Resources/Data/game/actorDataSave.txt";
     private string gameDataLoadPath = "/Resources/Data/game/gameMessageSave.txt";
     private string gameDataLoadSign = "/Resources/Data/sign.dll";
-    private Vector2 lastBornPos;
     private float coinMovement = 0.2f;          //金币奖励浮动倍率  80%-120%
     private int expBase = 40;                           //等级经验基数
     private int hpBase = 150;
@@ -48,14 +47,14 @@ public class GameData
     }
     //data公共量初始化
     private void initData() {
-        LastBornPos = new Vector2(PlayerPrefs.GetFloat("lastBornPosX", 0), PlayerPrefs.GetFloat("lastBornPosY", 0));
+        //LastBornPos = new Vector2(PlayerPrefs.GetFloat("lastBornPosX", 0), PlayerPrefs.GetFloat("lastBornPosY", 0));
         //loadGameMessageData();
         dataplaymessage = new DataPlayMessage();
         dataplaymessage.combatIDCount = 1;
         loadPlayerData();
     }
 
-    public Vector2 LastBornPos { get => lastBornPos; set => lastBornPos = value; }
+    //public Vector2 LastBornPos { get => lastBornPos; set => lastBornPos = value; }
     public float CoinMovement { get => coinMovement; set => coinMovement = value; }
     public PlayerMessage Playermessage { get => playermessage; set => playermessage = value; }
     public DataPlayMessage DataPlaymessage { get => dataplaymessage; set => dataplaymessage = value; }

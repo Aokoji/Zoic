@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+//AI行动分析器   现在内嵌到战斗单位里去了
 public class EnemyActionAnalyse
 {
     private List<int> atkType;          //攻击型
@@ -17,7 +17,6 @@ public class EnemyActionAnalyse
         int advantageLevel; //优势等级  0-10 平均5
         int advantageType; //优势类型  0均势  1属性优势 
         bool advantageJudge;  //优势评判
-
     }
     public EnemyActionAnalyse()
     {
@@ -30,20 +29,36 @@ public class EnemyActionAnalyse
         AnalyzeResult result = new AnalyzeResult();
         //可能需要设置目标  或者多加一个目标分析
         //技能解析
-        skillAnalyze(item.SkillData);
+        //skillAnalyze(item.SkillData);
         //分析行动
-
         //派发攻击事件
+
+        result.skillID=randomSkill(item);
+        if(AllUnitData.getSkillData(result.skillID)[4].Equals("200")|| AllUnitData.getSkillData(result.skillID)[4].Equals("201"))
+            result.takeNum = item.NumID;
+        else if(AllUnitData.getSkillData(result.skillID)[4].Equals("203"))
+            result.takeNum = player.NumID;
+        result.selfNum = item.NumID;
+        result.skillType = int.Parse(AllUnitData.getSkillData(result.skillID)[3]);
 
         //如果是伤害型技能  或 指向性debuff
         //测试
+        /*
         result.takeNum = player.NumID;
         result.selfNum = item.NumID;
         int skillid = item.AttackID;//测试
         result.skillID =skillid; 
         result.skillType = int.Parse(AllUnitData.getSkillData(skillid)[3]);
-        //combatNextStep();
+        */
         return result;
+    }
+    //随机技能
+    private int randomSkill(CombatMessage item)
+    {
+        int id = item.AttackID;
+        if (item.SkillOdds>0&&Random.Range(0, 100) < item.SkillOdds)   //触发技能
+            id = item.SkillData[Random.Range(0, item.SkillData.Count)].skillID;
+        return id;
     }
 
     private void initList()
