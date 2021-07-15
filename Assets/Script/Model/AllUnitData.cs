@@ -85,6 +85,7 @@ public class AllUnitData:MonoBehaviour
         //加载数据
         loadPath();
         setnatureName();
+        //testLoad();
     }
     private static void loadPath()
     {
@@ -168,9 +169,31 @@ public class AllUnitData:MonoBehaviour
     {       //根据编号获取异常状态数据
         return allExtraData[i];
     }
+
+    public static void testLoad()
+    {
+        unitMessage m = new unitMessage();
+        m.name = "aaa";
+        m.id = 2;
+        //存json
+        string json=JsonUtility.ToJson(m);
+        byte[] js = Encoding.ASCII.GetBytes(json.ToCharArray());
+        File.WriteAllBytes(Application.streamingAssetsPath + "Json.json", js);
+        Debug.Log(json);
+        //读json
+        if (!File.Exists(Application.streamingAssetsPath + "Json.json"))
+        {
+            return; //不存在
+        }
+        byte[] jsbt = File.ReadAllBytes(Application.streamingAssetsPath + "Json.json");
+        string read = Encoding.ASCII.GetString(jsbt);
+        unitMessage a = JsonUtility.FromJson<unitMessage>(read);
+        Debug.Log(a.id + a.name);
+    }
 }
 public class unitMessage
 {
-
+    public int id;
+    public string name;
 }
 

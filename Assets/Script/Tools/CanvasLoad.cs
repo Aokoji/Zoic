@@ -38,5 +38,6 @@ public class CanvasLoad : MonoBehaviour
         ViewController.Instance.addCameraDictionary("uicam", uicam);
         DontDestroyOnLoad(instance);
         DontDestroyOnLoad(canvasui.gameObject);
+        //PlotController.Instance.initData(); //载入剧情组件
     }
 }

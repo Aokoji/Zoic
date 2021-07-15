@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO.Compression;
 using System.Runtime.Serialization;
 using System;
+using System.Text;
 
 public class GameData
 {
@@ -24,7 +25,7 @@ public class GameData
         }
     }
     private string baseDataLoadPath = "/Resources/Data/game/actorDataSave.txt";
-    private string gameDataLoadPath = "/Resources/Data/game/gameMessageSave.txt";
+    private string gameDataLoadPath = "/Resources/Data/game/gameMessageSave.json";
     private string gameDataLoadSign = "/Resources/Data/sign.dll";
     private float coinMovement = 0.2f;          //金币奖励浮动倍率  80%-120%
     private int expBase = 40;                           //等级经验基数
@@ -48,9 +49,7 @@ public class GameData
     //data公共量初始化
     private void initData() {
         //LastBornPos = new Vector2(PlayerPrefs.GetFloat("lastBornPosX", 0), PlayerPrefs.GetFloat("lastBornPosY", 0));
-        //loadGameMessageData();
-        dataplaymessage = new DataPlayMessage();
-        dataplaymessage.combatIDCount = 1;
+        loadGameMessageData();
         loadPlayerData();
     }
 
@@ -136,7 +135,7 @@ public class GameData
     private void loadGameMessageData()
     {
         PubTool.Instance.addLogger("读取游戏配置");
-        BinaryFormatter bin = new BinaryFormatter();
+        //BinaryFormatter bin = new BinaryFormatter();
         if (!Directory.Exists("Assets/Resources/Data/game")) Directory.CreateDirectory("Assets/Resources/Data/game");
         if (!File.Exists(Application.dataPath + gameDataLoadPath))
         {
@@ -147,24 +146,23 @@ public class GameData
                 PubTool.Instance.addLogger("游戏配置错误!");
                 Application.Quit();
             }*/
-            initGameDataMessage();             //没有档则创建档
             PubTool.Instance.addLogger("创建游戏配置");
+            initGameDataMessage1();             //没有档则创建档
         }
         else
         {
-            FileStream file = File.Open(Application.dataPath + gameDataLoadPath, FileMode.Open);
-            dataplaymessage = (DataPlayMessage)bin.Deserialize(file);
-            file.Close();
+            byte[] jsbt = File.ReadAllBytes(Application.dataPath + gameDataLoadPath);
+            string read = Encoding.ASCII.GetString(jsbt);
+            dataplaymessage= JsonUtility.FromJson<DataPlayMessage>(read);
         }
     }
     //  记录游戏部分配置数据      （自动记录）
     public void saveGameMessageData()
     {
         PubTool.Instance.addLogger("保存配置");
-        BinaryFormatter bin = new BinaryFormatter();
-        FileStream file = File.Create(Application.dataPath + gameDataLoadPath);
-        bin.Serialize(file, playermessage);
-        file.Close();
+        string json = JsonUtility.ToJson(dataplaymessage);
+        byte[] js = Encoding.ASCII.GetBytes(json.ToCharArray());
+        File.WriteAllBytes(Application.dataPath + gameDataLoadPath, js);
     }
     //加载玩家数据       (手动加载 + 自动加载)
     public void loadPlayerData()  
@@ -237,17 +235,11 @@ public class GameData
         Debug.Log("save create success!");
     }
     //初始化游戏配置
-    private void initGameDataMessage()
+    private void initGameDataMessage1()
     {
         dataplaymessage = new DataPlayMessage();
         dataplaymessage.combatIDCount = 0;
-
-        BinaryFormatter bin = new BinaryFormatter();
-        FileStream file = File.Create(Application.dataPath + gameDataLoadPath);
-        File.Create(Application.dataPath + gameDataLoadSign);
-        bin.Serialize(file, dataplaymessage);
-        file.Close();
-        Debug.Log("data create success!");
+        saveGameMessageData();
     }
 
 
