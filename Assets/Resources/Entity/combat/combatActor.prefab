@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2301577887273864104}
   - component: {fileID: 7767700030604797058}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 8390387834600928687}
   - component: {fileID: 8062806871672372069}
   - component: {fileID: 3395679890274726006}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -151,7 +151,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: c0aa5c617b7bbe147ac54c9f6675646f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -192,7 +192,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7815835995747641439}
   - component: {fileID: 2812787211277330338}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: combatActor
   m_TagString: Untagged
   m_Icon: {fileID: 0}

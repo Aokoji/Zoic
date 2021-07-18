@@ -83,7 +83,7 @@ public class CombatView : MonoBehaviour
             loadactor.transform.SetParent(transform);
             loadactor.transform.position = startPos.transform.position;
             loadactor.transform.lossyScale.Set(1, 1,1);
-            loadactor.SetActive(true);       //todo  待修改
+            loadactor.SetActive(true);       //todo  待修改  目前为提前创建好
             */
             item.IconActor = actorIcon[count];
 
@@ -96,6 +96,7 @@ public class CombatView : MonoBehaviour
             loadactorBody.name = item.Name;
             loadactorBody.SetActive(false);
             item.Prefab = loadactorBody;
+            item.Prefab.name = "createPrefab";
             actorBody.Add(loadactorBody);
             loadactorBody.GetComponent<CombatActorItem>().chooseArrowChange(false);
 
@@ -122,6 +123,11 @@ public class CombatView : MonoBehaviour
             conts[1].text = skill.skillLevel+"";     //等级
             conts[2].text = AllUnitData.getSkillData(skill.skillID)[29];     //体力消耗
             conts[3].text = AllUnitData.getSkillData(skill.skillID)[30];     //精力消耗
+            bar.GetComponent<Button>().onClick.AddListener(()=>                             //闭包写法  网上抄的
+            {
+                int id = skill.skillID;
+                chooseSkillMessage(id);
+            });
         }
     }
 
@@ -206,19 +212,6 @@ public class CombatView : MonoBehaviour
     {
         messageFather.SetActive(true);
     }
-    public void addContextByData(string data)
-    {
-        GameObject row = addContext();
-        //+++设置数据
-    }
-    public void showContext(List<string> data)  //+++需要写一个数据类型存储显示信息
-    {
-        foreach(var item in data)
-        {
-            addContextByData(item);
-        }
-    }
-
 
     //----------------------------------------数据end---------------------------------
 
@@ -304,11 +297,24 @@ public class CombatView : MonoBehaviour
     {
 
     }
-
+    //选择技能  显示三级 技能详情面板
+    private void chooseSkillMessage(int id)
+    {
+        skillThirdFather.SetActive(true);
+        string cont;
+        cont="技能详情\n"+ AllUnitData.getSkillData(id)[1]+"\n    "+ AllUnitData.getSkillData(id)[2];
+        skillThirdFather.GetComponentInChildren<Text>().text = cont;
+        //var item = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+        baseControl.SetActive(false);
+        //刷新箭头指向状态（就是待选目标的状态  重置为可选目标）
+        resetArrowState();
+        tanban.SetActive(true);
+    }
     //关闭二级  技能页面
     private void closeSkillScene()
     {
         lockBaseButton(false);
+        cancelConfirmPanel();
         hideContext();
     }
     //锁基础按钮

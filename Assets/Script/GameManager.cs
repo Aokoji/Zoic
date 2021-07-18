@@ -1,7 +1,8 @@
 ﻿using System.Collections;
-//using System;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 //游戏管理器
 public class GameManager : MonoBehaviour
 {
@@ -18,13 +19,7 @@ public class GameManager : MonoBehaviour
         PubTool.Instance.addLogger("游戏启动");
         AllUnitData.loadData();
         GameData.initGameData();
-        ViewController.Instance.initCreateViewController(); //初始化视图
-        CanvasLoad.loadCanvas();
-        PlayerControl.Instance.initCreatePlayer();          //初始化玩家
-        PlayerManager.Instance.loadPlayerManager();     //加载玩家管理器
-        MainController.Instance.initController();
-        CombatController.Instance.initController();
-        initTools();
+        
     }
     //创建manager
     public static void initManager()
@@ -38,6 +33,44 @@ public class GameManager : MonoBehaviour
     private void initTools()
     {
 
+    }
+
+    //加载游戏控制器
+    public void loadBaseGameController()
+    {
+        ViewController.Instance.initCreateViewController(); //初始化视图
+        CanvasLoad.loadCanvas();                                    //UI
+        PlotController.Instance.initData(); //载入剧情组件
+        PlayerControl.Instance.initCreatePlayer();          //初始化玩家
+        PlayerManager.Instance.loadPlayerManager();     //加载玩家管理器
+        MainController.Instance.initController();
+        CombatController.Instance.initController();
+        initTools();
+    }
+
+    public void startGame()
+    {
+        //开始界面切换到  游戏界面
+        changeScene("BaseMain");
+        StartCoroutine(waitForLoadScene("BaseMain", loadBaseGameController));
+    }
+
+    //切换场景
+    public void changeScene(string name)
+    {
+        SceneManager.LoadScene(name);
+    }
+    /// <summary>
+    ///     场景加载方法      场景名，回调
+    /// </summary>
+    private IEnumerator waitForLoadScene(string name, Action callback)
+    {
+        while (SceneManager.GetActiveScene().name != name)
+        {
+            yield return null;
+        }
+        PubTool.Instance.addLogger("开始场景加载完成");
+        callback();
     }
 
     // Update is called once per frame
