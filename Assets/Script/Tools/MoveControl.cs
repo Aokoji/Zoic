@@ -12,6 +12,11 @@ public class MoveControl : MonoBehaviour
     private Transform[] childs;
     private GameObject body;
 
+    public bool stepCalculate = false;      //野区遇怪  步数计算开关
+    public int stepLenght = 0;              //遇怪步长
+    public int stepProb = 0;                  //步长概率
+    private float stepunit = 0;
+
     public bool moveCtrl = true;
 
     enum State {IDLE=0,WALK=1 }
@@ -25,6 +30,11 @@ public class MoveControl : MonoBehaviour
         movestate = (int)State.IDLE;
         moveCtrl = true;
     }
+    //激活步数计数器
+    public void activateStepCalculate()
+    {
+        setStepCalculate(true,1,1);     //步数计数器默认值
+    }
 
     // Update is called once per frame
     void Update()
@@ -32,12 +42,33 @@ public class MoveControl : MonoBehaviour
         move();
     }
 
+    /// <summary>
+    /// 设置步数计数器参数
+    /// sw-开关   、len-步长 、prob-步长概率
+    /// </summary>
+    public void setStepCalculate(bool sw,int len,int prob)
+    {
+        stepCalculate = sw;
+        stepLenght = len;
+        stepProb = prob;
+    }
+    //内部计算步长工具
+    private void stepCalulateTool()
+    {
+        stepunit += Time.deltaTime;
+    }
+
+    //移动方法
     private void move()
     {
         if (!moveCtrl) { return;  }
         moveAxis = Input.GetAxis("Horizontal");
         if (moveAxis != 0)
         {
+            if (stepCalculate)  //是否计算步长
+            {
+                stepCalulateTool();
+            }
             if (movestate != (int)State.WALK)
             {
                 movestate = (int)State.WALK;
@@ -54,7 +85,7 @@ public class MoveControl : MonoBehaviour
             }
         }
     }
-
+    //播放动画
     private void changeAnim(string name)
     {
         anim.Play(name);
