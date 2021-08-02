@@ -26,11 +26,16 @@ public class PlayerControl : DDOLController<PlayerControl>
     {
         player.GetComponent<MoveControl>().initData();
     }
-
+    //   人物控制开关
     public void setControl(bool ctrl)
     {
         //待添加   特殊情况会（比如战斗）消除玩家仇恨（也就是无敌）
         moveCtrl.moveCtrl = ctrl;
+    }
+    //  人物显示开关
+    public void setVisible(bool visit)
+    {
+        player.SetActive(visit);
     }
 
 

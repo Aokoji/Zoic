@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class MoveControl : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class MoveControl : MonoBehaviour
     private int movestate;
     private Transform[] childs;
     private GameObject body;
+    private bool isFaceLeft = true;       //面朝左
 
     public bool stepCalculate = false;      //野区遇怪  步数计算开关
     public int stepLenght = 0;              //遇怪步长
@@ -30,6 +32,11 @@ public class MoveControl : MonoBehaviour
         movestate = (int)State.IDLE;
         moveCtrl = true;
     }
+    /// <summary>
+    /// 获得单位朝向  true为左 false为右
+    /// </summary>
+    public bool getFaceDirection() { return isFaceLeft; }
+
     //激活步数计数器
     public void activateStepCalculate()
     {
@@ -69,6 +76,7 @@ public class MoveControl : MonoBehaviour
             {
                 stepCalulateTool();
             }
+            isFaceLeft = moveAxis > 0;
             if (movestate != (int)State.WALK)
             {
                 movestate = (int)State.WALK;
@@ -88,6 +96,13 @@ public class MoveControl : MonoBehaviour
     //播放动画
     private void changeAnim(string name)
     {
+        Action changeDirection = delegate ()
+          {
+                if (isFaceLeft) gameObject.transform.localScale = new Vector3(Mathf.Abs(gameObject.transform.localScale.x)*-1, gameObject.transform.localScale.y, gameObject.transform.localScale.z);
+                else gameObject.transform.localScale = new Vector3(Mathf.Abs(gameObject.transform.localScale.x), gameObject.transform.localScale.y, gameObject.transform.localScale.z);
+          };
+        if (movestate == (int)State.WALK)
+            PubTool.Instance.laterDo(0.25f, changeDirection);
         anim.Play(name);
     }
 

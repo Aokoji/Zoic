@@ -10,49 +10,65 @@ public class EventTransfer : DDOLController<EventTransfer>
         
     }
     //升级事件  （任何升级）
-    private delegate void UpgradeEvent();
+    public delegate void UpgradeEvent();
     //操作事件
-    private delegate void OperationEvent();
+    public delegate void OperationEvent();
 
     /// <summary>
     /// 升级事件
     /// </summary>
-    private event UpgradeEvent levelUp =null;
+    public event UpgradeEvent levelUp = new UpgradeEvent(nullfunction);
     public void levelUpAction() {
         //GameData.Data.levelUp();
         levelUp(); // 升级
-    } 
+    }
 
     /// <summary>
     /// 获得技能点
     /// </summary>
-    private event UpgradeEvent skillGet = null;
+    public event UpgradeEvent skillGet = new UpgradeEvent(nullfunction);
     public void getSkillAction() {
         GameData.Data.skillPointGot();
         skillGet();
     }
-    
 
 
 
     /// <summary>
+    /// 游戏开始
+    /// </summary>
+    public event OperationEvent gameStartSceneEvent = new OperationEvent(nullfunction);
+    public void gameStartSceneAction()
+    {
+        gameStartSceneEvent();
+    }
+    /// <summary>
+    /// 新场景加载完成
+    /// </summary>
+    public event OperationEvent loadNewSceneEvent = new OperationEvent(nullfunction);
+    public void loadNewSceneAction()
+    {
+        loadNewSceneEvent();
+    }
+    /// <summary>
     /// 存档
     /// </summary>
-    private event OperationEvent saveLoad = null;
+    public event OperationEvent saveLoadEvent = new OperationEvent(nullfunction);
     public void doSaveLoad() {
         GameData.Data.saveLoad();
-        saveLoad();
+        saveLoadEvent();
     }
     /// <summary>
     /// 存档配置（自动存档）
     /// </summary>
-    private event OperationEvent saveGameMessage = null;
+    public event OperationEvent saveGameMessageEvent = new OperationEvent(nullfunction);
     public void doSaveGameMessage()
     {
         GameData.Data.saveGameMessageData();
-        saveGameMessage();
+        saveGameMessageEvent();
     }
 
+    private static void nullfunction() { }
     /*
      
      enemy  
