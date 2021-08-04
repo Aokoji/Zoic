@@ -16,7 +16,6 @@ public class PlayerMessage
     public int expmax;         //最大经验
     public int expcur;          //当前经验
     public int atk;                 //攻击
-    public int def;                 //防御
     public int speed;               //速度
     public int strike;              //暴击
     public int dodge;               //闪避

@@ -10,7 +10,10 @@ public class MainController : DDOLController<MainController>
     {
         
     }
-
+    /// <summary>
+    /// 进入战斗方法    会先根据怪物编号转换为战斗数据
+    /// </summary>
+    /// <param name="list">怪物编号 列表</param>
     public void receiveCombatInformation(List<int> list)
     {
         if (list.Count==0)
@@ -25,7 +28,7 @@ public class MainController : DDOLController<MainController>
         }
         openCombat(enemy);
     }
-    public void openCombat(List<CombatMessage> enemy)
+    private void openCombat(List<CombatMessage> enemy)
     {
         //遭遇怪物后  会派发给maincontroller事件  传递怪物信息   控制器封装所有信息进入战斗
         List<CombatMessage> list=new List<CombatMessage>();
@@ -65,7 +68,6 @@ public class MainController : DDOLController<MainController>
         mess.UnitData["dodge"] = play.dodge;
         mess.UnitData["curHp"] = play.hpcur;
         mess.UnitData["curMp"] = play.mpcur;
-        mess.UnitData["defence"] = play.def;
         mess.IconName = GameData.Data.PLAYER;
         mess.IsPlayer = true;
         mess.NumID = 0;
@@ -88,7 +90,6 @@ public class MainController : DDOLController<MainController>
         mess.UnitData["dodge"] = int.Parse(enemy[10]);
         mess.UnitData["curHp"] = int.Parse(enemy[2]);
         mess.UnitData["curMp"] = int.Parse(enemy[3]);
-        mess.UnitData["defence"] = int.Parse(enemy[11]);
         mess.IconName = enemy[1];
         mess.IsPlayer = false;
         skillSave skill;
