@@ -30,8 +30,8 @@ public class AttackAction
     {
         atkResult = new AttackResult();
         string type = AllUnitData.getSkillData(action.skillID)[SKILL_TYPE];//获取技能类型
-        sourceActor = dataList[action.selfNum];
-        takeActors = new List<CombatMessage>();
+        sourceActor = dataList[action.selfNum];     //伤害来源目标
+        takeActors = new List<CombatMessage>();     //被伤目标
         switch (type)
         {
             case "101": territoryTypeAction(action); break;    //场地类型处理
@@ -121,14 +121,14 @@ public class AttackAction
                 float pat;
                 if (skillPat.Equals("0")) pat = (int)Mathf.Round((float)taken.UnitData[AllUnitData.getEncode("7")]) / 100;     //分析技能攻击类型（ad  ap）
                 else pat = (int)Mathf.Round((float)taken.UnitData[AllUnitData.getEncode("8")]) / 100;
+
                 int hit = (int)(finalNum * (1 - pat));
                 int extrahit = 0;
                 if (skill[15].Equals("1")) extrahit = settleExtraSubjoin(taken, hit);   //计算攻击特效附加伤害
                 int phy = taken.UnitData["curHp"] - hit - extrahit;
-
-                taken.UnitData["curHp"] = phy;
                 atkResult.changeTarget = "";        //+++待修改  变动目标
                 if (phy <= 0) phy = 0;
+                taken.UnitData["curHp"] = phy;
                 atkResult.changeTo = phy;
             }
             else

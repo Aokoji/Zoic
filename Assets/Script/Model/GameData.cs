@@ -32,7 +32,7 @@ public class GameData
     private int hpBase = 150;
     private int mpBase = 30;
     private int atkBase = 12;
-    private int defBase = 2;
+    //private int defBase = 2;
     public string PLAYER = "player";
 
 
@@ -105,6 +105,7 @@ public class GameData
         //攻击曲线  50multi        2^(x/20)+x/5-1
         //防御曲线  25multi        x/4
         //经验曲线  125multi      2^(x/15)+x/4+x^(1/4)-1          +0.1*等级
+        ///        防御减伤效果曲线    -2^((150-x)/30)+32+x/9                     当前防御效果差值 取百分之0-40      防/攻=系数x 不能负值  
 
         //体力提升  额外回复+20%
         int numPer = (int)Math.Floor((Math.Pow(2, (level + 1) / 24) + (level + 1) / 8 - 1) - (Math.Pow(2, level / 24) + level / 8 - 1)) * hpBase;
@@ -121,8 +122,8 @@ public class GameData
         //攻防提升
         numPer = (int)Math.Floor((Math.Pow(2, (level + 1) / 20) + (level + 1) / 5 - 1) - (Math.Pow(2, level / 20) + level / 5 - 1)) * atkBase;
         playermessage.atk += numPer;
-        numPer = (int)((level + 1.0) / 4 - level / 4) * defBase;
-        playermessage.def += numPer;
+        //numPer = (int)((level + 1.0) / 4 - level / 4) * defBase;
+        //playermessage.def += numPer;
     }
     //加经验上限
     private void levelExp(int level)
@@ -216,7 +217,6 @@ public class GameData
         playermessage.expcur = 0;
         playermessage.expmax = expBase;
         playermessage.atk = atkBase;
-        playermessage.def = defBase;
         playermessage.strike = 0;
         playermessage.dodge = 0;
         playermessage.speed = 30;

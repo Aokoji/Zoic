@@ -39,23 +39,34 @@ public class GameManager : MonoBehaviour
     public void loadBaseGameController()
     {
         ViewController.Instance.initCreateViewController(); //初始化视图
+        EventTransfer.Instance.initEvent();                         //初始化事件派发器
         CanvasLoad.loadCanvas();                                    //UI
-        PlotController.Instance.initData(); //载入剧情组件
         PlayerControl.Instance.initCreatePlayer();          //初始化玩家
         PlayerManager.Instance.loadPlayerManager();     //加载玩家管理器
         MainController.Instance.initController();
         CombatController.Instance.initController();
+        PlotController.Instance.initData();                     //载入剧情组件
         initTools();
+        initOverAllEvent();
+        EventTransfer.Instance.gameStartSceneAction();    //派发进入游戏事件
+        EventTransfer.Instance.loadNewSceneAction();      //派发加载新场景完成事件
+        PubTool.Instance.addLogger("加载进入基础场景完成，准备载入场景跳转。");
     }
-
+    //初始化全局事件
+    private void initOverAllEvent()
+    {
+        PlotController.Instance.initStartGameEvent();
+    }
+    //------------------------------------------------------------------------------------------------------场景切换主动方法------------
+    //点击主页面的开始  切换场景
     public void startGame()
     {
         //开始界面切换到  游戏界面
         changeScene("BaseMain");
         StartCoroutine(waitForLoadScene("BaseMain", loadBaseGameController));
     }
-
-    //切换场景
+    //------------------------------------------------------------------------------------------------------场景切换方法-  end  -------------------------
+    //切换场景 公共方法
     public void changeScene(string name)
     {
         SceneManager.LoadScene(name);
