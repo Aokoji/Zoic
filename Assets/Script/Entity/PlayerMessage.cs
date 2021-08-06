@@ -26,7 +26,7 @@ public class PlayerMessage
     public int attackID;               //攻击默认序号
     public int skillPoint;          //技能点
     public List<skillSave> skills=new List<skillSave>();    //技能
-    public List<itemSave> items=new List<itemSave>();   //背包
+    public itemSave items=new itemSave();   //背包
 
     //任务
     public int plotCount;   //剧情进度 (主)
@@ -59,6 +59,9 @@ public class itemSave
 public class oneGood
 {
     public int id;      //id
+    public string picture;      //图标（目前不用）
+    public string typeName; //物品类型（统类图标）
+    public int bagType;     //背包分类  (1装备，2道具，3材料，4任务)
     public int num; //持有数
 }
 
