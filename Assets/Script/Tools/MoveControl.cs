@@ -28,7 +28,7 @@ public class MoveControl : MonoBehaviour
     {
         selfname = transform.name;
         setChildsGameObject();
-        moveSpeed = 2;
+        moveSpeed = 2.5f;
         movestate = (int)State.IDLE;
         moveCtrl = true;
     }
@@ -76,7 +76,7 @@ public class MoveControl : MonoBehaviour
             {
                 stepCalulateTool();
             }
-            isFaceLeft = moveAxis > 0;
+            isFaceLeft = moveAxis < 0;
             if (movestate != (int)State.WALK)
             {
                 movestate = (int)State.WALK;
@@ -98,8 +98,8 @@ public class MoveControl : MonoBehaviour
     {
         Action changeDirection = delegate ()
           {
-                if (isFaceLeft) gameObject.transform.localScale = new Vector3(Mathf.Abs(gameObject.transform.localScale.x)*-1, gameObject.transform.localScale.y, gameObject.transform.localScale.z);
-                else gameObject.transform.localScale = new Vector3(Mathf.Abs(gameObject.transform.localScale.x), gameObject.transform.localScale.y, gameObject.transform.localScale.z);
+                if (isFaceLeft) gameObject.transform.localScale = new Vector3(Mathf.Abs(gameObject.transform.localScale.x), gameObject.transform.localScale.y, gameObject.transform.localScale.z);
+                else gameObject.transform.localScale = new Vector3(Mathf.Abs(gameObject.transform.localScale.x) * -1, gameObject.transform.localScale.y, gameObject.transform.localScale.z);
           };
         if (movestate == (int)State.WALK)
             PubTool.Instance.laterDo(0.25f, changeDirection);

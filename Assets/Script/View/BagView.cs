@@ -28,6 +28,7 @@ public class BagView : MonoBehaviour
         bagListData.Add(3, bag_material);
         bagListData.Add(4, bag_task);
         initEvent();
+        gameObject.SetActive(false);
     }
     //赋予按钮功能
     private void initEvent()
@@ -45,9 +46,11 @@ public class BagView : MonoBehaviour
     {
         curShowBag = 1;
         //加载背包格子
-        loadBagGrid(playerdata.items.goods);
+        //loadBagGrid(playerdata.items.goods);
         //加载人物装备
         //按钮功能添加
+        //+++待修改  加载完成
+        gameObject.SetActive(true);
     }
 
     
@@ -137,7 +140,7 @@ public class BagView : MonoBehaviour
     //关闭
     private void clickClose()
     {
-
+        gameObject.SetActive(false);
     }
 
     // 加一个背包网格

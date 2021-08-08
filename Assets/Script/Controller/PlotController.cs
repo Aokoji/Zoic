@@ -35,8 +35,9 @@ public class PlotController : DDOLController<PlotController>
             {
                 PlayerControl.instance.setVisible(true);
                 PlayerControl.instance.setControl(true);
+                CanvasLoad.instance.cameraFollowPlayer();
             };
-            PubTool.instance.laterDo(3, show);
+            PubTool.instance.laterDo(2, show);
         }
         else
         {//否则判断其他剧情点

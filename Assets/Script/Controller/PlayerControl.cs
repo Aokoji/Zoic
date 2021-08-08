@@ -37,6 +37,16 @@ public class PlayerControl : DDOLController<PlayerControl>
     {
         player.SetActive(visit);
     }
+    public MoveControl getPlayer()
+    {
+        return moveCtrl;
+    }
+    //获得正方向
+    public bool getFaceLeft()
+    {
+        return moveCtrl.getFaceDirection();
+    }
+    
 
 
 

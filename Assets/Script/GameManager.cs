@@ -30,17 +30,12 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(manage);
     }
 
-    private void initTools()
-    {
-
-    }
-
     //加载游戏控制器
     public void loadBaseGameController()
     {
         ViewController.Instance.initCreateViewController(); //初始化视图
         EventTransfer.Instance.initEvent();                         //初始化事件派发器
-        CanvasLoad.loadCanvas();                                    //UI
+        CanvasLoad.instance.initData();                                    //UI
         PlayerControl.Instance.initCreatePlayer();          //初始化玩家
         PlayerManager.Instance.loadPlayerManager();     //加载玩家管理器
         MainController.Instance.initController();
@@ -51,6 +46,10 @@ public class GameManager : MonoBehaviour
         EventTransfer.Instance.gameStartSceneAction();    //派发进入游戏事件
         EventTransfer.Instance.loadNewSceneAction();      //派发加载新场景完成事件
         PubTool.Instance.addLogger("加载进入基础场景完成，准备载入场景跳转。");
+    }
+    private void initTools()
+    {
+        BagControl.Instance.initData();
     }
     //初始化全局事件
     private void initOverAllEvent()

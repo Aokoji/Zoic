@@ -1,15 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainView : MonoBehaviour
 {
 
+    public Button testBtn;
+
     public void initData()
     {
-
+        initEvent();
     }
-
+    private void initEvent()
+    {
+        testBtn.onClick.AddListener(openBag);
+    }
+    private void openBag()
+    {
+        BagControl.Instance.openBag(null);
+    }
 
 
 

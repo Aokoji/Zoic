@@ -2,9 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//控制主UI  并且兼职 控制视图显示功能
 public class ViewController : DDOLController<ViewController>
 {
     private MainView mainview = null;
+    //特殊加入的方法  canvasLoad写法规范错误纠正
+    public void setMainView(MainView view){
+        mainview = view;
+        mainview.initData();
+    }
 
     //   maincam   uicam    combatcam
     private Dictionary<string, Camera> cameraView = null;
@@ -12,7 +18,6 @@ public class ViewController : DDOLController<ViewController>
     public void initCreateViewController()
     {
         cameraView = new Dictionary<string, Camera>();
-        //mainview=initCreateMainView();
     }
     public void addCameraDictionary(string name,Camera cam)
     {
@@ -55,18 +60,6 @@ public class ViewController : DDOLController<ViewController>
         setCameraVisible("uicam", false);
     }
 
-    //初始化视图1            ui 界面
-    public MainView initCreateMainView()
-    {
-        GameObject baseain = Resources.Load<GameObject>("Entity/MainView");
-        var baseMain = Instantiate(baseain);
-        baseMain.name = "MainView";
-        baseMain.transform.SetParent(CanvasLoad.canvasui.transform, false);
-        var mainview = baseMain.GetComponent<MainView>();
-        mainview.gameObject.SetActive(false);       //todo  待修改
-        mainview.initData();
-        return mainview;
-    }
     //重置控制器
     public void resetViewController(bool isDestory)
     {
