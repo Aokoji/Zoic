@@ -5,6 +5,9 @@ using UnityEngine;
 public class DataPlayMessage 
 {
 
+    //场景
+    public int sceneIdleNum;        //当前场景
+    public Dictionary<int, ModuleType> resourceItemData; //所有场景可收集资源数据  场景编号，场景数列
 
-    public int combatIDCount;
+    public int combatIDCount;   //战斗记录编号
 }

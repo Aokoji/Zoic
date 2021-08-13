@@ -13,6 +13,8 @@ public class EventTransfer : DDOLController<EventTransfer>
     public delegate void UpgradeEvent();
     //操作事件
     public delegate void OperationEvent();
+    //场景加载事件
+    public delegate void SceneLoadEvent();
 
     /// <summary>
     /// 升级事件
@@ -68,14 +70,18 @@ public class EventTransfer : DDOLController<EventTransfer>
         saveGameMessageEvent();
     }
 
+
+    //场景编号001
+    public event SceneLoadEvent sceneNum001Event = new SceneLoadEvent(nullfunction);
+    public void loadSceneNum001()
+    {
+        sceneNum001Event();
+    }
+
     private static void nullfunction() { }
     /*
      
      enemy  
-     combat头像（player和enemy）
-     场景道具 ： 小草丛123  
-     花丛12  
-     果丛1   
      场景1森林空地
      道具图标几个
      idle界面ui  头像 背包 属性 设置
