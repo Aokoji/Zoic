@@ -7,7 +7,7 @@ using System.Text;
 
 public class AllUnitData:MonoBehaviour
 {
-    private static AllUnitData unitData = null;
+    private static AllUnitData unitData = new AllUnitData();
     public static AllUnitData Data
     {
         get {

@@ -11,8 +11,13 @@ using System.Text;
 /// </summary>
 public class JsonDataSave
 {
+    private static JsonDataSave jsdata0 = new JsonDataSave();
+    public static JsonDataSave jsdata
+    {
+        get { return jsdata0; }
+    }
     //----------------------------------------***    手动添加固定数据变量  无需赋值      ***------------------------------------------
-    AllGoodStaticData allGoodData = new AllGoodStaticData();
+    public static AllGoodStaticData allGoodData = new AllGoodStaticData();
 
 
 
@@ -41,8 +46,8 @@ public class JsonDataSave
         //      invoke方法读取
         StaticCSVDataTool obj = new StaticCSVDataTool();
         Type csvEnt = obj.GetType();
-        MethodInfo method = csvEnt.GetMethod("StaticCSVDataTool.loadData_" + name);
-        T m = (T)method.Invoke(obj,null);
+        MethodInfo method = csvEnt.GetMethod("loadData_" + name);
+        object m = method.Invoke(obj, new object[] { });
         /*
         //      代理方法读取
         StaticCSVDataTool obj0 = new StaticCSVDataTool();

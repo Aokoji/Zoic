@@ -17,7 +17,7 @@ public class JsonReadToolTest
         //读取
         for (int i = 0; i < mes.Length; i += 3)
         {
-            JsonDataSave jEntity = new JsonDataSave();
+            JsonDataSave jEntity = JsonDataSave.jsdata;
             Type jType = jEntity.GetType();
             FieldInfo jLocal = jType.GetField(mes[i + 1]);  //拿到变量
             Type taType = jLocal.GetType();     //实例
