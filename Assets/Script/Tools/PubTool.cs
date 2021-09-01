@@ -88,5 +88,13 @@ public class PubTool : DDOLController<PubTool>
         string mess = DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss    ") + context + "\n";
         File.AppendAllText(path, mess);
     }
-
+    public void gameError(string message,bool iskill)
+    {
+        Debug.LogError(message);
+        addLogger(message);
+        if (iskill)
+        {
+            Application.Quit();
+        }
+    }
 }

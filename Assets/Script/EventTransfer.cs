@@ -57,7 +57,6 @@ public class EventTransfer : DDOLController<EventTransfer>
     /// </summary>
     public event OperationEvent saveLoadEvent = new OperationEvent(nullfunction);
     public void doSaveLoad() {
-        GameData.Data.saveLoad();
         saveLoadEvent();
     }
     /// <summary>

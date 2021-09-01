@@ -2,10 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//场景编号001
-public class SceneMap200101 : MonoBehaviour
+//场景编号01
+//场景控制器  需要挂在场景住控上  并手动赋值
+public class SceneMap20101 : MonoBehaviour
 {
-    private int mapid = 200101; //地图编号
+    private int mapid = 20101; //地图编号
     private int curModuleId;    //当前激活资源点编号（玩家进入）   -1为没有
     //-------------------------------------------------------------资源点------------------------------------
     //资源点数据都要单独配置
@@ -19,7 +20,14 @@ public class SceneMap200101 : MonoBehaviour
     //由主控制器调用  并记录
     public void initData()
     {
-        allDataList = GameData.Data.DataPlaymessage.resourceItemData[Mapid];
+        if (GameData.Data.DataPlaymessage.resourceItemData.ContainsKey(Mapid))
+        {
+            allDataList = GameData.Data.DataPlaymessage.resourceItemData[Mapid];
+        }
+        else
+        {
+            allDataList = new ModuleType();
+        }
         initSceneCollection();
     }
     //初始化场景可互动资源
@@ -40,7 +48,8 @@ public class SceneMap200101 : MonoBehaviour
                     type = 1;
                 }
                 //读取到该类型 的默认配置
-                ModuleOneCollect mod=AllUnitData.getModuleCollectionType(type.ToString());
+                //ModuleOneCollect mod=AllUnitData.getModuleCollectionType(type.ToString());
+                ModuleOneCollect mod=AllUnitData.Data.getJsonData<ModuleOneCollect>("allCollectData",type);
                 mod.mapId = Mapid;
                 mod.resourceId = count;
                 count++;

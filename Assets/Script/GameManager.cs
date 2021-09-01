@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         PubTool.Instance.addLogger("游戏启动");
-        AllUnitData.loadData();
+        AllUnitData.Data.loadData();
         GameData.initGameData();
         
     }
@@ -96,12 +96,16 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            CombatController.Instance.playerDoAttack2();
+            //CombatController.Instance.playerDoAttack2();
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            PubTool.Instance.addLogger("ceshi");
-            //Debug.Log(Random.Range(0, 2));
+            //测试时间间隔
+            /*
+            DateTime data = DateTime.Now.ToLocalTime();
+            DateTime load = module.lastCatchTime;
+            int num = DateTime.Compare(data, load);
+            */
         }
     }
 

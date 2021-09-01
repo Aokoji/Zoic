@@ -2,23 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System;
 using System.Text;
 
 public class AllUnitData:MonoBehaviour
 {
+    private static AllUnitData unitData = null;
+    public static AllUnitData Data
+    {
+        get {
+            return unitData;
+        }
+    }
     /*
      * 待更改+++
      * 所有csv文件均作为基本数据文件  作为参考基值
      * 检测json文件存在，如果没有json记录  则读取csv文件并做json存储
      * 每当修改csv文件参数时  需要手动删除生成的json文件  让加载时重新读取达到刷新的目的
      */
+    private JsonReadToolTest jsonRead = new JsonReadToolTest();
 
-    //全部单位静态数据
-    private static Dictionary<string, AllUnitTypeStaticData> allUnitTypeData = new Dictionary<string, AllUnitTypeStaticData>();
+    public T getJsonData<T>(string name, int num)
+    {
+        return jsonRead.getJsonData<T>(name, num);
+    }
+   
+
+
     //单个可收集资源组件信息配置  （类型编号 ，类型信息）
     private static Dictionary<string, ModuleOneCollect> oneCollectionTypeData = new Dictionary<string, ModuleOneCollect>();
-
-    //public static Dictionary<string, unitMessage> allUnitData;
+    
     //------------------------静态单位信息----------------------
     static List<string[]> allUnitData = new List<string[]>();           //单位信息
     static List<string[]> allUnitSkillData = new List<string[]>();        //单位技能对照
@@ -36,6 +49,7 @@ public class AllUnitData:MonoBehaviour
      * 只需要添加路径配置即可加载
      * 不需要重新赋变量
      */
+
     private static string unitPath = "Assets/Resources/Data//unitMessage.csv";
     private static string unitSkillPath = "Assets/Resources/Data//unitSkillMessage.csv";
     private static string skillPath = "Assets/Resources/Data//skillMessage.csv";
@@ -50,8 +64,10 @@ public class AllUnitData:MonoBehaviour
     /// <summary>
     /// 加载静态数据(全部读取,不包括存档)
     /// </summary>
-    public static void loadData()
+    public void loadData()
     {   //读取配置
+        jsonRead.readAllJsonData();
+
         loadMessage.Add(allUnitData, unitPath);
         loadMessage.Add(allUnitSkillData, unitSkillPath);
         loadMessage.Add(allSkillData, skillPath);
@@ -61,9 +77,8 @@ public class AllUnitData:MonoBehaviour
         loadMessage.Add(allExtraData, extraPath);
         //loadMessage.Add(allCollectionTypeData, collectionPath);
         //加载数据
-        loadPath();
-        setnatureName();
-        //testLoad();
+        //loadPath();
+        //setnatureName();
     }
     private static void loadPath()
     {
@@ -119,7 +134,6 @@ public class AllUnitData:MonoBehaviour
         return natureName[num];
     }
 
-
     public static string[] getUnitData(int i)
     {       //根据编号获取怪物数据
         return allUnitData[i];
@@ -150,12 +164,6 @@ public class AllUnitData:MonoBehaviour
     }
 
 
-
-    //csv收集信息转json
-    public static ModuleOneCollect getModuleCollectionType(string type)
-    {
-        return oneCollectionTypeData[type];
-    }
     //-----------------------------------------json 存储测试
     public static void testLoad()
     {
@@ -228,7 +236,7 @@ public class AllUnitData:MonoBehaviour
     }
 }
 public class unitMessage
-{
+{//测试空类  没用
     public int id;
     public string name;
 }
