@@ -33,8 +33,13 @@ public class JsonReadToolTest
             string read = Encoding.ASCII.GetString(jsbt);
             object b = JsonUtility.FromJson<object>(read);
             //转换赋值
-            MethodInfo method = jType.GetMethod("setValue").MakeGenericMethod(taType);
+            //MethodInfo method = jType.GetMethod("setValue").MakeGenericMethod(taType);
+            /*
+            MethodInfo method = jType.GetMethod("convertType").MakeGenericMethod(taType);
             jLocal.SetValue(jType, method.Invoke(jEntity, new object[] { b }));
+            */
+            MethodInfo method= jType.GetMethod(mes[i + 1] + "Trans");
+            method.Invoke(jType, new object[] { b });
         }
     }
 

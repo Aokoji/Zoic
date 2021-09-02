@@ -25,7 +25,14 @@ public class JsonDataSave
 
 
 
-
+    public void allGoodDataTrans(object o)
+    {   //强转
+        if (o != null)
+            Debug.Log("getData" + o.ToString());
+        else
+            Debug.Log("isnull===");
+        allGoodData= (AllGoodStaticData)o;
+    }
 
     //------------------------------------------------***********************---------------------------------------------------------------
     //----以下区域不用操作-------------------
@@ -37,6 +44,22 @@ public class JsonDataSave
     {
         return (T)obj;
     }
+    ///测试转换方法
+    public static T convertType<T>(object obj)
+    {
+        Type tp = typeof(T);
+        if (tp.IsGenericType) tp = tp.GetGenericArguments()[0];
+        //反射
+        var tryparse = tp.GetMethod("TryParse",BindingFlags.Public|BindingFlags.Static,Type.DefaultBinder,new Type[] { typeof(string), tp.MakeByRefType() },
+            new ParameterModifier[] {new ParameterModifier(2) });
+        var parameters = new object[] {obj,Activator.CreateInstance(tp) };
+        bool success = (bool)tryparse.Invoke(null, parameters);
+        if (success)
+            return (T)parameters[1];
+        else
+            return default(T);
+    }
+
     /// <summary>
     ///     初始化json数据
     /// </summary>
