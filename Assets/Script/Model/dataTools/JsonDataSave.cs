@@ -5,6 +5,7 @@ using System.IO;
 using System;
 using System.Reflection;
 using System.Text;
+
 /// <summary>
 /// json数据存储方法
 /// 读取顺序  ：  读取方法  JsonReadToolTest--》存储数据  JsonDataSave--》没有则读取csv文件  StaticCSVDataTool
@@ -17,33 +18,24 @@ public class JsonDataSave
         get { return jsdata0; }
     }
     //----------------------------------------***    手动添加固定数据变量  无需赋值      ***------------------------------------------
-    public static AllGoodStaticData allGoodData = new AllGoodStaticData();
+    public Dictionary<int, GoodStaticData> allGoodData = new Dictionary<int, GoodStaticData>();
 
 
 
 
 
 
-
-    public void allGoodDataTrans(object o)
-    {   //强转
-        if (o != null)
-            Debug.Log("getData" + o.ToString());
-        else
-            Debug.Log("isnull===");
-        allGoodData= (AllGoodStaticData)o;
+    // 命名格式    变量+“Read”
+    public void allGoodDataRead(string o)
+    {   //转换存储
+        List<GoodStaticData> data = JsonUtility.FromJson<List<GoodStaticData>>(o);
+        foreach (var t in data)
+            allGoodData.Add(t.id, t);
     }
 
     //------------------------------------------------***********************---------------------------------------------------------------
     //----以下区域不用操作-------------------
     delegate object csvdelegate();
-    /// <summary>
-    /// 转换数据方法 目前转换json读取的存储数据
-    /// </summary>
-    public T setValue<T>(System.Object obj)
-    {
-        return (T)obj;
-    }
     ///测试转换方法
     public static T convertType<T>(object obj)
     {
@@ -70,7 +62,6 @@ public class JsonDataSave
         StaticCSVDataTool obj = new StaticCSVDataTool();
         Type csvEnt = obj.GetType();
         MethodInfo method = csvEnt.GetMethod("loadData_" + name);
-        object m = method.Invoke(obj, new object[] { });
         /*
         //      代理方法读取
         StaticCSVDataTool obj0 = new StaticCSVDataTool();
@@ -78,7 +69,7 @@ public class JsonDataSave
         csvdelegate method0 = (csvdelegate)Delegate.CreateDelegate(t0, obj0, "StaticCSVDataTool.loadData_" + name);
         object m0=method0();
         */
-        string json = JsonUtility.ToJson(m);
+        string json = JsonUtility.ToJson(method.Invoke(obj, new object[] { }));
         byte[] js = Encoding.ASCII.GetBytes(json.ToCharArray());
         File.WriteAllBytes(Application.dataPath + path, js);
     }

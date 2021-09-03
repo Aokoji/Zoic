@@ -31,26 +31,25 @@ public class JsonReadToolTest
             //读取
             byte[] jsbt = File.ReadAllBytes(Application.dataPath + mes[i]);
             string read = Encoding.ASCII.GetString(jsbt);
-            object b = JsonUtility.FromJson<object>(read);
             //转换赋值
-            //MethodInfo method = jType.GetMethod("setValue").MakeGenericMethod(taType);
             /*
             MethodInfo method = jType.GetMethod("convertType").MakeGenericMethod(taType);
             jLocal.SetValue(jType, method.Invoke(jEntity, new object[] { b }));
             */
-            MethodInfo method= jType.GetMethod(mes[i + 1] + "Trans");
-            method.Invoke(jType, new object[] { b });
+            MethodInfo method= jType.GetMethod(mes[i + 1] + "Read");
+            method.Invoke(jType, new object[] { read });
         }
     }
 
     //外部获取数据
     public T getJsonData<T>(string name, int num)
     {
-        Type jType = typeof(JsonDataSave);
+        JsonDataSave jEntity = JsonDataSave.jsdata;
+        Type jType = jEntity.GetType();
         FieldInfo jLocal = jType.GetField(name);
-        Type dic = jLocal.GetType();
-        Dictionary<int, T> data = (Dictionary<int, T>)(dic.GetProperty("childDic").GetValue(jLocal, null));
-        T sNode = data[num];
-        return sNode;
+        IDictionary dict = jLocal.GetValue(jEntity) as IDictionary;
+        if (dict == null)
+            PubTool.Instance.gameError("静态数据读取错误！！！", true);
+        return (T)dict[num];
     }
 }
