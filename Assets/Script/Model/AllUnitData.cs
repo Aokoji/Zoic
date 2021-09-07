@@ -15,51 +15,28 @@ public class AllUnitData:MonoBehaviour
         }
     }
     /*
-     * 待更改+++
+     * 待更改
      * 所有csv文件均作为基本数据文件  作为参考基值
      * 检测json文件存在，如果没有json记录  则读取csv文件并做json存储
      * 每当修改csv文件参数时  需要手动删除生成的json文件  让加载时重新读取达到刷新的目的
      */
+
     private JsonReadToolTest jsonRead = new JsonReadToolTest();
 
+    /// <summary>
+    /// 获取静态数据参考值
+    /// </summary>
+    /// <typeparam name="T">返回值类型</typeparam>
+    /// <param name="name">存变量参数名(要输对)</param>
+    /// <param name="num">id</param>
+    /// <returns></returns>
     public T getJsonData<T>(string name, int num)
     {
         return jsonRead.getJsonData<T>(name, num);
     }
    
-
-
-    //单个可收集资源组件信息配置  （类型编号 ，类型信息）
-    private static Dictionary<string, ModuleOneCollect> oneCollectionTypeData = new Dictionary<string, ModuleOneCollect>();
-    
     //------------------------静态单位信息----------------------
-    static List<string[]> allUnitData = new List<string[]>();           //单位信息
-    static List<string[]> allUnitSkillData = new List<string[]>();        //单位技能对照
-    static List<string[]> allSkillData = new List<string[]>();           //技能基础参数信息
-    static List<string[]> allSpoilData = new List<string[]>();         //单位爆率清单
-    static List<string[]> allGoodData = new List<string[]>();        //所有物品清单
-    static List<string[]> allAbnormalData = new List<string[]>();        //所有异常列表
-    static List<string[]> allExtraData = new List<string[]>();        //所有攻击特殊列表
     //------------------------初始化分类信息----------------
-    static List<string[]> allCollectionTypeData = new List<string[]>();        //初始化场景数据类型信息(可收集互动物体)
-
-    /*
-     * 这部分规范性需要修改+++
-     * 改成统一的字符数组
-     * 只需要添加路径配置即可加载
-     * 不需要重新赋变量
-     */
-
-    private static string unitPath = "Assets/Resources/Data//unitMessage.csv";
-    private static string unitSkillPath = "Assets/Resources/Data//unitSkillMessage.csv";
-    private static string skillPath = "Assets/Resources/Data//skillMessage.csv";
-    private static string spoilPath = "Assets/Resources/Data//spoilMessage.csv";
-    private static string goodPath = "Assets/Resources/Data//goodMessage.csv";
-    private static string abnormalPath = "Assets/Resources/Data//abnormalMessage.csv";
-    private static string extraPath = "Assets/Resources/Data//extraMessage.csv";
-    //private static string collectionPath = "Assets/Resources/Data//extraMessage.csv";
-    private static Dictionary<string, string> natureName = new Dictionary<string, string>();
-    private static Dictionary<List<string[]>, string> loadMessage = new Dictionary<List<string[]>, string>();       //<信息，路径>
     
     /// <summary>
     /// 加载静态数据(全部读取,不包括存档)
@@ -67,102 +44,7 @@ public class AllUnitData:MonoBehaviour
     public void loadData()
     {   //读取配置
         jsonRead.readAllJsonData();
-
-        loadMessage.Add(allUnitData, unitPath);
-        loadMessage.Add(allUnitSkillData, unitSkillPath);
-        loadMessage.Add(allSkillData, skillPath);
-        loadMessage.Add(allSpoilData, spoilPath);
-        loadMessage.Add(allGoodData, goodPath);
-        loadMessage.Add(allAbnormalData, abnormalPath);
-        loadMessage.Add(allExtraData, extraPath);
-        //loadMessage.Add(allCollectionTypeData, collectionPath);
-        //加载数据
-        //loadPath();
-        //setnatureName();
     }
-    private static void loadPath()
-    {
-        StreamReader sr=null;
-        foreach(var item in loadMessage)
-        {
-            if (File.Exists(item.Value))
-            {
-                sr = File.OpenText(item.Value);
-            }
-            else
-            {
-                Debug.LogError("读取静态数据异常!!!!"+item.Value);
-                return;
-            }
-            string str;
-            while ((str = sr.ReadLine()) != null)
-            {
-                item.Key.Add(str.Split(','));
-            }
-            sr.Close();
-        }
-        if (sr != null)
-        {
-            sr.Dispose();
-        }
-        else
-        {
-            Debug.LogError("静态数据加载异常!!!!");
-            return;
-        }
-
-    }
-    private static void setnatureName()
-    {
-        natureName.Add("0","id");
-        natureName.Add("1","name");
-        natureName.Add("2","physical");
-        natureName.Add("3","vigor");
-        natureName.Add("4","attack");
-        natureName.Add("5","speed");
-        natureName.Add("6","type");
-        natureName.Add("7","adPat");
-        natureName.Add("8","apPat");
-        natureName.Add("9","strike");
-        natureName.Add("10","dodge");
-        natureName.Add("11", "curHp");
-        natureName.Add("12", "curMp");
-        natureName.Add("13","state");
-    }
-    public static string getEncode(string num)
-    {
-        return natureName[num];
-    }
-
-    public static string[] getUnitData(int i)
-    {       //根据编号获取怪物数据
-        return allUnitData[i];
-    }
-    public static string[] getUnitSkillData(int i)
-    {       //根据编号获取怪物数据技能
-        return allUnitSkillData[i];
-    }
-    public static string[] getSkillData(int i)
-    {       //根据编号获取技能数据
-        return allSkillData[i];
-    }
-    public static string[] getGoodData(int i)
-    {       //根据编号获取物品数据
-        return allGoodData[i];
-    }
-    public static string[] getSpoilData(int i)
-    {       //根据编号获取爆率数据
-        return allSpoilData[i];
-    }
-    public static string[] getAbnormalData(int i)
-    {       //根据编号获取异常状态数据
-        return allAbnormalData[i];
-    }
-    public static string[] getExtraData(int i)
-    {       //根据编号获取异常状态数据
-        return allExtraData[i];
-    }
-
 
     //-----------------------------------------json 存储测试
     public static void testLoad()
@@ -187,6 +69,7 @@ public class AllUnitData:MonoBehaviour
     }
 
     //--------------------------------------------------------测试部分-------------------------
+    static string unitPath = "";
     public static void loadtext()   //写文件1   测试
     {
         StreamWriter sw;

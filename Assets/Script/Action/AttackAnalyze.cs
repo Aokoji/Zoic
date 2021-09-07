@@ -5,23 +5,27 @@ using UnityEngine;
 public class AttackAnalyze : MonoBehaviour
 {
     private List<CombatMessage> dataList;       //总数据
-    private AttackResult atkResult;
+    private AttackResultData atkResult;         //战斗数据
     private spoilsResult spoils;    //战利品
     CombatMessage sourceActor;          //来源
     List<CombatMessage> takeActors; //目标
     public bool isFaild = false;
-
-    string PLAYER = "player";   //玩家name
-    int SKILL_TYPE = 3;
-    int SUBJOIN_NUM = 5;    //特殊效果下标
-    int REFER_START = 16;   //参考值开始下标
-    int REFER_INTREVAL = 5; //取比例间隔
-    int REWORD_NUM = 10;//最高掉落数  9-1=8
-    int DAMAGE_TYPE = 14;   //伤害类型下标
+    
+    
     public void initData(List<CombatMessage> data)
     {
         dataList = data;
         spoils = new spoilsResult();
+    }
+    public AttackResultData doAction(AnalyzeResult action)
+    {
+        atkResult = new AttackResultData();
+        if (action.isNormalAtk)
+            normalAction(action);
+        else
+            specialAction(action);
+        if (atkResult == null) Debug.Log("战斗数据赋值错误");
+        return atkResult;
     }
     //----------------------------------总处理方法-------------------------------------------------------------------
     //------------输入  AnalyzeResult  类   包含（int）：自身下标、技能id、技能类型（判断范围）、目标序号（仅单体，群体类型根据技能类型区分）
@@ -30,16 +34,26 @@ public class AttackAnalyze : MonoBehaviour
     //普通的战斗处理
     public AttackResult normalAction(AnalyzeResult action)
     {
-        atkResult = new AttackResult();
-        string type = AllUnitData.getSkillData(action.skillID)[SKILL_TYPE];//获取技能类型
-        sourceActor = dataList[action.selfNum];     //伤害来源目标
-        takeActors = new List<CombatMessage>();     //被伤目标
-        switch (type)
+        SkillStaticData skill = AllUnitData.Data.getJsonData<SkillStaticData>("allSkillData",action.skillID);//获取技能
+        //伤害来源目标
+        sourceActor = dataList[action.selfNum];     
+        //被伤目标
+        takeActors = new List<CombatMessage>();  
+        if (action.takeNum == -1)
         {
-            case "101": territoryTypeAction(action); break;    //场地类型处理
-            case "102": stateTypeAction(action); break;    //增益类型处理
-            case "103": harmTypeAction(action); break;    //攻击类型处理
-            case "111": break; //道具类处理1
+            
+        }
+        else
+        {
+            takeActors.Add(dataList[action.takeNum]);
+        }
+        //分析技能类型
+        switch (skill.skillType)
+        {
+            case 101: territoryTypeAction(action); break;    //场地类型处理
+            case 102: stateTypeAction(action); break;    //增益类型处理
+            case 103: harmTypeAction(action); break;    //攻击类型处理
+            case 111: break; //道具类处理1
             default: break;
         }
         //行动结算

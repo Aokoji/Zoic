@@ -27,7 +27,7 @@ public class CombatController : DDOLController<CombatController>
         //willActionActor = new List<CombatMessage>();
     }
     //外部调用  打开界面
-    public void openCombat(List<CombatMessage> data,string logName)    //处理传进来的数据  敌人 玩家 战斗类型（野怪 boss或精英剧情等） 战斗场景等配置
+    public void openCombat(List<CombatMessage> data,string logName)    //+++处理传进来的数据  敌人 玩家 战斗类型（野怪 boss或精英剧情等） 战斗场景等配置
     {
         logname = logName;
         messageActor = data;

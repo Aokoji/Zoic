@@ -17,24 +17,78 @@ public class JsonDataSave
     {
         get { return jsdata0; }
     }
-    //----------------------------------------***    手动添加固定数据变量  无需赋值      ***------------------------------------------
-    public Dictionary<int, GoodStaticData> allGoodData = new Dictionary<int, GoodStaticData>();
-
-
-
-
-
+    //============================================================================================
+    //----------------------------------------***    手动添加固定数据变量  手动赋值      ***------------------------------------------
+    
+    public Dictionary<int, GoodStaticData> allExtraData = new Dictionary<int, GoodStaticData>();
 
     // 命名格式    变量+“Read”
-    public void allGoodDataRead(string o)
+    //**********单位信息***********
+    public Dictionary<int, UnitTypeStaticData> allUnitData = new Dictionary<int, UnitTypeStaticData>();
+    public void allUnitDataRead(string o)
     {   //转换存储
-        List<GoodStaticData> data = JsonUtility.FromJson<List<GoodStaticData>>(o);
-        foreach (var t in data)
+        AllUnitTypeStaticData data = JsonUtility.FromJson<AllUnitTypeStaticData>(o);
+        foreach (var t in data.childDic)
+            allUnitData.Add(t.id, t);
+    }
+    
+    //***************技能基础参数信息****************
+    public Dictionary<int, SkillStaticData> allSkillData = new Dictionary<int, SkillStaticData>();
+    public void allSkillDataRead(string o)
+    {
+        AllSkillStaticData data = JsonUtility.FromJson<AllSkillStaticData>(o);
+        foreach (var t in data.childDic)
+            allSkillData.Add(t.id, t);
+    }
+
+    //************单位技能对照***********
+    public Dictionary<int, UnitSkillStaticData> allUnitSkillData = new Dictionary<int, UnitSkillStaticData>();
+    public void allUnitSkillDataRead(string o)
+    {
+        AllUnitSkillStaticData data = JsonUtility.FromJson<AllUnitSkillStaticData>(o);
+        foreach (var t in data.childDic)
+            allUnitSkillData.Add(t.id, t);
+    }
+
+    //*************单位爆率清单**********************
+    public Dictionary<int, UnitSpoilStaticData> allSpoilData = new Dictionary<int, UnitSpoilStaticData>();
+    public void allSpoilDataRead(string o)
+    {
+        AllUnitSpoilStaticData data = JsonUtility.FromJson<AllUnitSpoilStaticData>(o);
+        foreach (var t in data.childDic)
+            allSpoilData.Add(t.id, t);
+    }
+
+    //*******************所有物品清单***********************
+    public Dictionary<int, GoodStaticData> allGoodData = new Dictionary<int, GoodStaticData>();
+    public void allGoodDataRead(string o)
+    {
+        AllGoodStaticData data = JsonUtility.FromJson<AllGoodStaticData>(o);
+        foreach (var t in data.childDic)
             allGoodData.Add(t.id, t);
     }
 
-    //------------------------------------------------***********************---------------------------------------------------------------
-    //----以下区域不用操作-------------------
+    //*******************所有收集单位信息*****************
+    public Dictionary<int, CollectTypeStaticData> allCollcetData = new Dictionary<int, CollectTypeStaticData>();
+    public void allCollcetDataRead(string o)
+    {
+        AllCollectTypeStaticData data = JsonUtility.FromJson<AllCollectTypeStaticData>(o);
+        foreach (var t in data.childDic)
+            allCollcetData.Add(t.id, t);
+    }
+
+    //*********************所有状态信息***********************
+    public Dictionary<int, AbnormalStaticData> allAbnormalData = new Dictionary<int, AbnormalStaticData>();
+    public void allAbnormalDataRead(string o)
+    {
+        AllAbnormalStaticData data = JsonUtility.FromJson<AllAbnormalStaticData>(o);
+        foreach (var t in data.childDic)
+            allCollcetData.Add(t.id, t);
+    }
+
+    //------------------------------------------------***********************----------------------------------------------------------------------------
+    //-===============================================================================================
+    //-----------------------------------------------------以下区域不用操作-------------------
     delegate object csvdelegate();
     ///测试转换方法
     public static T convertType<T>(object obj)
@@ -55,9 +109,9 @@ public class JsonDataSave
     /// <summary>
     ///     初始化json数据
     /// </summary>
-    public void createNewJson<T>(string path, string name)
+    public void createNewJson(string path, string name)
     {
-        //假装读取csv得出了初始化类型
+        //读取csv得出了初始化类型
         //      invoke方法读取
         StaticCSVDataTool obj = new StaticCSVDataTool();
         Type csvEnt = obj.GetType();

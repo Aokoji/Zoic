@@ -92,7 +92,8 @@ public class GameManager : MonoBehaviour
             //MainController.Instance.openCombat();
             List<int> list = new List<int>();
             list.Add(1);
-            MainController.Instance.SendMessage("receiveCombatInformation", list, SendMessageOptions.DontRequireReceiver);
+            //MainController.Instance.SendMessage("receiveCombatInformation", list, SendMessageOptions.DontRequireReceiver);
+            MainController.Instance.receiveCombatInformation( list);
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {

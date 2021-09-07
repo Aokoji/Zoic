@@ -14,28 +14,24 @@ public class JsonReadToolTest
     public void readAllJsonData()
     {
         string[] mes = LoadPaths.constantJsonPath;
+        JsonDataSave jEntity = JsonDataSave.jsdata;
+        Type jType = jEntity.GetType();
         //读取
-        for (int i = 0; i < mes.Length; i += 3)
+        for (int i = 0; i < mes.Length; i += 2)
         {
-            JsonDataSave jEntity = JsonDataSave.jsdata;
-            Type jType = jEntity.GetType();
             FieldInfo jLocal = jType.GetField(mes[i + 1]);  //拿到变量
             Type taType = jLocal.GetType();     //实例
 
             if (!File.Exists(Application.dataPath + mes[i]))
             {
                 //不存在
-                MethodInfo func = jType.GetMethod("createNewJson").MakeGenericMethod(taType);
+                MethodInfo func = jType.GetMethod("createNewJson");
                 func.Invoke(jEntity, new object[] { mes[i], mes[i + 1] });
             }
             //读取
             byte[] jsbt = File.ReadAllBytes(Application.dataPath + mes[i]);
             string read = Encoding.ASCII.GetString(jsbt);
             //转换赋值
-            /*
-            MethodInfo method = jType.GetMethod("convertType").MakeGenericMethod(taType);
-            jLocal.SetValue(jType, method.Invoke(jEntity, new object[] { b }));
-            */
             MethodInfo method= jType.GetMethod(mes[i + 1] + "Read");
             method.Invoke(jType, new object[] { read });
         }

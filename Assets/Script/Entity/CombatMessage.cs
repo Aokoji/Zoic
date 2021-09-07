@@ -4,62 +4,31 @@ using UnityEngine;
 
 public class CombatMessage
 {
-    public CombatMessage()
-    {
-        UnitData = new Dictionary<string, int>();
-        //SkillData = new Dictionary<int, skillDetail>();
-        UnitData.Add("id", id);
-        UnitData.Add("physical", physical);
-        UnitData.Add("vigor", vigor);
-        UnitData.Add("attack", attack);
-        UnitData.Add("speed", speed);
-        UnitData.Add("type", type);
-        UnitData.Add("adPat", adPat);
-        UnitData.Add("apPat", apPat);
-        UnitData.Add("strike", strike);
-        UnitData.Add("dodge", dodge);
-        UnitData.Add("curHp", curHp);
-        UnitData.Add("curMp", curMp);
-        UnitData.Add("defence", def);
-    }
     //--------以下为内部引用量
-    private int id;      //取数据的列表id
     private string name;
     private string iconName;
-    private int physical;
-    private int vigor;
-    private int attack;
-    private int speed;
-    private int type;
-    private int adPat;
-    private int apPat;
-    private int strike;
-    private int dodge;
-
-    private int maxHp;
-    private int maxMp;
+    private UnitTypeStaticData data;
+    //战斗可变动值
     private int curHp;
     private int curMp;
-    private int def;
+    private float curSpeed; //这个记录跑条位置   不进行手动更改
 
     //---------以下为外部引用量
+    private int level;      //所有属性基于等级的比例值  （曲线值） 部分角色越高级越强
     private int numID;          //战斗中list序号  玩家默认为0
-    private GameObject prefab;
-    private GameObject iconActor;
-    private int level;
-    private List<abnormalState> abnormal=new List<abnormalState>();
-    private List<specialAttackExtra> atkExtra = new List<specialAttackExtra>();
+    private GameObject prefab;      //战斗人物实体
+    private GameObject iconActor;   //战斗人物头像
+    private List<abnormalState> abnormal=new List<abnormalState>();     //状态（buff/debuff）
+    private List<specialAttackExtra> atkExtra = new List<specialAttackExtra>();     //+++这个属性待定
     private List<skillSave> skillData = new List<skillSave>();  //技能
 
-    private float curSpeed;
     private bool isPlayer;
     private bool isDead;
-    private Dictionary<string, int> unitData;
     //private Dictionary<int, skillDetail> skillData;//技能id  等级
-    private EnemyActionAnalyse analyse = new EnemyActionAnalyse();//ai分析器
+    private EnemyActionAnalyse analyse = new EnemyActionAnalyse();//ai分析器 （玩家不需要）
 
-    private int attackID;
-    private int skillOdds;  //技能概率
+    private int attackID;   //平Aid
+    private int skillOdds;  //技能概率  (忘了是啥了)
 
     public float CurSpeed { get => curSpeed; set => curSpeed = value; }
     public string Name { get => name; set => name = value; }
@@ -71,13 +40,15 @@ public class CombatMessage
     public List<specialAttackExtra> AtkExtra { get => atkExtra; set => atkExtra = value; }
     public List<skillSave> SkillData { get => skillData; set => skillData = value; }
     public bool IsDead { get => isDead; set => isDead = value; }
-    public Dictionary<string, int> UnitData { get => unitData; set => unitData = value; }
     public EnemyActionAnalyse Analyse { get => analyse; set => analyse = value; }
     public string IconName { get => iconName; set => iconName = value; }
     public int NumID { get => numID; set => numID = value; }
     public int SkillOdds { get => skillOdds; set => skillOdds = value; }
-
-    //技能
+    public UnitTypeStaticData Data { get => data; set => data = value; }
+    public int CurHp { get => curHp; set => curHp = value; }
+    public int CurMp { get => curMp; set => curMp = value; }
+    public int Level { get => level; set => level = value; }
+    
 }
 
 public class abnormalState

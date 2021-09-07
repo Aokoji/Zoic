@@ -107,8 +107,9 @@ public class EnemyActionAnalyse
 
 //返回类  分析结果  返回给攻击动作组
 public class AnalyzeResult{
+    public bool isNormalAtk;    //是否普通攻击
     public int selfNum;
     public int skillID;
-    public int skillType;   //生效类型  0自身，1己方单体，2己方全体，3敌方单体，4敌方全体，5全体，6特殊
-    public int takeNum;     //对象序号 （相对于当此的list的序号，非单体不读取）
+    public int skillType;   //生效类型  0自身，1己方全体，2敌方单体，3敌方全体，4全体，5特殊
+    public int takeNum=-1;     //对象序号 （相对于当此的list的序号，非单体不读取）
 }
