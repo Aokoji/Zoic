@@ -20,9 +20,17 @@ public class AllUnitData:MonoBehaviour
      * 检测json文件存在，如果没有json记录  则读取csv文件并做json存储
      * 每当修改csv文件参数时  需要手动删除生成的json文件  让加载时重新读取达到刷新的目的
      */
-
     private JsonReadToolTest jsonRead = new JsonReadToolTest();
+    
+    /// <summary>
+    /// 加载静态数据(全部读取,不包括存档)  (游戏启动自动调用)
+    /// </summary>
+    public void loadData()
+    {   //读取配置
+        jsonRead.readAllJsonData();
+    }
 
+    //外部调用
     /// <summary>
     /// 获取静态数据参考值
     /// </summary>
@@ -35,16 +43,25 @@ public class AllUnitData:MonoBehaviour
         return jsonRead.getJsonData<T>(name, num);
     }
    
-    //------------------------静态单位信息----------------------
-    //------------------------初始化分类信息----------------
-    
+    //外部调用
     /// <summary>
-    /// 加载静态数据(全部读取,不包括存档)
+    /// 获取战时数据编号对应属性
     /// </summary>
-    public void loadData()
-    {   //读取配置
-        jsonRead.readAllJsonData();
+    /// <param name="unit">作战单位</param>
+    /// <param name="i">属性编号</param>
+    /// <returns></returns>
+    public int getCombatParamData(combatUnitProperty unit,int i)
+    {
+        int num = 0;
+        switch (i)
+        {
+            case 101:num = unit.physical_last;break;
+        }
+        return num;
     }
+
+
+
 
     //-----------------------------------------json 存储测试
     public static void testLoad()

@@ -111,5 +111,5 @@ public class AnalyzeResult{
     public int selfNum;
     public int skillID;
     public int skillType;   //生效类型  0自身，1己方全体，2敌方单体，3敌方全体，4全体，5特殊
-    public int takeNum=-1;     //对象序号 （相对于当此的list的序号，非单体不读取）
+    public List<int> takeNum = new List<int>();         //对象序号 
 }

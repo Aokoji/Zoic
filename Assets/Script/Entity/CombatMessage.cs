@@ -7,14 +7,11 @@ public class CombatMessage
     //--------以下为内部引用量
     private string name;
     private string iconName;
-    private UnitTypeStaticData data;
-    //战斗可变动值
-    private int curHp;
-    private int curMp;
+    private combatUnitProperty data = new combatUnitProperty();
+
     private float curSpeed; //这个记录跑条位置   不进行手动更改
 
     //---------以下为外部引用量
-    private int level;      //所有属性基于等级的比例值  （曲线值） 部分角色越高级越强
     private int numID;          //战斗中list序号  玩家默认为0
     private GameObject prefab;      //战斗人物实体
     private GameObject iconActor;   //战斗人物头像
@@ -44,16 +41,31 @@ public class CombatMessage
     public string IconName { get => iconName; set => iconName = value; }
     public int NumID { get => numID; set => numID = value; }
     public int SkillOdds { get => skillOdds; set => skillOdds = value; }
-    public UnitTypeStaticData Data { get => data; set => data = value; }
-    public int CurHp { get => curHp; set => curHp = value; }
-    public int CurMp { get => curMp; set => curMp = value; }
-    public int Level { get => level; set => level = value; }
-    
+    public combatUnitProperty Data { get => data; set => data = value; }
+
+    /// <summary>
+    /// 赋完值后 拉栓
+    /// </summary>
+    public void paddingData()
+    {
+
+    }
+    /// <summary>
+    /// 获取该单位  数值编号对应属性
+    /// </summary>
+    public int getCombatParamData(int i)
+    {
+        return AllUnitData.Data.getCombatParamData(data, i);
+    }
 }
 
 public class abnormalState
 {//状态表  buff  debuff        (普通buff)
     public int id;  //异常状态id(包括正面状态)
+
+    public bool isSpecial;
+    public bool isTarget;
+
     public int round;// 剩余回合
     public int refer;//能力参数
     public int perHit;//每回合数值(伤害/回复)
@@ -72,4 +84,46 @@ public class specialAttackExtra
     public int type;            //下标2类型
     public int actOn;   //作用于
     public int specialRefer;   //特殊参考
+}
+
+//战斗用人物属性细分
+public class combatUnitProperty
+{
+    public int id;
+    public int level;      //所有属性基于等级的比例值  （曲线值） 部分角色越高级越强
+    // 基础值                          （敌人需要赋值基础值和浮动天赋 最终计算面板）
+    public int physical_base;    
+    public int vigor_base;      
+    public int attack_base;       
+    public int speed_base;        
+    public int strike_base;        
+    public int dodge_base;    
+    public int hitRate_base;       
+    public int defence_base;       
+    public int adPat_base;         
+    public int apPat_base;      
+    public int force_base;      
+    public int wisdom_base; 
+    public int agility_base;
+    //天赋
+    public int force_point;      //力量
+    public int wisdom_point; //智力
+    public int agility_point;    //敏捷
+    //最终面板          (玩家直接赋值最终面板)
+    public int physical_last;
+    public int vigor_last;
+    public int attack_last;
+    public int speed_last;
+    public int strike_last;
+    public int dodge_last;
+    public int hitRate_last;
+    public int defence_last;
+    public int adPat_last;
+    public int apPat_last;
+    public int force_last;
+    public int wisdom_last;
+    public int agility_last;
+    //战斗可变动值
+    private int curHp;
+    private int curMp;
 }

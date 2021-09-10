@@ -5,11 +5,10 @@ using UnityEngine;
 //返回类   攻击结果  返回给回合结算
 public class AttackResultData
 {
-    public CombatMessage sourceActor;//攻击方
-    public List<CombatMessage> takenActor;//受击方(主攻击)
+    public int sourceActor;//攻击方
+    public List<int> takenActor;//受击方(主攻击)
     public int animType;    // * 动画类型  标记播放的攻击动画
-    public bool isHit;  //是否伤害/治疗
-    public List<bool> hitType = new List<bool>();      //受击类型  (伤害，治疗)
+    public bool isHit;  //是否伤害
     public List<int[]> hitCount = new List<int[]>();    //受击伤害(包含多频)
     public List<bool> isHitRare = new List<bool>();   //该次攻击类型技能是否命中
 

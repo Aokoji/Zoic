@@ -480,7 +480,7 @@ public class AttackAction
 }
 
 //返回类   攻击结果  返回给动画组
-public class AttackResult
+public class AttackResult0
 {
     public int type;    //类型
     public List<int> hitCount;  //这是次数  每个人都要受list长度次数攻击  总和为总伤害
@@ -498,7 +498,7 @@ public class AttackResult
     public List<CombatMessage> willDeadActor = new List<CombatMessage>();//给我死
 }
 //返回类  存储类   当局战利品结算
-public class spoilsResult
+public class spoilsResult0
 {
     public List<int> spoils=new List<int>();    //战利品id表
     public int coins;       //结算货币

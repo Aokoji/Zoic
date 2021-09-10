@@ -6,15 +6,14 @@ using UnityEngine;
 public class CombatController : DDOLController<CombatController>
 {
     public EventManager eventManager;           //注册一个事件处理器
-    private AttackAction attackAction;              //战斗缓存器
+    private AttackAnalyze attackAction;              //战斗缓存器
     public CombatView combat;
     private GameObject combatScene;
     private float pubPer = 0.05f;
-    private bool iswait;
+    private bool iswait;    //是否进度等待
     private string logname;
 
     private List<CombatMessage> messageActor = null;         //跑进度全部单位数据
-    private CombatMessage willActionActor = null;      //待操作的单位
 
     //manager调用  初始化并自动创建单例
     public void initController()
@@ -23,8 +22,7 @@ public class CombatController : DDOLController<CombatController>
         combatScene = null;
         iswait = false;
         messageActor = new List<CombatMessage>();
-        attackAction = new AttackAction();
-        //willActionActor = new List<CombatMessage>();
+        attackAction = new AttackAnalyze();
     }
     //外部调用  打开界面
     public void openCombat(List<CombatMessage> data,string logName)    //+++处理传进来的数据  敌人 玩家 战斗类型（野怪 boss或精英剧情等） 战斗场景等配置
@@ -34,7 +32,7 @@ public class CombatController : DDOLController<CombatController>
         attackAction.initData(messageActor);
         if (combat == null) { initCombat(messageActor); }
         AnimationController.Instance.cleanNextStepAction(); //清空动画控制器事件
-        AnimationController.Instance.combatNextStep += nextStep;
+        AnimationController.Instance.combatNextStep += roundEndAction;
         combat.transform.SetAsLastSibling();            //置顶
         initEvent();
         ViewController.instance.setCameraVisible("combatcam", true);        //强制显示战斗场景相机（单显示）
@@ -94,77 +92,87 @@ public class CombatController : DDOLController<CombatController>
     {
         Debug.Log("结束加载场景 ");//+++其实改先播放一会等待的展示 或播一个回合开始的小动画
     }
+    //----------------------------------------------------------------------------开始进度------------------------
     //开始跑进度  （速度条）
     private void startPrograss(Action callback)
     {
-        PubTool.instance.addCombatLogger(logname, "开始游戏进度");
-        StartCoroutine(doLoadPrograss());
+        nextStep();
         callback();
     }
-
     IEnumerator doLoadPrograss()
     {
-        if (iswait) yield break;
-        else
+        foreach (var item in messageActor)
         {
-            foreach (var item in messageActor)
+            //暂定总长100  标速 40为1s
+            float per = pubPer * item.Data.speed_last;
+            item.CurSpeed += per;
+            //设置ui进度
+            combat.setRelative(item);
+            if (item.CurSpeed >= 100)
             {
-                //暂定总长100  标速 40为1s
-                float per = pubPer * item.UnitData["speed"];
-                item.CurSpeed += per;
-                combat.setRelative(item);
-                if (item.CurSpeed >= 100)
-                {
-                    //willActionActor.Add(item);
-                    willActionActor = item;
-                    item.CurSpeed = 0;
-                    break;  //暂且先这样
-                }
-            }
-            checkAction();
-        }
-        yield return new WaitForSeconds(0.02f);
-        StartCoroutine(doLoadPrograss());
-    }
-    //检查一次更新过后   未执行的单位
-    private void checkAction()
-    {
-        if (willActionActor != null)
-        {
-            iswait = true;
-            if (!willActionActor.IsPlayer)//敌人攻击
-            {
-                Debug.Log("【敌人攻击】");
-                //轮到敌人攻击  拿到一个攻击数据组
-                AnalyzeResult aiAction = willActionActor.Analyse.analyseCombatAttack(messageActor, willActionActor,combat.playerActor);
-                //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
-                AttackResult animData=attackAction.normalAction(aiAction);
-                //根据计算结果  调用动画播放器   播放完动画后进行下一步
-                AnimationController.Instance.playCombatBeHit(combat,animData);
-            }
-            else
-            {
-                //+++dosomething  轮到玩家操作
-                combat.playerRound();
-                Debug.Log("【玩家攻击】");
+                item.CurSpeed = 0;
+                iswait = true;
+                //执行回合
+                runRoundAction(item);
+                break;
             }
         }
+        if (!iswait)
+        {
+            yield return new WaitForSeconds(0.02f);
+            StartCoroutine(doLoadPrograss());
+        }
     }
-    //进行完操作  接着跑进度
+    //跑进度方法
     public void nextStep()
     {
+        PubTool.instance.addCombatLogger(logname, "开始游戏进度");
         Debug.Log("开始计算速度..");
-        if (!checkCombatResult())
+        iswait = false;
+        StartCoroutine(doLoadPrograss());
+    }
+    //-----------------------------------------------------------------------开始进度 end -------------
+    //执行回合
+    private void runRoundAction(CombatMessage actor)
+    {
+        //+++回合-1   cd
+        if (!actor.IsPlayer)//敌人攻击
         {
+            Debug.Log("【敌人攻击】");
+            //轮到敌人攻击  拿到一个攻击数据组  由ai分析出结果
+            AnalyzeResult aiAction = actor.Analyse.analyseCombatAttack(messageActor, actor, combat.playerActor);
+            //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
+            //获得的战斗数据传给回合控制器  计算回合全部数据  之后打包传给动画控制器
+            wholeRoundData animData =attackAction.doAction(aiAction);
+            
+            //根据计算结果  调用动画播放器   播放完动画后进行下一步
+            //AnimationController.Instance.playCombatBeHit(combat,animData);
+        }
+        else
+        {
+            //+++dosomething  轮到玩家操作
+            combat.playerRound();
+            Debug.Log("【玩家攻击】");
+        }
+    }
+    //完整的回合结束
+    //传入动画播放  全部播放完成后 进行回合结束的回调
+    public void roundEndAction()
+    {
+        //检查游戏继续
+        if (checkCombatResult())
+        {
+            nextStep();
+        }
+        else
+        {
+            //+++执行结算动画调用
             combatSettle();
             //+++如果结束  执行结算判断  胜利或失败  继续结算动画
             return;
         }
-        iswait = false;
-        willActionActor = null;
-        StartCoroutine(doLoadPrograss());
     }
-    //检查战斗是否结束      包括玩家与敌人
+    //检查战斗是否继续      包括玩家与敌人
     public bool checkCombatResult()
     {
         return attackAction.checkCombatContinue();
@@ -172,6 +180,7 @@ public class CombatController : DDOLController<CombatController>
     //战斗结算
     private void combatSettle()
     {
+        //判断输赢
         combat.playSettleAnim(attackAction.checkCombatResult(),exitCombat);
     }
     //退出
