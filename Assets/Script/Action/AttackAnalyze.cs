@@ -20,7 +20,7 @@ public class AttackAnalyze : MonoBehaviour
         dataList = data;
         spoils = new spoilsResult();
     }
-    public wholeRoundData doAction(AnalyzeResult action)
+    public AttackResultData doAction(AnalyzeResult action)
     {
         //初始化技能存储、战斗返回数据
         skill = new SkillStaticData();
@@ -31,9 +31,9 @@ public class AttackAnalyze : MonoBehaviour
         else
             specialAction(action);
         if (atkResult == null) Debug.LogError("战斗数据赋值错误");
-        else roundAnalyzeAction(atkResult);
+        else roundAnalyzeAction();
         if (roundData == null) Debug.LogError("回合数据赋值错误");
-        return roundData;
+        return atkResult;
     }
     //----------------------------------总处理方法-------------------------------------------------------------------
     //------------输入  AnalyzeResult  类   操作的内容类   只处理当次动作产生的数值
@@ -98,73 +98,135 @@ public class AttackAnalyze : MonoBehaviour
     {
         //标记为伤害
         atkResult.isHit = true;
+        //记录伤害类型
+        atkResult.hitType = skill.damageType;
+        bool holy = atkResult.hitType == 190;   //临时记录是否真伤
+        //记录攻击特效
+        atkResult.isSpecial = skill.isSpecialEffect;
         //----------计算攻击----------
         //获得参考属性值
         int basePro =sourceActor.getCombatParamData(skill.damageRefer);
         //计算基础伤害
         int baseDam = skill.damageMulti / 100 * basePro;
         //计算暴击
-        baseDam = baseDam * (Random.Range(0,100)<sourceActor.Data.strike_last?2:1);
+        baseDam =holy?baseDam:baseDam * (Random.Range(0,100)<sourceActor.Data.strike_last?2:1);
         //计算作用目标伤害
         for(int i= 0;i<takeActors.Count;i++)
         {
             //计算命中和闪避
-            bool israte = Random.Range(0, 100) < sourceActor.Data.hitRate_last;       //true命中
+            bool israte =holy?holy:Random.Range(0, 100) < sourceActor.Data.hitRate_last;       //true命中
             if (israte)
             {
-                israte = Random.Range(0, 100) > takeActors[i].Data.dodge_last;   //true命中
+                israte =holy?holy:Random.Range(0, 100) > takeActors[i].Data.dodge_last;   //true命中
                 if (israte)
                 {//命中
                     //计算防御  
-                    int hitresult = DataTransTool.defenceTrans(baseDam,takeActors[i].Data.defence_last);
+                    int hitresult =holy? baseDam:DataTransTool.defenceTrans(baseDam,takeActors[i].Data.defence_last);
                     //获得减伤类型数据
-                    int pat = skill.damageType == 0 ? takeActors[i].Data.adPat_last : takeActors[i].Data.apPat_last;
-                    //计算减伤
-                    hitresult = (int)Mathf.Round(hitresult * (float)(1 - (pat / 100)));
+                    if (!holy)
+                    {
+                        int pat=0;
+                        if (skill.damageType == 191) pat = takeActors[i].Data.adPat_last;
+                        if (skill.damageType == 192) pat = takeActors[i].Data.apPat_last;
+                        //计算减伤
+                        hitresult = (int)Mathf.Round(hitresult * (float)(1 - (pat / 100)));
+                    }
                     //计算攻击频率
                     int[] hitnums = new int[skill.damageNum];
                     int hitper = (int)Mathf.Round(hitresult / skill.damageNum);
                     for (int k=0;k< skill.damageNum;k++)
                     {
-                        k = hitper;
+                        hitnums[k] = hitper;
                     }
                     atkResult.hitCount.Add(hitnums);
+                    atkResult.hitNum.Add(hitresult);
+                    //-----------------------------------------------
+                    //计算攻击特效
+                    if (skill.isSpecialEffect)
+                    {
+                        atkResult.isSpecial = true;
+                        calculateSpecialEffect(takeActors[i]);
+                    }
+                    else atkResult.isSpecial = false;
                 }
             }
             atkResult.isHitRare.Add(israte);
         }
     }
     //=======================================       回合处理器       ============================
-    private void roundAnalyzeAction(AttackResultData result)
+    public wholeRoundData roundAnalyzeAction()
     {
-        //计算伤害
-        //计算攻击特效
-        foreach(var abState in dataList[result.sourceActor].Abnormal)
-        {
-            //判断是否攻击特效
-            if (abState.isSpecial)
-            {
 
-            }
+        //计算伤害
+        //遍历状态表   计算攻击特效
+        foreach(abnormalState abState in dataList[atkResult.sourceActor].Abnormal)
+        {
+            
         }
         //判断死亡
         //计算buff生效
         //判断死亡
         //buff回合刷新
         //返回动画
+        return roundData;
     }
 
-
-
-
-
-
-
-
-
-
-
-
+    /// <summary>
+    /// 计算攻击特效方法（自动）
+    /// </summary>
+    /// <param name="target">受害人</param>
+    private void calculateSpecialEffect(CombatMessage target)
+    {
+        List<int> sphit=new List<int>();    //特效次数
+        List<int> sptyp=new List<int>();    //特效类型
+        foreach (var abnormal in sourceActor.Abnormal)
+        {
+            //判断特效
+            if (!abnormal.isSpecial) continue;
+            //记录特效参考值   计算伤害
+            int refer;
+            if (abnormal.isSelf)
+            {
+                refer = sourceActor.getCombatParamData(abnormal.effectRefer);
+            }
+            else
+            {
+                refer = target.getCombatParamData(abnormal.effectRefer);
+            }
+            if (abnormal.effectRefer == 150) {
+                refer=atkResult.hitNum[atkResult.hitNum.Count-1];
+            }
+            refer = (int)Mathf.Round(abnormal.effectHitMulti / 100* refer);
+            //计算减伤
+            if (abnormal.effectType != 190)
+            {
+                DataTransTool.defenceTrans(refer, target.Data.defence_last);
+                int pat = 0;
+                if (skill.damageType == 191) pat = target.Data.adPat_last;
+                if (skill.damageType == 192) pat = target.Data.apPat_last;
+                refer = (int)Mathf.Floor(refer * (float)(1 - (pat / 100)));
+            }
+            //得到伤害  赋值
+            sphit.Add(refer);
+            //记录伤害类型
+            sptyp.Add(abnormal.effectType);
+        }
+        //换算  赋值结果
+        int num = sphit.Count;
+        if (num > 0)
+        {
+            int[] hitsp = new int[num];
+            int[] typsp = new int[num];
+            for (int i = 0; i < num; i++)
+            {
+                hitsp[i] = sphit[i];
+                typsp[i] = sptyp[i];
+            }
+            atkResult.specialCount.Add(hitsp);
+            atkResult.specialType.Add(typsp);
+        }
+    }
+    
     //目标击败
     public void settleActorDead(CombatMessage actor)
     {

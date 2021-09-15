@@ -61,17 +61,27 @@ public class CombatMessage
 
 public class abnormalState
 {//状态表  buff  debuff        (普通buff)
-    public int id;  //异常状态id(包括正面状态)
+    public int id;  //异常状态id(包括正面状态和攻击特效)
+    public string name;
 
     public bool isSpecial;
     public bool isTarget;
-
     public int round;// 剩余回合
-    public int refer;//能力参数
-    public int perHit;//每回合数值(伤害/回复)
-    public int effectAbility;   //影响能力
-    public int effectMulti;     //影响参数
-    public bool isEffect;   //是否已作用
+    public int resCount;    //剩余次数（有次数优先次数）不使用为-1
+    public bool isGain;         //是否增益（用来显示说明）
+    public int abnormalLogo;        //异常参数种类图标  (攻击，力量，敏捷，智力，暴击，闪避，命中，速度，防御，逃跑)（中毒，流血，灼烧）
+
+    public int effectAbility;       //影响属性编号
+    public int effectMulti;         //影响幅度（基础）(百分比或固定  目前百分比)(增减益)
+    public int effectConstant;      //固定值
+
+    public bool isSettleHit;      //是否结算伤害
+    
+    public bool isSelf;     //特殊单独计算参考目标取值（参考自身还是目标）
+    public int effectType;      //伤害类型
+    public int effectRefer;         //影响效果参考属性编号（攻击特效和异常伤害状态）(攻击特效取 effectHitMulti  计算伤害)       (比如参考当前生命)
+    public int effectHitMulti;      //伤害取值      （目前是百分比）
+    public int effectReferNum;         //影响效果参考值(释放时记录) (针对例 毒)
 }
 public class specialAttackExtra
 {//特殊攻击附加

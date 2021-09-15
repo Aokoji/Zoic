@@ -64,9 +64,8 @@ public class SkillStaticData
     //1智力= 精力+基于智力魔攻+精力回复速度
     //1敏捷=1速度 2防御
 
-    public int damageType;  //伤害类型  0,1  物理 魔法
+    public int damageType;  //伤害类型  191,192  物理 魔法
     public bool isSpecialEffect;     //附带攻击特效
-    public bool isHoly;         //真伤
     public int damageRefer;     //伤害参考属性
     public int damageMulti;     //伤害比例
     public int damageNum;       //伤害次数
@@ -123,12 +122,22 @@ public class AbnormalStaticData
     public int id;
     public string name;
     public bool isSpecial;      //是否特殊（攻击特效）
-    public bool isTarget;       //是否作用taken对面目标
-    public int abnormalType;        //异常参数种类  用来区分是否是同一种类异常
-    public int effectAbility;       //影响属性
-    public int effectRefer;         //影响效果参考
-    public int effectReferNum;         //影响效果参考值(释放时记录)
-    public int effectMulti;         //影响幅度
+    public bool isTarget;       //是否  * 作用 *  taken对面目标
+    public bool isGain;         //是否增益（用来显示说明）
+    public int abnormalLogo;        //异常参数种类图标  (攻击，力量，敏捷，智力，暴击，闪避，命中，速度，防御，逃跑)（中毒，流血，灼烧）
+
+    public int effectAbility;       //影响属性编号
+    public int effectMulti;         //影响幅度（基础）(百分比或固定  目前百分比)(增减益)
+    public int effectConstant;      //固定值
+
+    public bool isSettleHit;      //是否结算伤害
+
+    public bool isCure;         //是否治疗
+    public bool isSelf;     //特殊单独计算参考目标取值（参考自身还是目标）
+    public int effectType;      //伤害类型
+    public int effectRefer;         //影响效果参考属性编号（攻击特效和异常伤害状态）(攻击特效取 effectHitMulti  计算伤害)       (比如参考当前生命)
+    public int effectHitMulti;      //伤害取值      （目前是百分比）
+    public int effectReferNum;         //影响效果参考值(释放时记录) (针对例 毒)
 }
 
 

@@ -6,11 +6,19 @@ using UnityEngine;
 public class AttackResultData
 {
     public int sourceActor;//攻击方
-    public List<int> takenActor;//受击方(主攻击)
+    public List<int> takenActor;//受击方(主攻击)      顺序001
     public int animType;    // * 动画类型  标记播放的攻击动画
     public bool isHit;  //是否伤害
-    public List<int[]> hitCount = new List<int[]>();    //受击伤害(包含多频)
-    public List<bool> isHitRare = new List<bool>();   //该次攻击类型技能是否命中
+    public List<int> hitNum = new List<int>();    //受击伤害(不包含多频)        顺序001
+    public List<int[]> hitCount = new List<int[]>();    //受击伤害(包含多频)        顺序001
+    public int hitType;
+    public List<bool> isHitRare = new List<bool>();   //该次攻击类型技能是否命中        顺序001
+    public bool isSpecial;      //是否附带攻击特效
+    public List<int[]> specialCount = new List<int[]>();    //受攻击特效数       顺序001
+    public List<int[]> specialType = new List<int[]>(); //受攻击特效类型（用于显示字体颜色）     顺序001
+
+    public bool iscure;     //治疗
+    public List<int> cureNum = new List<int>();
 
     public bool isBuff; //是否buff
     public int buffId;  //buffid  对应abnormal数据
@@ -39,10 +47,21 @@ public class wholeRoundData
 {
     //------------------------------------------------（主动操作部分）-------------------------------
     public AttackResultData result;
+    public List<SettleRoundActor> settleActors = new List<SettleRoundActor>();//结算对象
     //-------------------------------------------(回合结算部分)--------------------------------
-    public List<CombatMessage> settleActor = new List<CombatMessage>(); //结算对象
+    public List<int> settleActor = new List<int>(); 
     public List<bool> settleHitType = new List<bool>();      //结算受击类型  (伤害，治疗)
     public List<int[]> settleHitCount = new List<int[]>();    //结算受击伤害(包含多频)
     public List<int> settleBuffExist = new List<int>();         //剩余buff
     public List<CombatMessage> roundDeadActor = new List<CombatMessage>();//给我死
+}
+
+//结算时  每个被结算actor的数据
+public class SettleRoundActor
+{
+    public List<int[]> hitNumber = new List<int[]>();               //挨打
+    public bool isPhy;                          //伤害类型
+    public List<int[]> specialNumber = new List<int[]>();       //特效挨打
+    public List<int[]> specialType = new List<int[]>();             //特效显示数字类型  ( 颜色 ) 
+    
 }

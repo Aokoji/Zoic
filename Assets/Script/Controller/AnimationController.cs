@@ -66,7 +66,12 @@ public class AnimationController : DDOLController<AnimationController>
         return 0;
     }
 
-    public void playCombatBeHit(CombatView combat,AttackResult result)
+    /// <summary>
+    /// 调用动画播放器 播放攻击回合动画
+    /// </summary>
+    /// <param name="combat">控制场景</param>
+    /// <param name="result">结果</param>
+    public void playCombatBeHit(CombatView combat, AttackResultData result,Action action)
     {//播放被击动画  并调用合适的视图面板变动
         Debug.Log("【播放动画】攻击方:"+result.sourceActor.Name+"    受击方:"+result.takenActor[0].Name);
         Debug.Log("【参数】异常状态"+result.takenActor[0].Abnormal.Count+"个【附加异常】"+result.inflictionID.Count);
@@ -78,13 +83,17 @@ public class AnimationController : DDOLController<AnimationController>
         {
 
         }
-        void action()
-        {
-            combatNextStep();
-        }
         playAnimation(result.sourceActor.Prefab.GetComponentInChildren<Animator>().gameObject, "testAction",false, action);
 
     }
+
+    public void playCombarRoundSettle(wholeRoundData rounddata,Action action)
+    {
+
+    }
+
+
+
 
     public void playCombatSceneTransform(CombatView combat,int type)
     {//加载入场动画  普通切换  动画为 0

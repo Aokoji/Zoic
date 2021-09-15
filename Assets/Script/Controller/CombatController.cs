@@ -42,7 +42,6 @@ public class CombatController : DDOLController<CombatController>
         eventManager.combat += arrangeScence;      //赋予布置场景方法   可多个
         eventManager.combatEnd += combatEnd;
         eventManager.doCombat();            //打开界面
-        PubTool.Instance.addStep(startPrograss);    //加入序列
     }
     //内部调用          创建UI
     public void initCombat(List<CombatMessage> data)
@@ -75,6 +74,9 @@ public class CombatController : DDOLController<CombatController>
         //布置场景数据
         combat.setSceneLayout(0);
         //AnimationController.Instance.playCombatSceneTransform(combat, 0);   //  0    默认转场
+        //+++专场结束 显示遭遇信息。
+        //+++显示距离数据信息
+        PubTool.Instance.addStep(startPrograss);    //加入序列
         Debug.Log("布置场景数据");
     }
     //事件
@@ -142,11 +144,9 @@ public class CombatController : DDOLController<CombatController>
             //轮到敌人攻击  拿到一个攻击数据组  由ai分析出结果
             AnalyzeResult aiAction = actor.Analyse.analyseCombatAttack(messageActor, actor, combat.playerActor);
             //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
-            //获得的战斗数据传给回合控制器  计算回合全部数据  之后打包传给动画控制器
-            wholeRoundData animData =attackAction.doAction(aiAction);
-            
-            //根据计算结果  调用动画播放器   播放完动画后进行下一步
-            //AnimationController.Instance.playCombatBeHit(combat,animData);
+            AttackResultData animData =attackAction.doAction(aiAction);
+            //获得的战斗数据传给动画机  动画机执行完进行回合判定
+            AnimationController.Instance.playCombatBeHit(combat, animData,roundSettle);
         }
         else
         {
@@ -156,6 +156,19 @@ public class CombatController : DDOLController<CombatController>
         }
     }
     //完整的回合结束
+    public void roundSettle()
+    {
+        if (checkCombatResult())
+        {
+            //获得回合结束数据
+            wholeRoundData rounddata = attackAction.roundAnalyzeAction();
+            //回合结算
+            AnimationController.Instance.playCombarRoundSettle(rounddata, roundEndAction);
+        }
+        else
+            roundEndAction();
+    }
+
     //传入动画播放  全部播放完成后 进行回合结束的回调
     public void roundEndAction()
     {
