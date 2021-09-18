@@ -5,6 +5,10 @@ using UnityEngine;
 //返回类   攻击结果  返回给回合结算
 public class AttackResultData
 {
+    public bool isMoveInstruct; //是否移动指令
+    public int moveDistance;    //移动距离
+    public int finDistance; //最终距离
+
     public int sourceActor;//攻击方
     public List<int> takenActor;//受击方(主攻击)      顺序001
     public int animType;    // * 动画类型  标记播放的攻击动画
@@ -29,7 +33,7 @@ public class AttackResultData
     public int domainId;    //场地id
      //+++   需要完善场地数据    (目前没有这样技能  可以先跳过)
 
-    public List<CombatMessage> willDeadActor = new List<CombatMessage>();//给我死
+    public List<int> willDeadActor = new List<int>();//给我死
     /*
     public string changeTarget;//变动目标(显示槽)
     public int changeTo;//变动参数

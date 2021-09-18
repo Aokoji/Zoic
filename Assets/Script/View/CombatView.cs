@@ -161,6 +161,21 @@ public class CombatView : MonoBehaviour
         //面板出现短暂动画
         PubTool.Instance.addStep(playPanelFirstStage);
     }
+
+    //显示提示板（比如距离）
+    public void showTips1Second(Action action)
+    {
+        //提示板0.25渐显
+        //提示板1秒展示
+        //提示板0.25渐隐
+        //渐隐结束
+        action();
+    }
+    //设置内容
+    public void setTipsContext(string text)
+    {
+
+    }
     //---------------------------------------------出场动画--------------------------------
     private void playEnterScene(Action callback)
     {

@@ -14,14 +14,27 @@ public class AttackAnalyze : MonoBehaviour
     public bool isFaild = false;
     string PLAYER = "player";   //玩家name
 
+    public int distance;
+
 
     public void initData(List<CombatMessage> data)
     {
         dataList = data;
         spoils = new spoilsResult();
+        distance = 2;   //+++初始距离为2(根据怪物属性 变化)
     }
     public AttackResultData doAction(AnalyzeResult action)
     {
+        if (action.isMoveInstruct)      //有move指令
+        {
+            //判断移动
+            atkResult.isMoveInstruct = true;
+            atkResult.moveDistance = distance == 0?0: action.moveDistance;      //0 则代表 虽然移动了 但是距离最近了  针对强制位移的技能  主动不会移动0以内
+            atkResult.moveDistance = distance - action.moveDistance < 0 ? distance : action.moveDistance;   //防止走过头
+            distance -= atkResult.moveDistance;
+            //移动没有后续操作  则返回
+            if (!action.isExtraHit) return atkResult;
+        }
         //初始化技能存储、战斗返回数据
         skill = new SkillStaticData();
         atkResult = new AttackResultData();
@@ -33,6 +46,40 @@ public class AttackAnalyze : MonoBehaviour
         if (atkResult == null) Debug.LogError("战斗数据赋值错误");
         else roundAnalyzeAction();
         if (roundData == null) Debug.LogError("回合数据赋值错误");
+        return takeEffectAttackResult();
+    }
+
+    //结算伤害  (生效)
+    public AttackResultData takeEffectAttackResult()
+    {
+        for(int i = 0; i < takeActors.Count; i++)
+        {
+            //计算伤害
+            if (atkResult.isHit)
+            {
+                int hitfin=0;
+                if (atkResult.isSpecial)
+                {
+                    foreach (int k in atkResult.specialCount[i])
+                        hitfin += k;
+                }
+                hitfin += atkResult.hitNum[i];
+                if (takeActors[i].hitCurPhysical(hitfin))
+                {
+                    atkResult.willDeadActor.Add(i);
+                }
+            }
+            //叠buff
+            if (atkResult.isBuff)
+            {
+
+            }
+            //计算治疗
+            if (atkResult.iscure)
+            {
+                takeActors[i].hitCurPhysical(-atkResult.cureNum[i]);
+            }
+        }
         return atkResult;
     }
     //----------------------------------总处理方法-------------------------------------------------------------------
@@ -156,13 +203,32 @@ public class AttackAnalyze : MonoBehaviour
     //=======================================       回合处理器       ============================
     public wholeRoundData roundAnalyzeAction()
     {
-
-        //计算伤害
-        //遍历状态表   计算攻击特效
-        foreach(abnormalState abState in dataList[atkResult.sourceActor].Abnormal)
+        int count = 0;
+        void runActor()
         {
-            
+            if (count >= dataList.Count) return;
+            var abactor = dataList[count];
+            if (abactor.IsDead)
+            {
+                runActor();
+                return;
+            }
+            foreach(var abstate in abactor.Abnormal)
+            {
+
+            }
+
+
+
+
+
+
+            count++;
+            runActor();
         }
+        //计算伤害
+        runActor();
+
         //判断死亡
         //计算buff生效
         //判断死亡

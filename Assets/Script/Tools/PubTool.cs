@@ -7,7 +7,11 @@ public class PubTool : DDOLController<PubTool>
 {
     private bool stepLock = false;                      //方法执行中锁
     private bool stepAllow = true;                      //方法执行信号
+
+    private bool animLock = false;                      //方法执行中锁
+    private bool animAllow = true;                      //方法执行信号
     private List<Action<Action>> stepList = new List<Action<Action>>();     //公用方法序列
+    private List<Action<Action>> animStepList = new List<Action<Action>>();     //动画方法序列
     private StreamWriter sw = null;
     //private string logPath = "Assets/Resources/Data//eventLog.txt";
     //private FileInfo logfile;
@@ -19,6 +23,7 @@ public class PubTool : DDOLController<PubTool>
     private void Update()
     {
         updateStep();
+        updateAnimStep();
     }
     /// <summary>
     /// 延时方法  参数 （延时float   回调action）
@@ -48,9 +53,28 @@ public class PubTool : DDOLController<PubTool>
             }
         }
     }
+    //动画序列
+    private void updateAnimStep()
+    {
+        animAllow = animStepList.Count > 0;
+        if (!animLock)
+        {
+            if (animAllow)
+            {
+                animLock = true;
+                Action<Action> callback = animStepList[0];
+                animStepList.Remove(animStepList[0]);
+                callback(animStepNext);
+            }
+        }
+    }
     private void stepNext()
     {
         stepLock = false;
+    }
+    private void animStepNext()
+    {
+        animLock = false;
     }
     /// <summary>
     /// 添加执行步骤  必须含有参数action  可以进行下一步时调用  类似callback（其实就是）
@@ -58,6 +82,10 @@ public class PubTool : DDOLController<PubTool>
     public void addStep(Action<Action> action)
     {
         stepList.Add(action);
+    }
+    public void addAnimStep(Action<Action> action)
+    {
+        animStepList.Add(action);
     }
     /// <summary>
     /// 清理方法序列  执行中方法停不掉

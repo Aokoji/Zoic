@@ -24,7 +24,13 @@ public class AnimationController : DDOLController<AnimationController>
             combatNextStep -= delArray[i] as CombatAction;
         }
     }
-    //外部调用 播放组件动画
+    /// <summary>
+    /// 外部调用 播放组件动画
+    /// </summary>
+    /// <param name="obj">组件gameobj</param>
+    /// <param name="aniName">动画名</param>
+    /// <param name="loop">循环</param>
+    /// <param name="callBack">回调</param>
     public void playAnimation(GameObject obj, string aniName,bool loop,Action callBack)
     {
         Animator anim = obj.GetComponent<Animator>();
@@ -71,23 +77,35 @@ public class AnimationController : DDOLController<AnimationController>
     /// </summary>
     /// <param name="combat">控制场景</param>
     /// <param name="result">结果</param>
-    public void playCombatBeHit(CombatView combat, AttackResultData result,Action action)
+    public void playCombatBeHit(CombatView combat, AttackResultData result,List<CombatMessage> actorList,Action action)
     {//播放被击动画  并调用合适的视图面板变动
-        Debug.Log("【播放动画】攻击方:"+result.sourceActor.Name+"    受击方:"+result.takenActor[0].Name);
-        Debug.Log("【参数】异常状态"+result.takenActor[0].Abnormal.Count+"个【附加异常】"+result.inflictionID.Count);
+        Debug.Log("【播放动画】攻击方:"+actorList[result.sourceActor].Name+"    受击方:"+ actorList[result.takenActor[0]].Name);
         //if (result.sourceActor.AtkExtra.Count != 0) { Debug.Log(result.sourceActor.AtkExtra[0].id); }
         //if (result.extraHit!=null && result.extraHit.Length != 0) { Debug.Log(result.extraHit[0]); }
-        Debug.Log("【战斗数据】"+ result.sourceActor.Name + "："+result.sourceActor.UnitData["curHp"]+"    "+ result.takenActor[0].Name + "："+result.takenActor[0].UnitData["curHp"]);
-        //全部播放完成后
+        Debug.Log("【战斗数据】");
+
+        //播放攻击方动画
+        PubTool.instance.addAnimStep(delegate (Action callback)
+        {
+            playAnimation(actorList[result.sourceActor].Prefab.GetComponentInChildren<Animator>().gameObject, "testAction", false, callback);
+        });
+        //播放受击方动画
+        //播放受击方特效
+        //播放的同时显示数值
+        //全部播放完成后  播放死亡
         if (result.willDeadActor.Count != 0)
         {
-
+            //挨个播死亡动画
         }
-        playAnimation(result.sourceActor.Prefab.GetComponentInChildren<Animator>().gameObject, "testAction",false, action);
-
+        //攻击播放结束
+        PubTool.instance.addAnimStep(delegate (Action callback)
+        {
+            callback();
+            action();
+        });
     }
 
-    public void playCombarRoundSettle(wholeRoundData rounddata,Action action)
+    public void playCombarRoundSettle(wholeRoundData rounddata, List<CombatMessage> actorList, Action action)
     {
 
     }

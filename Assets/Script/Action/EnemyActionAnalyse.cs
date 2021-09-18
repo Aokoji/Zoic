@@ -107,6 +107,9 @@ public class EnemyActionAnalyse
 
 //返回类  分析结果  返回给攻击动作组
 public class AnalyzeResult{
+    public bool isMoveInstruct; //是否移动指令
+    public int moveDistance;    //移动距离
+    public bool isExtraHit;
     public bool isNormalAtk;    //是否普通攻击
     public int selfNum;
     public int skillID;

@@ -57,6 +57,26 @@ public class CombatMessage
     {
         return AllUnitData.Data.getCombatParamData(data, i);
     }
+    /// <summary>
+    /// 掉血
+    /// </summary>
+    /// <param name="hit">值</param>
+    public bool hitCurPhysical(int hit)
+    {
+        data.curHp -= hit;
+        if(data.curHp<=0)
+        {
+            IsDead = true;
+            return true;
+        }
+        if (data.curHp > data.physical_last)
+        {
+            data.curHp = data.physical_last;
+        }
+        return false;
+    }
+    
+
 }
 
 public class abnormalState
@@ -134,6 +154,6 @@ public class combatUnitProperty
     public int wisdom_last;
     public int agility_last;
     //战斗可变动值
-    private int curHp;
-    private int curMp;
+    public int curHp;
+    public int curMp;
 }

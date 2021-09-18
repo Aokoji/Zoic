@@ -85,6 +85,12 @@ public class CombatController : DDOLController<CombatController>
         //+++各种战斗确认界面通用一个确认和取消  在点击方法中根据view层 选择状态区分触发攻击的操作事件
         combat.attackConfirm.onClick.AddListener(playerDoAttack);    //攻击并触发下一步
     }
+    //显示标签1秒
+    public void showTips1Second(string context,Action action)
+    {
+        combat.setTipsContext(context);
+        combat.showTips1Second(action);
+    }
     //-------------------------------------------------内部逻辑-----------------------------
     private void combatStart()
     {
@@ -146,7 +152,7 @@ public class CombatController : DDOLController<CombatController>
             //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
             AttackResultData animData =attackAction.doAction(aiAction);
             //获得的战斗数据传给动画机  动画机执行完进行回合判定
-            AnimationController.Instance.playCombatBeHit(combat, animData,roundSettle);
+            AnimationController.Instance.playCombatBeHit(combat, animData,messageActor,roundSettle);
         }
         else
         {
@@ -163,7 +169,7 @@ public class CombatController : DDOLController<CombatController>
             //获得回合结束数据
             wholeRoundData rounddata = attackAction.roundAnalyzeAction();
             //回合结算
-            AnimationController.Instance.playCombarRoundSettle(rounddata, roundEndAction);
+            AnimationController.Instance.playCombarRoundSettle(rounddata, messageActor,roundEndAction);
         }
         else
             roundEndAction();
