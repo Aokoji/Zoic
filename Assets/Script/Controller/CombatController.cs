@@ -217,38 +217,16 @@ public class CombatController : DDOLController<CombatController>
     public void playerDoAttack()
     {
         AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
+        SkillStaticData skill= combat.chooseSkill;
         aiAction.selfNum = combat.playerActor.NumID;
-        aiAction.skillID =combat.chooseSkill;
-        aiAction.skillType =int.Parse( AllUnitData.getSkillData(combat.chooseSkill)[3]);
-        aiAction.takeNum = combat.chooseActor;
+        aiAction.skillID =combat.chooseSkill.id;
+        aiAction.skillType =skill.effectType;
+        aiAction.takeNum.Add(combat.chooseActor);
         //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
-        AttackResult animData = attackAction.normalAction(aiAction);
-        //根据计算结果  调用动画播放器   播放完动画后进行下一步
-        AnimationController.Instance.playCombatBeHit(combat, animData);
+        AttackResultData animData = attackAction.doAction(aiAction);
+        //获得的战斗数据传给动画机  动画机执行完进行回合判定
+        AnimationController.Instance.playCombatBeHit(combat, animData, messageActor, roundSettle);
         //eventManager.doattackNext(combat.playerActor, combat.chooseActor);
-    }
-    public void playerDoAttack1()
-    {
-        AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
-        aiAction.selfNum = 0;
-        aiAction.skillID = 2;
-        aiAction.skillType = 103;
-        aiAction.takeNum = 1;
-        //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
-        AttackResult animData = attackAction.normalAction(aiAction);
-        //根据计算结果  调用动画播放器   播放完动画后进行下一步
-        AnimationController.Instance.playCombatBeHit(combat, animData);
-        //eventManager.doattackNext(combat.playerActor, combat.chooseActor);
-    }
-    public void playerDoAttack2()
-    {
-        AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
-        aiAction.selfNum = 0;
-        aiAction.skillID = 4;
-        aiAction.skillType = 103;
-        aiAction.takeNum = 1;
-        AttackResult animData = attackAction.normalAction(aiAction);
-        AnimationController.Instance.playCombatBeHit(combat, animData);
     }
 
 

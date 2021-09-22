@@ -42,7 +42,15 @@ public class AllUnitData:MonoBehaviour
     {
         return jsonRead.getJsonData<T>(name, num);
     }
-   
+
+    /// <summary>
+    /// 获取技能 单独分支方法  （便捷）
+    /// </summary>
+    public SkillStaticData getSkillStaticData(int num)
+    {
+        return jsonRead.getJsonData<SkillStaticData>("allSkillData", num);
+    }
+
     //外部调用
     /// <summary>
     /// 获取战时数据编号对应属性

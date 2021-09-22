@@ -12,12 +12,13 @@ public class CombatMessage
     private float curSpeed; //这个记录跑条位置   不进行手动更改
 
     //---------以下为外部引用量
+    public int id;
     private int numID;          //战斗中list序号  玩家默认为0
     private GameObject prefab;      //战斗人物实体
     private GameObject iconActor;   //战斗人物头像
     private List<abnormalState> abnormal=new List<abnormalState>();     //状态（buff/debuff）
     private List<specialAttackExtra> atkExtra = new List<specialAttackExtra>();     //+++这个属性待定
-    private List<skillSave> skillData = new List<skillSave>();  //技能
+    private skillSave skillData = new skillSave();  //技能
 
     private bool isPlayer;
     private bool isDead;
@@ -35,7 +36,7 @@ public class CombatMessage
     public int AttackID { get => attackID; set => attackID = value; }
     public List<abnormalState> Abnormal { get => abnormal; set => abnormal = value; }
     public List<specialAttackExtra> AtkExtra { get => atkExtra; set => atkExtra = value; }
-    public List<skillSave> SkillData { get => skillData; set => skillData = value; }
+    public skillSave SkillData { get => skillData; set => skillData = value; }
     public bool IsDead { get => isDead; set => isDead = value; }
     public EnemyActionAnalyse Analyse { get => analyse; set => analyse = value; }
     public string IconName { get => iconName; set => iconName = value; }
@@ -44,7 +45,7 @@ public class CombatMessage
     public combatUnitProperty Data { get => data; set => data = value; }
 
     /// <summary>
-    /// 赋完值后 拉栓
+    /// 赋完值后 拉栓 计算属性赋最终值
     /// </summary>
     public void paddingData()
     {
@@ -75,7 +76,6 @@ public class CombatMessage
         }
         return false;
     }
-    
 
 }
 
@@ -96,10 +96,13 @@ public class abnormalState
     public int effectConstant;      //固定值
 
     public bool isSettleHit;      //是否结算伤害
+    public bool isSettleCure;   //是否结算治疗
+    public bool isBuff;     //是否buff    (区分攻击特效和结算伤害)
     
     public bool isSelf;     //特殊单独计算参考目标取值（参考自身还是目标）
-    public int effectType;      //伤害类型
-    public int effectRefer;         //影响效果参考属性编号（攻击特效和异常伤害状态）(攻击特效取 effectHitMulti  计算伤害)       (比如参考当前生命)
+    public int effectType;      //伤害类型(计算减伤用)
+    public int effectTypeShow;  //伤害类型（显示用）
+    public int effectRefer;         //影响效果参考属性编号（攻击特效和异常伤害状态）(攻击特效取 effectHitMulti  计算伤害 毒 治疗)       (比如参考当前生命)
     public int effectHitMulti;      //伤害取值      （目前是百分比）
     public int effectReferNum;         //影响效果参考值(释放时记录) (针对例 毒)
 }
@@ -139,7 +142,7 @@ public class combatUnitProperty
     public int force_point;      //力量
     public int wisdom_point; //智力
     public int agility_point;    //敏捷
-    //最终面板          (玩家直接赋值最终面板)
+    //最终面板          (玩家也要付基础值 但不赋值天赋)
     public int physical_last;
     public int vigor_last;
     public int attack_last;

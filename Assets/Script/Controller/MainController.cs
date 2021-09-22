@@ -37,7 +37,7 @@ public class MainController : DDOLController<MainController>
         int id = 1;
         foreach(var item in enemy)
         {
-            item.UnitData["id"] = id;
+            item.id = id;
             item.NumID = id;
             list.Add(item);
             id++;
@@ -56,56 +56,48 @@ public class MainController : DDOLController<MainController>
     public CombatMessage playerSaveToCombat(PlayerMessage play)     //玩家数据  转换  战斗场景数据
     {
         CombatMessage mess = new CombatMessage();
-        mess.UnitData["id"] = 0;
-        mess.UnitData["physical"] = play.hpmax;
-        mess.UnitData["vigor"] = play.mpmax;
-        mess.UnitData["attack"] = play.atk;
-        mess.UnitData["speed"] = play.speed;
-        mess.UnitData["type"] = 0;
-        mess.UnitData["adPat"] = play.adPat;
-        mess.UnitData["apPat"] = play.apPat;
-        mess.UnitData["strike"] = play.strike;
-        mess.UnitData["dodge"] = play.dodge;
-        mess.UnitData["curHp"] = play.hpcur;
-        mess.UnitData["curMp"] = play.mpcur;
+        mess.id = 0;
+        mess.Data.physical_base = play.physical_last;
+        mess.Data.vigor_base= play.vigor_last;
+        mess.Data.attack_base = play.attack_last;
+        mess.Data.speed_base = play.speed_last;
+        mess.Data.adPat_base = play.adPat_last;
+        mess.Data.apPat_base = play.apPat_last;
+        mess.Data.strike_base = play.strike_last;
+        mess.Data.dodge_base = play.dodge_last;
+        mess.Data.defence_base = play.defence_last;
+        mess.Data.curHp = play.hpcur;
+        mess.Data.curMp = play.mpcur;
         mess.IconName = GameData.Data.PLAYER;
         mess.IsPlayer = true;
         mess.NumID = 0;
-        mess.AttackID = 2;
+        mess.AttackID = play.attackID;
         mess.SkillData = play.skills;
         return mess;
     }
     public CombatMessage enemyToCombat(int id)                //单位数据  转换  战斗场景数据
     {
         CombatMessage mess = new CombatMessage();
-        string[] enemy = AllUnitData.getUnitData(id);
-        mess.UnitData["physical"] = int.Parse(enemy[2]);
-        mess.UnitData["vigor"] = int.Parse(enemy[3]);
-        mess.UnitData["attack"] = int.Parse(enemy[4]);
-        mess.UnitData["speed"] = int.Parse(enemy[5]);
-        mess.UnitData["type"] = int.Parse(enemy[6]);
-        mess.UnitData["adPat"] = int.Parse(enemy[7]);
-        mess.UnitData["apPat"] = int.Parse(enemy[8]);
-        mess.UnitData["strike"] = int.Parse(enemy[9]);
-        mess.UnitData["dodge"] = int.Parse(enemy[10]);
-        mess.UnitData["curHp"] = int.Parse(enemy[2]);
-        mess.UnitData["curMp"] = int.Parse(enemy[3]);
-        mess.IconName = enemy[1];
+        UnitTypeStaticData play = AllUnitData.Data.getJsonData<UnitTypeStaticData>("allUnitData", id);
+        mess.Data.physical_base = play.physical;
+        mess.Data.vigor_base = play.vigor;
+        mess.Data.attack_base = play.attack;
+        mess.Data.speed_base = play.speed;
+        mess.Data.adPat_base = play.adPat;
+        mess.Data.apPat_base = play.apPat;
+        mess.Data.strike_base = play.strike;
+        mess.Data.dodge_base = play.dodge;
+        mess.Data.defence_base = play.defence;
+        mess.Data.curHp = play.physical;
+        mess.Data.curMp = play.vigor;
+        mess.IconName = play.name;
         mess.IsPlayer = false;
-        skillSave skill;
-        List<skillSave> list = new List<skillSave>();
-        string[] skills = AllUnitData.getUnitSkillData(id);
-        mess.AttackID = int.Parse(skills[2]);
-        mess.SkillOdds = int.Parse(skills[1]);
-        for(int i = 3; i < skills.Length; i++)
+        UnitSkillStaticData skills = AllUnitData.Data.getJsonData<UnitSkillStaticData>("allUnitSkillData", id);
+        mess.AttackID = skills.attakcNum;
+        foreach(var sk in skills.skills)
         {
-            if (skills[i].Equals(0)) break;
-            skill = new skillSave();
-            skill.skillID = int.Parse(skills[i]);
-            skill.skillLevel = int.Parse(skills[i+1]);
-            list.Add(skill);
+            mess.SkillData.skillHold.Add(sk);
         }
-        mess.SkillData = list;
         return mess;
     }
 

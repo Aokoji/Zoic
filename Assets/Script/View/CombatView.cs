@@ -31,7 +31,7 @@ public class CombatView : MonoBehaviour
     private List<GameObject> actorBody = null;
     private List<CombatMessage> _Data = null;       //全部数据
     public CombatMessage playerActor = null;        //玩家本体
-    public int chooseSkill;                 //选择的技能   目标(仅限单体) 其他类型有自动识别
+    public SkillStaticData chooseSkill;                 //选择的技能   目标(仅限单体) 其他类型有自动识别
     public int chooseActor;             //在选择攻击目标时  或 释放环境技能确定窗时  提前赋值
 
     private float distance; //总的进度条长度
@@ -115,18 +115,17 @@ public class CombatView : MonoBehaviour
     private void initLayout()
     {
         clearContext();     //清理技能列表
-        foreach(var skill in playerActor.SkillData)
+        foreach(var skill in playerActor.SkillData.skillHold)
         {
             GameObject bar = addContext();
             Text[] conts=bar.GetComponentsInChildren<Text>();
-            conts[0].text = AllUnitData.getSkillData(skill.skillID)[1];     //技能名称
-            conts[1].text = skill.skillLevel+"";     //等级
-            conts[2].text = AllUnitData.getSkillData(skill.skillID)[29];     //体力消耗
-            conts[3].text = AllUnitData.getSkillData(skill.skillID)[30];     //精力消耗
+            conts[0].text = skill.name;     //技能名称
+            conts[1].text = skill.level+"";     //等级
+            conts[2].text = skill.expend1 + "";     //体力消耗
+            conts[3].text = skill.expend2 + "";     //精力消耗
             bar.GetComponent<Button>().onClick.AddListener(()=>                             //闭包写法  网上抄的
             {
-                int id = skill.skillID;
-                chooseSkillMessage(id);
+                chooseSkillMessage(skill);
             });
         }
     }
@@ -291,7 +290,7 @@ public class CombatView : MonoBehaviour
     {
         isChooseOneActor = true;    //允许出现选择箭头
         //进入二级界面
-        chooseSkill = playerActor.AttackID;
+        chooseSkill = AllUnitData.Data.getSkillStaticData(playerActor.AttackID);
         //无效化 基础四个按钮  
         baseControl.SetActive(false);
         //刷新箭头指向状态（就是待选目标的状态  重置为可选目标）
@@ -313,11 +312,11 @@ public class CombatView : MonoBehaviour
 
     }
     //选择技能  显示三级 技能详情面板
-    private void chooseSkillMessage(int id)
+    private void chooseSkillMessage(SkillStaticData skill)
     {
         skillThirdFather.SetActive(true);
         string cont;
-        cont="技能详情\n"+ AllUnitData.getSkillData(id)[1]+"\n    "+ AllUnitData.getSkillData(id)[2];
+        cont="技能详情\n"+ skill.name+"：\n    "+skill.describe;
         skillThirdFather.GetComponentInChildren<Text>().text = cont;
         //var item = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         baseControl.SetActive(false);

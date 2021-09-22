@@ -83,7 +83,8 @@ public class AllUnitSkillStaticData{public List<UnitSkillStaticData> childDic = 
 public class UnitSkillStaticData
 {
     public int id;
-    public int skillType;
+    public int attakcNum;
+    public List<SkillStaticData> skills = new List<SkillStaticData>();
 }
 //----------------------------------------单位爆率--------------------------------------------
 [System.Serializable]
@@ -92,6 +93,9 @@ public class AllUnitSpoilStaticData{public List<UnitSpoilStaticData> childDic = 
 public class UnitSpoilStaticData
 {
     public int id;
+    public List<int> spoilItems = new List<int>();
+    public List<int> mgSpoil = new List<int>();
+    public int[] awardNum = new int[9];    //奖励个数 1-9  几率  支持1位小数  即0.5%    会存5
 }
 //----------------------------------------物品数据----------------------------------------
 [System.Serializable]

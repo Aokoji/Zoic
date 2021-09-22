@@ -83,7 +83,7 @@ public class JsonDataSave
     {
         AllAbnormalStaticData data = JsonUtility.FromJson<AllAbnormalStaticData>(o);
         foreach (var t in data.childDic)
-            allCollcetData.Add(t.id, t);
+            allAbnormalData.Add(t.id, t);
     }
 
     //------------------------------------------------***********************----------------------------------------------------------------------------

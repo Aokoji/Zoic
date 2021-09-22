@@ -75,9 +75,9 @@ public class PlayerMessage
     //==================================                 技能与物品                  =======================
 
     public int attackID;               //攻击默认序号
-    public int skillPoint;          //技能点
-    public List<skillSave> skills=new List<skillSave>();    //技能
+    public skillSave skills=new skillSave();    //技能
     public itemSave items=new itemSave();   //背包
+    public bool isDead;
 
     //+++任务 这个要分开记录  和下边
     public int plotCount;   //剧情进度 (主)
@@ -93,6 +93,39 @@ public class PlayerMessage
         //+++计算装备加成  赋值
         //+++计算最终面板
     }
+    /// <summary>
+    /// 按减法计算当前体力
+    /// </summary>
+    public bool subCurPhysical(int hit)
+    {
+        hpcur -= hit;
+        if (hpcur <= 0)
+        {
+            isDead = true;
+            return true;
+        }
+        if (hpcur > physical_last)
+        {
+            hpcur = physical_last;
+        }
+        return false;
+    }
+    /// <summary>
+    /// 按减法计算当前精力
+    /// </summary>
+    public void subCurVigor(int hit)
+    {
+        mpcur -= hit;
+        if (mpcur <= 0)
+        {
+            mpcur = 0;
+        }
+        if (mpcur > vigor_last)
+        {
+            mpcur = vigor_last;
+        }
+    }
+
 }
 
 //技能信息

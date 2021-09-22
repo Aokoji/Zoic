@@ -32,7 +32,7 @@ public class GameData:MonoBehaviour
     private int hpBase = 150;
     private int mpBase = 30;
     private int atkBase = 12;
-    //private int defBase = 2;
+    private int defBase = 2;
     public string PLAYER = "player";
 
 
@@ -70,7 +70,7 @@ public class GameData:MonoBehaviour
     //事件调用  获得技能点
     public void skillPointGot()
     {
-        playermessage.skillPoint++;
+        playermessage.skills.skillPoint++;
     }
     //外部调用 获得经验
     public int addExp(int num)
@@ -111,21 +111,20 @@ public class GameData:MonoBehaviour
 
         //体力提升  额外回复+20%
         int numPer = (int)Math.Floor((Math.Pow(2, (level + 1) / 24) + (level + 1) / 8 - 1) - (Math.Pow(2, level / 24) + level / 8 - 1)) * hpBase;
-        playermessage.hpmax += numPer;
-        playermessage.hpcur += numPer + (int)(playermessage.hpmax * 0.2);
-        if (playermessage.hpcur > playermessage.hpmax)
-            playermessage.hpcur = playermessage.hpmax;
+        playermessage.physical_base += numPer;
         //精力提升  额外恢复+30%
-        numPer = (int)Math.Floor((Math.Log(level + 1) + (level + 1) / 6 + 1 / 2) - (Math.Log(level) + level / 6 + 1 / 2)) * mpBase;
-        playermessage.mpmax += numPer;
-        playermessage.mpcur += numPer + (int)(playermessage.hpmax * 0.3);
-        if (playermessage.mpcur > playermessage.mpmax)
-            playermessage.mpcur = playermessage.mpmax;
+        int numPer1 = (int)Math.Floor((Math.Log(level + 1) + (level + 1) / 6 + 1 / 2) - (Math.Log(level) + level / 6 + 1 / 2)) * mpBase;
+        playermessage.vigor_base += numPer1;
         //攻防提升
-        numPer = (int)Math.Floor((Math.Pow(2, (level + 1) / 20) + (level + 1) / 5 - 1) - (Math.Pow(2, level / 20) + level / 5 - 1)) * atkBase;
-        playermessage.atk += numPer;
-        //numPer = (int)((level + 1.0) / 4 - level / 4) * defBase;
-        //playermessage.def += numPer;
+        int numPer2 = (int)Math.Floor((Math.Pow(2, (level + 1) / 20) + (level + 1) / 5 - 1) - (Math.Pow(2, level / 20) + level / 5 - 1)) * atkBase;
+        playermessage.attack_base += numPer2;
+        numPer2 = (int)((level + 1.0) / 4 - level / 4) * defBase;
+        playermessage.defence_base += numPer;
+        //刷新
+        playermessage.paddingData();
+        //额外恢复
+        playermessage.subCurPhysical(numPer + (int)(playermessage.physical_base * 0.2));
+        playermessage.subCurVigor(numPer + (int)(playermessage.vigor_base * 0.3));
     }
     //加经验上限
     private void levelExp(int level)
@@ -231,24 +230,27 @@ public class GameData:MonoBehaviour
         playermessage = new PlayerMessage();
         playermessage.isFirstIn = true;
         playermessage.level = 1;
-        playermessage.hpmax = hpBase;
+        playermessage.physical_base = hpBase;
         playermessage.hpcur = hpBase;
-        playermessage.mpmax = mpBase;
+        playermessage.vigor_base = mpBase;
         playermessage.mpcur = mpBase;
         playermessage.expcur = 0;
         playermessage.expmax = expBase;
-        playermessage.atk = atkBase;
-        playermessage.strike = 0;
-        playermessage.dodge = 0;
-        playermessage.speed = 30;
-        playermessage.adPat = 0;
-        playermessage.apPat = 0;
+        playermessage.attack_base = atkBase;
+        playermessage.defence_base = atkBase;
+        playermessage.strike_base = 0;
+        playermessage.dodge_base = 0;
+        playermessage.speed_base = 30;
+        playermessage.adPat_base = 0;
+        playermessage.apPat_base = 0;
 
-        playermessage.skillPoint = 1;
-        skillSave skill1 = new skillSave();
-        skill1.skillID = 4;
-        skill1.skillLevel = 1;
-        playermessage.skills.Add(skill1);
+        playermessage.attackID = 2;
+        playermessage.skills = new skillSave();
+        playermessage.skills.skillPoint = 1;
+        SkillStaticData skill0 = AllUnitData.Data.getSkillStaticData(4);
+        skill0.level = 1;
+
+        playermessage.skills.skillHold.Add(skill0);
         Debug.Log("save create success!");
         saveLoad(null);
     }

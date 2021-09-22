@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text;
 //战斗分析器（新）+++待完成
 public class AttackAnalyze : MonoBehaviour
 {
@@ -44,8 +45,6 @@ public class AttackAnalyze : MonoBehaviour
         else
             specialAction(action);
         if (atkResult == null) Debug.LogError("战斗数据赋值错误");
-        else roundAnalyzeAction();
-        if (roundData == null) Debug.LogError("回合数据赋值错误");
         return takeEffectAttackResult();
     }
 
@@ -89,7 +88,7 @@ public class AttackAnalyze : MonoBehaviour
     //普通的战斗处理
     public AttackResultData normalAction(AnalyzeResult action)
     {
-        skill = AllUnitData.Data.getJsonData<SkillStaticData>("allSkillData",action.skillID);//获取技能
+        skill = AllUnitData.Data.getSkillStaticData(action.skillID);//获取技能
         //伤害来源目标
         sourceActor = dataList[action.selfNum];     
         //被伤目标
@@ -206,6 +205,7 @@ public class AttackAnalyze : MonoBehaviour
         int count = 0;
         void runActor()
         {
+            //避免多层套for
             if (count >= dataList.Count) return;
             var abactor = dataList[count];
             if (abactor.IsDead)
@@ -213,22 +213,78 @@ public class AttackAnalyze : MonoBehaviour
                 runActor();
                 return;
             }
-            foreach(var abstate in abactor.Abnormal)
+            SettleRoundActor actor = new SettleRoundActor();
+            actor.index = count;
+            int oneSettleHit = 0;   //记录结算伤害
+            int oneSettleCure = 0;  //记录结算回复
+            //计算buff伤害 倒序
+            for(int i = abactor.Abnormal.Count - 1; i >= 0; i--)
             {
-
+                abnormalState abstate = abactor.Abnormal[i];
+                //结算伤害类型
+                if (abstate.isSettleHit)
+                {
+                    int finHit=(int)Mathf.Floor((float)abstate.effectHitMulti / 100) * abstate.effectReferNum;
+                    finHit = DataTransTool.defenceTrans(finHit, abactor.Data.defence_last);
+                    if (abstate.effectType!=190)
+                    {
+                        int pat = 0;
+                        if (abstate.effectType == 191) pat = abactor.Data.adPat_last;
+                        if (abstate.effectType == 192) pat = abactor.Data.apPat_last;
+                        //计算减伤
+                        finHit = (int)Mathf.Round(finHit * (float)(1 - (pat / 100)));
+                    }
+                    //录入最终伤害
+                    actor.specialNumber.Add(finHit);
+                    actor.specialType.Add(abstate.effectTypeShow);
+                    oneSettleHit += finHit;
+                }
+                //计算回合结束治疗
+                if (abstate.isSettleCure)
+                {
+                    int fincure = 0;
+                    if (abstate.effectRefer != 0)
+                    {
+                        //有动态参考值
+                        float ability = abactor.getCombatParamData(abstate.effectRefer);
+                        fincure = (int)Mathf.Floor(abstate.effectHitMulti / 100 * ability);
+                    }
+                    else
+                    {
+                        fincure = (int)Mathf.Floor((float)abstate.effectHitMulti / 100) * abstate.effectReferNum;
+                    }
+                    //录入最终数值
+                    actor.specialNumber.Add(fincure);
+                    actor.specialType.Add(abstate.effectTypeShow);
+                    oneSettleCure += fincure;
+                }
+                //计算 cd
+                if (abstate.isBuff)
+                {
+                    abstate.round--;
+                    if(abstate.round>0)
+                        actor.settleBuffExist.Add(abstate);
+                }
             }
-
-
-
-
-
-
+            //结算属性
+            abactor.Abnormal = actor.settleBuffExist;
+            //结算伤害 判断死亡
+            if (abactor.hitCurPhysical(oneSettleHit - oneSettleCure))
+            {
+                actor.isRoundDead = true;
+                abactor.IsDead = true;
+            }
+            else
+            {
+                abactor.paddingData();
+            }
+            //记录单个个体 回合结算数据
+            roundData.settleActors.Add(actor);
             count++;
             runActor();
         }
         //计算伤害
         runActor();
-
         //判断死亡
         //计算buff生效
         //判断死亡
@@ -334,6 +390,56 @@ public class AttackAnalyze : MonoBehaviour
         }
         Debug.LogError("战斗结算错误!");
         return true;
+    }
+
+
+    //-------------------计算累积奖励
+    private void comulativeReword(int id)
+    {
+        int num = 0;    //最终个数
+        UnitSpoilStaticData spoilData = AllUnitData.Data.getJsonData<UnitSpoilStaticData>("allSpoilData", id);
+        int[] nums = new int[9];
+        //计算数量
+        int tem = Random.Range(0, 1000);
+        int ratherNum = 0;
+        for (int i =spoilData.awardNum.Length-1;i>0 ; i--)
+        {
+            ratherNum += nums[i];
+            if (tem < ratherNum)
+            {
+                tem = i;
+                break;
+            }
+        }
+        //逐个计算概率
+        for (int i = 0; i < tem; i++)
+        {
+            //添加结果
+            int rewordID = randomReword(id);
+            spoils.spoils.Add(rewordID);
+            Debug.Log("【掉落物品】" + AllUnitData.getGoodData(rewordID)[1]);
+        }
+        //给钱
+        spoils.coinType = int.Parse(spoilData[spoilData.Length - 1]);
+        spoils.coins = (int)(float.Parse(spoilData[spoilData.Length - 2]) * (1 - Random.Range(-GameData.Data.CoinMovement, GameData.Data.CoinMovement)));
+        Debug.Log("【钱】" + spoils.coins);
+    }
+    private int randomReword(int id)
+    {//从可获得物品中随机一个(有保底)  调该方法时意味着比得一个
+        int tem = Random.Range(0, 1000);
+        UnitSpoilStaticData sp = AllUnitData.Data.getJsonData<UnitSpoilStaticData>("allSpoilData", id);
+        int ratherNum = 0;
+        foreach (var i in sp.mgSpoil)
+        {
+            ratherNum += i * 10;
+            if (tem < ratherNum)
+            {
+                return i;
+            }
+        }
+        tem = Random.Range(0, 2);
+        if (tem == 0) return int.Parse(nums[nums.Length - 4]);
+        else return int.Parse(nums[nums.Length - 3]);
     }
 
 }

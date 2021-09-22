@@ -50,22 +50,18 @@ public class AttackResultData
 public class wholeRoundData
 {
     //------------------------------------------------（主动操作部分）-------------------------------
-    public AttackResultData result;
     public List<SettleRoundActor> settleActors = new List<SettleRoundActor>();//结算对象
-    //-------------------------------------------(回合结算部分)--------------------------------
-    public List<int> settleActor = new List<int>(); 
-    public List<bool> settleHitType = new List<bool>();      //结算受击类型  (伤害，治疗)
-    public List<int[]> settleHitCount = new List<int[]>();    //结算受击伤害(包含多频)
-    public List<int> settleBuffExist = new List<int>();         //剩余buff
-    public List<CombatMessage> roundDeadActor = new List<CombatMessage>();//给我死
+
 }
 
 //结算时  每个被结算actor的数据
 public class SettleRoundActor
 {
-    public List<int[]> hitNumber = new List<int[]>();               //挨打
+    public int index;   //下标序号
     public bool isPhy;                          //伤害类型
-    public List<int[]> specialNumber = new List<int[]>();       //特效挨打
-    public List<int[]> specialType = new List<int[]>();             //特效显示数字类型  ( 颜色 ) 
-    
+    public List<int> specialNumber = new List<int>();       //特效挨打(受毒、出血、治疗的特效标识)
+    public List<int> specialType = new List<int>();             //特效显示数字类型  ( 颜色 ) 
+
+    public List<abnormalState> settleBuffExist = new List<abnormalState>();         //剩余buff
+    public bool isRoundDead;    //给我死
 }
