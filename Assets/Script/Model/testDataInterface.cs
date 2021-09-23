@@ -23,10 +23,10 @@ public class testDataInterface
 
     public void testDataAdd(PlayerMessage playermessage)
     {
-        playermessage.attack_base += attackAdd;
+        playermessage.data.attack_base += attackAdd;
         playermessage.items.coins += coinsAdd;
-        playermessage.physical_base += hpAdd;
-        playermessage.hpcur += hpAdd;
+        playermessage.data.physical_base += hpAdd;
+        playermessage.data.hpcur += hpAdd;
         if (levelAddTo > 0)
             playermessage.level = levelAddTo;
 

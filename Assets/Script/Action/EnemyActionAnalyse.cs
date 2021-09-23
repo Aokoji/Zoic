@@ -34,12 +34,13 @@ public class EnemyActionAnalyse
         //派发攻击事件
 
         result.skillID=randomSkill(item);
-        if(AllUnitData.getSkillData(result.skillID)[4].Equals("200")|| AllUnitData.getSkillData(result.skillID)[4].Equals("201"))
-            result.takeNum = item.NumID;
-        else if(AllUnitData.getSkillData(result.skillID)[4].Equals("203"))
-            result.takeNum = player.NumID;
+        SkillStaticData skill = AllUnitData.Data.getJsonData<SkillStaticData>("allSkillData", result.skillID);
+        if(skill.effectType==310)
+            result.takeNum .Add( item.NumID);
+        else if(skill.effectType==313)
+            result.takeNum.Add( player.NumID);
         result.selfNum = item.NumID;
-        result.skillType = int.Parse(AllUnitData.getSkillData(result.skillID)[3]);
+        result.skillType = skill.effectType;
 
         //如果是伤害型技能  或 指向性debuff
         //测试
@@ -57,7 +58,7 @@ public class EnemyActionAnalyse
     {
         int id = item.AttackID;
         if (item.SkillOdds>0&&Random.Range(0, 100) < item.SkillOdds)   //触发技能
-            id = item.SkillData[Random.Range(0, item.SkillData.Count)].skillID;
+            id = item.SkillData.skillHold[Random.Range(0, item.SkillData.skillHold.Count)].id;
         return id;
     }
 
@@ -70,12 +71,12 @@ public class EnemyActionAnalyse
         defType = new List<int>();
         priorityType = new List<int>();
     }
-    public void skillAnalyze(List<skillSave> item)
+    public void skillAnalyze(skillSave item)
     {//技能解析
-        foreach(var skill in item)
+        foreach(var skill in item.skillHold)
         {
-            int id = skill.skillID;
-            switch (AllUnitData.getSkillData(id)[33])
+            int id = skill.id;
+            switch (skill.name)
             {
                 case "901": atkType.Add(id); break;
                 case "902": beneficialType.Add(id); break;

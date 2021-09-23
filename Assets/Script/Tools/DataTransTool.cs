@@ -49,9 +49,9 @@ public class DataTransTool
         mess.Data.strike_base = play.data.strike_last;
         mess.Data.dodge_base = play.data.dodge_last;
         mess.Data.defence_base = play.data.defence_fin;
-        mess.Data.force_base = play.data.force_fin;
-        mess.Data.agility_base = play.data.agility_fin;
-        mess.Data.wisdom_base = play.data.wisdom_fin;
+        mess.Data.force_base = play.data.force_last;
+        mess.Data.agility_base = play.data.agility_last;
+        mess.Data.wisdom_base = play.data.wisdom_last;
         mess.Data.curHp = play.data.hpcur;
         mess.Data.curMp = play.data.mpcur;
         mess.IconName = GameData.Data.PLAYER;
