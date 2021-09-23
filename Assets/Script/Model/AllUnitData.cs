@@ -60,15 +60,73 @@ public class AllUnitData:MonoBehaviour
     /// <returns></returns>
     public int getCombatParamData(combatUnitProperty unit,int i)
     {
-        int num = 0;
         switch (i)
         {
-            case 101:num = unit.physical_last;break;
+            case 101:return unit.physical_last;
+            case 102:return unit.curHp;
+            case 103:return unit.vigor_last;
+            case 104:return unit.curMp;
+            case 105:return unit.force_last;
+            case 106:return unit.agility_last;
+            case 107:return unit.wisdom_last;
+            case 108:return unit.attack_last;
+            case 109:return unit.speed_last;
+            case 110:return unit.defence_last;
+            case 111:return unit.strike_last;
+            case 112:return unit.dodge_last;
+            case 113:return unit.hitRate_last;
         }
-        return num;
+        return 0;
+    }
+    //战斗数据  buff计算赋值
+    public combatUnitProperty combatPropertyChange(combatUnitProperty unit,int index,int multi,int num)
+    {
+        switch (index)
+        {
+            case 101:unit.physical_last = (int)Mathf.Floor(unit.physical_last * (1 - multi)) + num;
+                if (unit.curHp > unit.physical_last) unit.curHp = unit.physical_last;
+                break;
+            case 102:break;
+            case 103:unit.vigor_last = (int)Mathf.Floor(unit.vigor_last * (1 - multi)) + num;
+                if (unit.curMp > unit.vigor_last) unit.curMp = unit.vigor_last;
+                break;
+            case 104:break;
+            case 105:unit.force_last = (int)Mathf.Floor(unit.force_last * (1 - multi)) + num;break;
+            case 106:unit.agility_last = (int)Mathf.Floor(unit.agility_last * (1 - multi)) + num;break;
+            case 107:unit.wisdom_last = (int)Mathf.Floor(unit.wisdom_last * (1 - multi)) + num;break;
+            case 108:unit.attack_last = (int)Mathf.Floor(unit.attack_last * (1 - multi)) + num;break;
+            case 109:unit.speed_last = (int)Mathf.Floor(unit.speed_last * (1 - multi)) + num;break;
+            case 110:unit.defence_last = (int)Mathf.Floor(unit.defence_last * (1 - multi)) + num;break;
+            case 111:unit.strike_last = unit.strike_last + multi + num;break;
+            case 112:unit.dodge_last = unit.dodge_last + multi + num;break;
+            case 113:unit.hitRate_last = unit.hitRate_last + multi + num;break;
+        }
+        return unit;
     }
 
-
+    /// <summary>
+    /// 玩家装备数据赋值
+    /// </summary>
+    public playerParam playerEquipCalculate(playerParam player,int id)
+    {
+        if(id==0)
+            return player;
+        EquipStaticData eqp = getJsonData<EquipStaticData>("allEquipData", id);
+        player.physical_equip += eqp.physicalAdd;
+        player.vigor_equip += eqp.vigorAdd;
+        player.attack_equip += eqp.attackAdd;
+        player.speed_equip += eqp.speedAdd;
+        player.defence_equip += eqp.defenceAdd;
+        player.strike_equip += eqp.strikeAdd;
+        player.dodge_equip += eqp.dodgeAdd;
+        player.hitRate_equip += eqp.hitRateAdd;
+        player.adPat_equip += eqp.adPatAdd;
+        player.apPat_equip += eqp.apPatAdd;
+        player.force_equip += eqp.forceAdd;
+        player.wisdom_equip += eqp.wisdomAdd;
+        player.agility_equip += eqp.agilityAdd;
+        return player;
+    }
 
 
     //-----------------------------------------json 存储测试

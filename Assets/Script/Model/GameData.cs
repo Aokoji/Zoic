@@ -27,12 +27,15 @@ public class GameData:MonoBehaviour
     private string baseDataLoadPath = "/Resources/Data/game/actorDataSave.txt";
     private string gameDataLoadPath = "/Resources/Data/game/gameMessageSave.json";
     private string gameDataLoadSign = "/Resources/Data/sign.dll";
-    private float coinMovement = 0.2f;          //金币奖励浮动倍率  80%-120%
     private int expBase = 40;                           //等级经验基数
     private int hpBase = 150;
     private int mpBase = 30;
     private int atkBase = 12;
     private int defBase = 2;
+    private int phyRecover = 3;
+    private float phyRecMulti = 0.2f;
+    private int vigRecover = 2;
+    private float vigRecMulti = 0.2f;
     public string PLAYER = "player";
 
 
@@ -56,14 +59,13 @@ public class GameData:MonoBehaviour
     }
 
     //public Vector2 LastBornPos { get => lastBornPos; set => lastBornPos = value; }
-    public float CoinMovement { get => coinMovement; set => coinMovement = value; }
     public PlayerMessage Playermessage { get => playermessage; set => playermessage = value; }
     public DataPlayMessage DataPlaymessage { get => dataplaymessage; set => dataplaymessage = value; }
 
     //事件调用  升级
     public void levelUp()
     {
-        actorGrowthCurve(playermessage.level);
+        actorGrowthCurve(playermessage.level,playermessage.jobOrder);
         playermessage.level++;
         PubTool.Instance.addLogger("人物升级!" + playermessage.level);
     }
@@ -98,7 +100,7 @@ public class GameData:MonoBehaviour
 
     //---------------------------------------------------------------------升级配置-----------------------
     //人物成长曲线
-    private void actorGrowthCurve(int level)
+    private void actorGrowthCurve(int level,int job)
     {
         //暂时不用    log(1+x^2+2*x)+2^(x/20)+x^2/1000-1    半s型曲线
         //人物成长曲线公式1-100   0-50multi     2^(x/20)+x/5-1    持续增长型
@@ -111,20 +113,26 @@ public class GameData:MonoBehaviour
 
         //体力提升  额外回复+20%
         int numPer = (int)Math.Floor((Math.Pow(2, (level + 1) / 24) + (level + 1) / 8 - 1) - (Math.Pow(2, level / 24) + level / 8 - 1)) * hpBase;
-        playermessage.physical_base += numPer;
+        playermessage.data.physical_base += numPer;
         //精力提升  额外恢复+30%
         int numPer1 = (int)Math.Floor((Math.Log(level + 1) + (level + 1) / 6 + 1 / 2) - (Math.Log(level) + level / 6 + 1 / 2)) * mpBase;
-        playermessage.vigor_base += numPer1;
+        playermessage.data.vigor_base += numPer1;
         //攻防提升
         int numPer2 = (int)Math.Floor((Math.Pow(2, (level + 1) / 20) + (level + 1) / 5 - 1) - (Math.Pow(2, level / 20) + level / 5 - 1)) * atkBase;
-        playermessage.attack_base += numPer2;
+        playermessage.data.attack_base += numPer2;
         numPer2 = (int)((level + 1.0) / 4 - level / 4) * defBase;
-        playermessage.defence_base += numPer;
+        playermessage.data.defence_base += numPer;
         //刷新
         playermessage.paddingData();
         //额外恢复
-        playermessage.subCurPhysical(numPer + (int)(playermessage.physical_base * 0.2));
-        playermessage.subCurVigor(numPer + (int)(playermessage.vigor_base * 0.3));
+        playermessage.subCurPhysical(numPer + (int)(playermessage.data.physical_base * 0.2));
+        playermessage.subCurVigor(numPer + (int)(playermessage.data.vigor_base * 0.3));
+        //常态恢复
+        playermessage.data.physical_recBase = (int)Mathf.Floor(phyRecover * (1 + (level + 1) * phyRecMulti));
+        if (job == 12)      //祭祀会自动回精力
+            playermessage.data.vigor_recBase = (int)Mathf.Floor(vigRecover * (1 + (level + 1) * vigRecMulti));
+        else
+            playermessage.data.vigor_recBase = 0;
     }
     //加经验上限
     private void levelExp(int level)
@@ -230,19 +238,21 @@ public class GameData:MonoBehaviour
         playermessage = new PlayerMessage();
         playermessage.isFirstIn = true;
         playermessage.level = 1;
-        playermessage.physical_base = hpBase;
-        playermessage.hpcur = hpBase;
-        playermessage.vigor_base = mpBase;
-        playermessage.mpcur = mpBase;
+        playermessage.data.physical_base = hpBase;
+        playermessage.data.hpcur = hpBase;
+        playermessage.data.vigor_base = mpBase;
+        playermessage.data.mpcur = mpBase;
         playermessage.expcur = 0;
         playermessage.expmax = expBase;
-        playermessage.attack_base = atkBase;
-        playermessage.defence_base = atkBase;
-        playermessage.strike_base = 0;
-        playermessage.dodge_base = 0;
-        playermessage.speed_base = 30;
-        playermessage.adPat_base = 0;
-        playermessage.apPat_base = 0;
+        playermessage.data.attack_base = atkBase;
+        playermessage.data.defence_base = atkBase;
+        playermessage.data.strike_base = 0;
+        playermessage.data.dodge_base = 0;
+        playermessage.data.speed_base = 30;
+        playermessage.data.adPat_base = 0;
+        playermessage.data.apPat_base = 0;
+        playermessage.data.physical_recBase = phyRecover;
+        playermessage.data.vigor_recBase = 0;
 
         playermessage.attackID = 2;
         playermessage.skills = new skillSave();

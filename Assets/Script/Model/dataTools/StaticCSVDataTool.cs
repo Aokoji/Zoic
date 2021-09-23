@@ -22,7 +22,7 @@ public class StaticCSVDataTool
 
     private string abnormalPath = "Assets/Resources/Data/CsvData//abnormalMessage.csv";//所有异常列表 （增益减益类型参数）
 
-    private string extraPath = "Assets/Resources/Data/CsvData//extraMessage.csv";//所有攻击特殊列表            --下边待定
+    private string equipPath = "Assets/Resources/Data/CsvData//equipMessage.csv";//所有装备列表 
 
     /// <summary>
     /// 物品数据  csv读取方法
@@ -139,7 +139,20 @@ public class StaticCSVDataTool
         }
         return data;
     }
+    //所有装备
+    public AllEquipStaticData loadData_allEquipData()
+    {
+        AllEquipStaticData data = new AllEquipStaticData();
+        List<string[]> list = loadCSV(equipPath);
+        foreach (string[] mess in list)
+        {
+            EquipStaticData item = new EquipStaticData();
+            item.id = int.Parse(mess[0]);
 
+            data.childDic.Add(item);
+        }
+        return data;
+    }
 
 
     //================================================================================================

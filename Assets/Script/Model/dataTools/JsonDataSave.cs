@@ -86,6 +86,15 @@ public class JsonDataSave
             allAbnormalData.Add(t.id, t);
     }
 
+    //*********************所有装备信息***********************
+    public Dictionary<int, EquipStaticData> allEquipData = new Dictionary<int, EquipStaticData>();
+    public void allEquipDataRead(string o)
+    {
+        AllEquipStaticData data = JsonUtility.FromJson<AllEquipStaticData>(o);
+        foreach (var t in data.childDic)
+            allEquipData.Add(t.id, t);
+    }
+
     //------------------------------------------------***********************----------------------------------------------------------------------------
     //-===============================================================================================
     //-----------------------------------------------------以下区域不用操作-------------------

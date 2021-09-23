@@ -49,7 +49,30 @@ public class CombatMessage
     /// </summary>
     public void paddingData()
     {
-
+        int force = data.force_base + (isPlayer ? 0: data.force_point);
+        int wisdom = data.wisdom_base + (isPlayer ? 0: data.wisdom_point);
+        int agility = data.agility_base + (isPlayer ? 0: data.agility_point);
+        data.physical_last = data.physical_base;
+        data.vigor_last = data.vigor_base;
+        data.strike_last = data.strike_base;
+        data.dodge_last = data.dodge_base;
+        data.adPat_last = data.adPat_base;
+        data.apPat_last = data.apPat_base;
+        data.hitRate_last = data.hitRate_base;
+        data.force_last = force;
+        data.agility_last = agility;
+        data.wisdom_last = wisdom;
+        //计算buff增减益
+        foreach (var abs in abnormal)
+        {
+            if (abs.isBuff)
+            {
+                data=AllUnitData.Data.combatPropertyChange(data, abs.effectAbility, abs.effectMulti, abs.effectConstant);
+            }
+        }
+        data.attack_last = data.attack_base + DataTransTool.forceTransAttack(data.force_last);
+        data.defence_last = data.defence_base + DataTransTool.agilityTransDefence(data.agility_last);
+        data.speed_last = data.speed_base + DataTransTool.agilityTransSpeed(data.agility_last);
     }
     /// <summary>
     /// 获取该单位  数值编号对应属性

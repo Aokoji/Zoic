@@ -357,7 +357,7 @@ public class AttackAnalyze : MonoBehaviour
             if (dataList[i].Name == actor.Name)
             {
                 //增加战利品
-                //if (actor.Name != PLAYER) comulativeReword(actor.Data.id);
+                if (actor.Name != PLAYER) comulativeReword(actor);
             }
         }
     }
@@ -394,20 +394,19 @@ public class AttackAnalyze : MonoBehaviour
 
 
     //-------------------计算累积奖励
-    private void comulativeReword(int id)
+    private void comulativeReword(CombatMessage actor)
     {
         int num = 0;    //最终个数
-        UnitSpoilStaticData spoilData = AllUnitData.Data.getJsonData<UnitSpoilStaticData>("allSpoilData", id);
-        int[] nums = new int[9];
+        UnitSpoilStaticData spoilData = AllUnitData.Data.getJsonData<UnitSpoilStaticData>("allSpoilData", actor.Data.id);
         //计算数量
         int tem = Random.Range(0, 1000);
         int ratherNum = 0;
         for (int i =spoilData.awardNum.Length-1;i>0 ; i--)
         {
-            ratherNum += nums[i];
+            ratherNum += spoilData.awardNum[i];
             if (tem < ratherNum)
             {
-                tem = i;
+                tem = i+1;
                 break;
             }
         }
@@ -415,31 +414,31 @@ public class AttackAnalyze : MonoBehaviour
         for (int i = 0; i < tem; i++)
         {
             //添加结果
-            int rewordID = randomReword(id);
+            int rewordID = randomReword(actor.Data.id, spoilData);
             spoils.spoils.Add(rewordID);
-            Debug.Log("【掉落物品】" + AllUnitData.getGoodData(rewordID)[1]);
+            Debug.Log("【掉落物品id】" + rewordID);
         }
         //给钱
-        spoils.coinType = int.Parse(spoilData[spoilData.Length - 1]);
-        spoils.coins = (int)(float.Parse(spoilData[spoilData.Length - 2]) * (1 - Random.Range(-GameData.Data.CoinMovement, GameData.Data.CoinMovement)));
+        spoils.coinType = spoilData.coinType;
+        //计算金币      (奖励值*浮动值 * 等级 * 等级提升倍率)
+        spoils.coins =(int)Mathf.Floor(spoilData.coinNum * (1 - (float)Random.Range(-spoilData.coinFloat, spoilData.coinFloat) / 10) * spoilData.coinLevelMulti * actor.Data.level);
         Debug.Log("【钱】" + spoils.coins);
     }
-    private int randomReword(int id)
+    private int randomReword(int id, UnitSpoilStaticData spoil)
     {//从可获得物品中随机一个(有保底)  调该方法时意味着比得一个
         int tem = Random.Range(0, 1000);
-        UnitSpoilStaticData sp = AllUnitData.Data.getJsonData<UnitSpoilStaticData>("allSpoilData", id);
         int ratherNum = 0;
-        foreach (var i in sp.mgSpoil)
+        for(int i=0;i<spoil.mgSpoil.Count;i++)
         {
-            ratherNum += i * 10;
+            ratherNum += spoil.mgSpoil[i] ;
             if (tem < ratherNum)
             {
-                return i;
+                return spoil.spoilItems[i];
             }
         }
+        //没有返回则说明没抽中  则进行保底抽奖  目前设置两个槽位  如果东西少则两个槽赋同一个id
         tem = Random.Range(0, 2);
-        if (tem == 0) return int.Parse(nums[nums.Length - 4]);
-        else return int.Parse(nums[nums.Length - 3]);
+        return tem == 0 ? spoil.minum1 : spoil.minum2;
     }
 
 }

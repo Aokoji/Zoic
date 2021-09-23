@@ -107,7 +107,8 @@ public class AnimationController : DDOLController<AnimationController>
 
     public void playCombarRoundSettle(wholeRoundData rounddata, List<CombatMessage> actorList, Action action)
     {
-
+        Debug.Log("【统计结算】"+ rounddata.ToString());
+        action();
     }
 
 

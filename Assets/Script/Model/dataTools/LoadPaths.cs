@@ -13,6 +13,7 @@ public class LoadPaths
         "/Resources/Data/game/allGoodDataSave.json","allGoodData",
         "/Resources/Data/game/allCollcetDataSave.json","allCollcetData",
         "/Resources/Data/game/allAbnormalDataSave.json","allAbnormalData",
+        "/Resources/Data/game/allEquipDataSave.json","allEquipData",
     };
 
 }
