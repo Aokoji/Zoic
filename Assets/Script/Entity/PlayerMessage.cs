@@ -12,7 +12,7 @@ public class PlayerMessage
     public int expmax;         //最大经验
     public int expcur;          //当前经验
 
-    public playerParam data;        //人物属性
+    public playerParam data=new playerParam();        //人物属性
     public int jobOrder;        //职阶
     //==================================                 技能与物品                  =======================
 
@@ -28,7 +28,7 @@ public class PlayerMessage
 
     //存档
     public int lastSceneNum;     //最后场景编号
-    public Vector2 lastBornPos;     //信标位置
+    //public Vector2 lastBornPos;     //信标位置
 
     public void paddingData()
     {

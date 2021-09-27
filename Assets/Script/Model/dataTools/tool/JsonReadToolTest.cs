@@ -33,7 +33,7 @@ public class JsonReadToolTest
             string read = Encoding.ASCII.GetString(jsbt);
             //转换赋值
             MethodInfo method= jType.GetMethod(mes[i + 1] + "Read");
-            method.Invoke(jType, new object[] { read });
+            method.Invoke(jEntity, new object[] { read });
         }
     }
 

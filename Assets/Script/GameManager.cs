@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
     {
         PubTool.Instance.addLogger("游戏启动");
         AllUnitData.Data.loadData();
-        GameData.initGameData();
+        GameData.Data.initGameData();
         
     }
     //创建manager

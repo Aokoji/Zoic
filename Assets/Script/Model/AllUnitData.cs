@@ -5,28 +5,29 @@ using System.IO;
 using System;
 using System.Text;
 
-public class AllUnitData:MonoBehaviour
-{
+public class AllUnitData:DDOLData<AllUnitData>
+{/*
     private static AllUnitData unitData = new AllUnitData();
     public static AllUnitData Data
     {
         get {
             return unitData;
         }
-    }
+    }*/
     /*
      * 待更改
      * 所有csv文件均作为基本数据文件  作为参考基值
      * 检测json文件存在，如果没有json记录  则读取csv文件并做json存储
      * 每当修改csv文件参数时  需要手动删除生成的json文件  让加载时重新读取达到刷新的目的
      */
-    private JsonReadToolTest jsonRead = new JsonReadToolTest();
+    private JsonReadToolTest jsonRead;
     
     /// <summary>
     /// 加载静态数据(全部读取,不包括存档)  (游戏启动自动调用)
     /// </summary>
     public void loadData()
     {   //读取配置
+        jsonRead = new JsonReadToolTest();
         jsonRead.readAllJsonData();
     }
 

@@ -28,3 +28,29 @@ public abstract class DDOLController <T>: MonoBehaviour where T: DDOLController<
         }
     }
 }
+
+public abstract class DDOLData<T> : MonoBehaviour where T : DDOLData<T>
+{
+    protected static T data = null;
+    public static T Data
+    {
+        get {
+            if (null == data)
+            {
+                GameObject dataprefeb = GameObject.FindGameObjectWithTag("DDOLDATA");
+                if (null == dataprefeb)
+                {
+                    GameObject manage = new GameObject("DDOLData");
+                    manage.tag = "DDOLDATA";
+                    data = manage.AddComponent<T>();
+                    DontDestroyOnLoad(manage);
+                }
+                else
+                {
+                    data = dataprefeb.AddComponent<T>();
+                }
+            }
+            return data;
+        }
+    }
+}

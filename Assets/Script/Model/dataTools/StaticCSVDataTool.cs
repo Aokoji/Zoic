@@ -161,6 +161,7 @@ public class StaticCSVDataTool
     {
         List<string[]> data = new List<string[]>();
         StreamReader sr = null;
+        Debug.Log(path + "==========");
         if (File.Exists(path))
         {
             sr = File.OpenText(path);

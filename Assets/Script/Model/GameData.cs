@@ -1,29 +1,26 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.IO.Compression;
-using System.Runtime.Serialization;
 using System;
 using System.Text;
 
-public class GameData:MonoBehaviour
-{
-    private static GameData gamedata = null;
+public class GameData: DDOLData<GameData>
+{/*
+    private static GameData data = null;
     public static GameData Data
     {
         get
         {
-            if (gamedata == null)
+            if (data == null)
             {
-                gamedata = new GameData();
-                gamedata.initData();
+                data = new GameData();
+                data.initData();
                 Debug.LogError("error way to create player data!");
             }
-            return gamedata;
+            return data;
         }
-    }
+    }*/
     private string baseDataLoadPath = "/Resources/Data/game/actorDataSave.txt";
     private string gameDataLoadPath = "/Resources/Data/game/gameMessageSave.json";
     private string gameDataLoadSign = "/Resources/Data/sign.dll";
@@ -46,16 +43,16 @@ public class GameData:MonoBehaviour
     private bool useTestData = true;    //使用测试数据
 
     //外部初始化调用方法
-    public static void initGameData()
+    public void initGameData()
     {
-        gamedata = new GameData();
-        gamedata.initData();
+        //data = new GameData();
+        initData();
     }
     //data公共量初始化
     private void initData() {
         //LastBornPos = new Vector2(PlayerPrefs.GetFloat("lastBornPosX", 0), PlayerPrefs.GetFloat("lastBornPosY", 0));
         loadGameMessageData();
-        loadPlayerData(null);
+        loadPlayerData();
     }
 
     //public Vector2 LastBornPos { get => lastBornPos; set => lastBornPos = value; }
@@ -173,11 +170,11 @@ public class GameData:MonoBehaviour
     }
     //----------------------------------------*******玩家数据******--------------------------------------
     //加载玩家数据       (手动加载 + 自动加载)
-    public void loadPlayerData(Action<bool> action)  
+    public void loadPlayerData()  
     {
-        StartCoroutine(loadLoading(action));
+        StartCoroutine(loadLoading());
     }
-    IEnumerator loadLoading(Action<bool> action)
+    IEnumerator loadLoading()
     {
         PubTool.Instance.addLogger("读取游戏存档");
         BinaryFormatter bin = new BinaryFormatter();
@@ -189,16 +186,16 @@ public class GameData:MonoBehaviour
         FileStream file = File.Open(Application.dataPath + baseDataLoadPath, FileMode.Open);
         //file.Seek(0, SeekOrigin.Begin);
         playermessage = (PlayerMessage)bin.Deserialize(file);
-        if (useTestData) testDataInterface.Data.testDataAdd(playermessage); //测试数据
+        if (useTestData) testDataInterface.Data.testDataAdd(ref playermessage); //测试数据
         if (playermessage != null)
         {
             PubTool.Instance.addLogger("读取成功");
-            action?.Invoke(true);
+            //action?.Invoke(true);
         }
         else
         {
             PubTool.Instance.addLogger("读取失败");
-            action?.Invoke(false);
+            //action?.Invoke(false);
         }
         file.Close();
         yield return null;

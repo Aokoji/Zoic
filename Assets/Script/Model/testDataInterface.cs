@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class testDataInterface 
 {
-    private static testDataInterface gamedata = null;
+    private static testDataInterface gamedata = new testDataInterface();
     public static testDataInterface Data
     {
         get
@@ -21,7 +21,7 @@ public class testDataInterface
     //加钱
     public int coinsAdd = 0;
 
-    public void testDataAdd(PlayerMessage playermessage)
+    public void testDataAdd(ref PlayerMessage playermessage)
     {
         playermessage.data.attack_base += attackAdd;
         playermessage.items.coins += coinsAdd;
