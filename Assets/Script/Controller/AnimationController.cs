@@ -79,6 +79,7 @@ public class AnimationController : DDOLController<AnimationController>
     /// <param name="result">结果</param>
     public void playCombatBeHit(CombatView combat, AttackResultData result,List<CombatMessage> actorList,Action action)
     {//播放被击动画  并调用合适的视图面板变动
+        Debug.Log(actorList.ToString());
         Debug.Log("【播放动画】攻击方:"+actorList[result.sourceActor].Name+"    受击方:"+ actorList[result.takenActor[0]].Name);
         //if (result.sourceActor.AtkExtra.Count != 0) { Debug.Log(result.sourceActor.AtkExtra[0].id); }
         //if (result.extraHit!=null && result.extraHit.Length != 0) { Debug.Log(result.extraHit[0]); }

@@ -33,12 +33,13 @@ public class PlayerMessage
     public void paddingData()
     {
         //+++计算装备加成  赋值
+        /*
         data = AllUnitData.Data.playerEquipCalculate(data,data.equip1);
         data = AllUnitData.Data.playerEquipCalculate(data,data.equip2);
         data = AllUnitData.Data.playerEquipCalculate(data,data.equip3);
         data = AllUnitData.Data.playerEquipCalculate(data,data.equip4);
         data = AllUnitData.Data.playerEquipCalculate(data,data.equip5);
-        data = AllUnitData.Data.playerEquipCalculate(data,data.equip6);
+        data = AllUnitData.Data.playerEquipCalculate(data,data.equip6);*/
         //+++计算最终面板
         data.physical_last = data.physical_base + data.physical_equip;
         data.vigor_last = data.vigor_base + data.vigor_equip;

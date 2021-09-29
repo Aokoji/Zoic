@@ -59,6 +59,8 @@ public class DataTransTool
         mess.NumID = 0;
         mess.AttackID = play.attackID;
         mess.SkillData = play.skills;
+
+        mess.paddingData();
         return mess;
     }
     public static CombatMessage enemyToCombat(int id)                //单位数据  转换  战斗场景数据
@@ -84,6 +86,7 @@ public class DataTransTool
         {
             mess.SkillData.skillHold.Add(sk);
         }
+        mess.paddingData();
         return mess;
     }
 }

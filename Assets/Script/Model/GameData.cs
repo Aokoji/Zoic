@@ -186,6 +186,7 @@ public class GameData: DDOLData<GameData>
         FileStream file = File.Open(Application.dataPath + baseDataLoadPath, FileMode.Open);
         //file.Seek(0, SeekOrigin.Begin);
         playermessage = (PlayerMessage)bin.Deserialize(file);
+        playermessage.paddingData();
         if (useTestData) testDataInterface.Data.testDataAdd(ref playermessage); //测试数据
         if (playermessage != null)
         {
@@ -258,6 +259,8 @@ public class GameData: DDOLData<GameData>
         skill0.level = 1;
 
         playermessage.skills.skillHold.Add(skill0);
+
+        playermessage.paddingData();
         Debug.Log("save create success!");
         saveLoad(null);
     }
