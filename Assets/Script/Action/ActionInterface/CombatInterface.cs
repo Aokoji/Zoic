@@ -16,19 +16,19 @@ public interface CombatInterface
     void buffTakeEffect(int i);
     void cureTakeEffect(int i);
     void territoryTypeAction(); //技能类型处理(场地)
-
+    //
     void stateTypeAction(); //技能类型处理(增益)
-
+    //
     void harmTypeAction(); //技能类型处理(伤害)
     void executeHarmEffect();   //伤害效果分析
-
+    //
     void calculateSpecialEffect(CombatMessage target);  //特殊攻击计算
-
+    //
     //--内置判断
     bool checkCombatResult();           //判断输赢(该局战斗)
     bool checkCombatContinue();     //是否继续(该局战斗)
     void settleActorDead(CombatMessage actor);      //目标击败
-
+    //
     //----奖励
     void comulativeReword(CombatMessage actor);         //计算目标奖励
     int randomReword(int id, UnitSpoilStaticData spoil);        //随机奖励（必出）

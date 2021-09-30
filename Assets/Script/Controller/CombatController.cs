@@ -199,7 +199,7 @@ public class CombatController : DDOLController<CombatController>
     private void combatSettle()
     {
         //判断输赢
-        combat.playSettleAnim(attackAction.checkCombatResult(),exitCombat);
+        combat.playSettleAnim(checkCombatResult(),exitCombat);
     }
     //退出
     public void exitCombat()
