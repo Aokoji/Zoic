@@ -29,7 +29,7 @@ public class BagControl : DDOLController<BagControl>
     public void openBag(Action action)
     {
         //获取物品数据 传递给view
-        bag.openBag(GameData.Data.Playermessage,action);
+        bag.openBag(GameData.Data.playerBridge.getInstance(),action);
     }
 
 

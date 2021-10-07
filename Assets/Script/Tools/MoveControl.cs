@@ -100,6 +100,7 @@ public class MoveControl : MonoBehaviour
           {
                 if (isFaceLeft) gameObject.transform.localScale = new Vector3(Mathf.Abs(gameObject.transform.localScale.x), gameObject.transform.localScale.y, gameObject.transform.localScale.z);
                 else gameObject.transform.localScale = new Vector3(Mathf.Abs(gameObject.transform.localScale.x) * -1, gameObject.transform.localScale.y, gameObject.transform.localScale.z);
+                //+++换图
           };
         if (movestate == (int)State.WALK)
             PubTool.Instance.laterDo(0.25f, changeDirection);

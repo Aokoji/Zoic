@@ -33,7 +33,7 @@ public class MainController : DDOLController<MainController>
         //遭遇怪物后  会派发给maincontroller事件  传递怪物信息   控制器封装所有信息进入战斗
         List<CombatMessage> list=new List<CombatMessage>();
         //封装player信息
-        list.Add(DataTransTool.playerSaveToCombat(GameData.Data.Playermessage));
+        list.Add(DataTransTool.playerSaveToCombat(GameData.Data.playerBridge.getInstance()));
         int id = 1;
         foreach(var item in enemy)
         {

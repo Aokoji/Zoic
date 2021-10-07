@@ -33,7 +33,6 @@ public class CombatController : DDOLController<CombatController>
         AnimationController.Instance.cleanNextStepAction(); //清空动画控制器事件
         AnimationController.Instance.combatNextStep += roundEndAction;
         combat.transform.SetAsLastSibling();            //置顶
-        initEvent();
         ViewController.instance.setCameraVisible("combatcam", true);        //强制显示战斗场景相机（单显示）
         //ViewController.instance.setCameraVisible("uicam", false);               //补充添加战斗ui相机
         eventManager = new EventManager();      //战斗触发器
@@ -53,9 +52,8 @@ public class CombatController : DDOLController<CombatController>
         var mainview = baseMain.GetComponent<CombatView>();
         mainview.gameObject.SetActive(true);       //todo  待修改
         combat = mainview;
-
-        combat.initMethod();
-        combat.initItemData(data);          //初始化界面数据
+        initEvent();
+        combat.init(data);          //初始化界面数据
         GameObject scece = Resources.Load<GameObject>("Entity/CombatScene");
         var scecemain = Instantiate(scece);
         scecemain.name = "CombatScene";
@@ -82,7 +80,8 @@ public class CombatController : DDOLController<CombatController>
     public void initEvent()
     {
         //+++各种战斗确认界面通用一个确认和取消  在点击方法中根据view层 选择状态区分触发攻击的操作事件
-        combat.attackConfirm.onClick.AddListener(playerDoAttack);    //攻击并触发下一步
+        combat.chooseConfirmBtn += playerDoAction;
+        //combat.attackConfirm.onClick.AddListener(playerDoAttack);    //攻击并触发下一步
     }
     //显示标签1秒
     public void showTips1Second(string context,Action action)
@@ -147,7 +146,7 @@ public class CombatController : DDOLController<CombatController>
         {
             Debug.Log("【敌人攻击】");
             //轮到敌人攻击  拿到一个攻击数据组  由ai分析出结果
-            AnalyzeResult aiAction = actor.Analyse.analyseCombatAttack(messageActor, actor, combat.playerActor);
+            AnalyzeResult aiAction = actor.Analyse.analyseCombatAttack(messageActor, actor);
             //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
             AttackResultData animData =attackAction.doAction(aiAction);
             //获得的战斗数据传给动画机  动画机执行完进行回合判定
@@ -213,14 +212,46 @@ public class CombatController : DDOLController<CombatController>
     }
     //////////////////-----------------------------------------EVENT----------------------
     
-    public void playerDoAttack()
+    public void playerDoAction()
     {
+        //区分逃跑
+        if (combat.isrun)
+        {
+
+        }
+        else
+        {
+
+        }
         AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
         SkillStaticData skill= combat.chooseSkill;
         aiAction.selfNum = combat.playerActor.NumID;
         aiAction.skillID =combat.chooseSkill.id;
-        aiAction.skillType =skill.effectType;
-        aiAction.takeNum.Add(combat.chooseActor);
+        //区分类型范围
+        switch (skill.effectType)
+        {
+            case 310: aiAction.takeNum.Add(combat.playerActor.NumID); break;
+            case 311: aiAction.takeNum.Add(combat.playerActor.NumID); break;
+            case 312: aiAction.takeNum.Add(combat.playerActor.NumID); break;
+            case 313: aiAction.takeNum.Add(combat.chooseActor); break;
+            case 314:
+                foreach(var i in messageActor)
+                    if(!i.IsPlayer)
+                        aiAction.takeNum.Add(i.NumID);
+                break;
+            case 315:
+                foreach (var i in messageActor)
+                    aiAction.takeNum.Add(i.NumID);
+                break;
+            case 316:
+                foreach (var i in messageActor)
+                    if (!i.IsPlayer)
+                        aiAction.takeNum.Add(i.NumID);
+                break;
+        }
+
+        aiAction.isExtraHit = skill.isHit;
+        aiAction.isNormalAtk = true;
         //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
         AttackResultData animData = attackAction.doAction(aiAction);
         //获得的战斗数据传给动画机  动画机执行完进行回合判定

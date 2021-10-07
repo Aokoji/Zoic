@@ -30,7 +30,7 @@ public class JsonReadToolTest
             }
             //读取
             byte[] jsbt = File.ReadAllBytes(Application.dataPath + mes[i]);
-            string read = Encoding.ASCII.GetString(jsbt);
+            string read = Encoding.UTF8.GetString(jsbt);
             //转换赋值
             MethodInfo method= jType.GetMethod(mes[i + 1] + "Read");
             method.Invoke(jEntity, new object[] { read });

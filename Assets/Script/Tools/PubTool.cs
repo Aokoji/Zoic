@@ -125,4 +125,13 @@ public class PubTool : DDOLController<PubTool>
             Application.Quit();
         }
     }
+
+    public static void dumpString<T>(T a)
+    {
+        Debug.Log(JsonUtility.ToJson(a));
+    }
+    public static void dumpString<T>(string b,T a)
+    {
+        Debug.Log(b+JsonUtility.ToJson(a));
+    }
 }

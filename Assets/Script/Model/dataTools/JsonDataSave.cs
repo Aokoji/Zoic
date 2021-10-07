@@ -133,7 +133,7 @@ public class JsonDataSave
         object m0=method0();
         */
         string json = JsonUtility.ToJson(method.Invoke(obj, new object[] { }));
-        byte[] js = Encoding.ASCII.GetBytes(json.ToCharArray());
+        byte[] js = Encoding.UTF8.GetBytes(json.ToCharArray());
         File.WriteAllBytes(Application.dataPath + path, js);
     }
 }

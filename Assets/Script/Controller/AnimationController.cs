@@ -40,7 +40,7 @@ public class AnimationController : DDOLController<AnimationController>
             Debug.LogError("animation  time  is  null  !");
             return;
         }
-        anim.Play(aniName);
+        anim.Play(aniName,0,0f);
         void action()
         {
             if(!loop) anim.Play(NONE);
@@ -79,16 +79,14 @@ public class AnimationController : DDOLController<AnimationController>
     /// <param name="result">结果</param>
     public void playCombatBeHit(CombatView combat, AttackResultData result,List<CombatMessage> actorList,Action action)
     {//播放被击动画  并调用合适的视图面板变动
-        Debug.Log(actorList.ToString());
-        Debug.Log("【播放动画】攻击方:"+actorList[result.sourceActor].Name+"    受击方:"+ actorList[result.takenActor[0]].Name);
+        PubTool.dumpString("【战斗数据】",result);
         //if (result.sourceActor.AtkExtra.Count != 0) { Debug.Log(result.sourceActor.AtkExtra[0].id); }
         //if (result.extraHit!=null && result.extraHit.Length != 0) { Debug.Log(result.extraHit[0]); }
-        Debug.Log("【战斗数据】");
 
         //播放攻击方动画
         PubTool.instance.addAnimStep(delegate (Action callback)
         {
-            playAnimation(actorList[result.sourceActor].Prefab.GetComponentInChildren<Animator>().gameObject, "testAction", false, callback);
+            playAnimation(actorList[result.sourceActor].Prefab.GetComponentInChildren<Animator>().gameObject, "playerActionAttack", false, callback);
         });
         //播放受击方动画
         //播放受击方特效
@@ -108,7 +106,7 @@ public class AnimationController : DDOLController<AnimationController>
 
     public void playCombarRoundSettle(wholeRoundData rounddata, List<CombatMessage> actorList, Action action)
     {
-        Debug.Log("【统计结算】"+ rounddata.ToString());
+        PubTool.dumpString("【统计结算】", rounddata);
         action();
     }
 

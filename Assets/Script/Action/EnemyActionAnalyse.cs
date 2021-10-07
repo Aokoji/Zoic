@@ -11,6 +11,8 @@ public class EnemyActionAnalyse
     private List<int> defType;          //防御
     private List<int> priorityType;         //优先型
     private CombatMessage player;
+
+    private bool isContraintNormal = true;  //强制平A
     // 内部结构体  分析详情
     private struct AnalyzeDetail
     {
@@ -22,10 +24,15 @@ public class EnemyActionAnalyse
     {
         initList();
     }
-
-    public AnalyzeResult analyseCombatAttack(List<CombatMessage> list,CombatMessage item, CombatMessage play)
+    /// <summary>
+    /// 分析行动
+    /// </summary>
+    /// <param name="list">所有单位信息</param>
+    /// <param name="item">攻击方</param>
+    /// <returns></returns>
+    public AnalyzeResult analyseCombatAttack(List<CombatMessage> list,CombatMessage item)
     {
-        player = play;
+        player = list[0];
         AnalyzeResult result = new AnalyzeResult();
         //可能需要设置目标  或者多加一个目标分析
         //技能解析
@@ -33,15 +40,31 @@ public class EnemyActionAnalyse
         //分析行动
         //派发攻击事件
 
+        if (isContraintNormal)
+        {
+            result.isNormalAtk = true;
+            result.isExtraHit = true;
+            result.isMoveInstruct = false;
+            result.selfNum = item.NumID;
+            result.skillID = item.AttackID;
+            result.takeNum.Add(player.NumID);
+            return result;
+        }
+        else
+        {
+            //不强制普攻   才进行动作分析
+        }
+
         result.skillID=randomSkill(item);
-        SkillStaticData skill = AllUnitData.Data.getJsonData<SkillStaticData>("allSkillData", result.skillID);
+        SkillStaticData skill = AllUnitData.Data.getSkillStaticData( result.skillID);
         if(skill.effectType==310)
             result.takeNum .Add( item.NumID);
         else if(skill.effectType==313)
             result.takeNum.Add( player.NumID);
         result.selfNum = item.NumID;
-        result.skillType = skill.effectType;
 
+        result.isNormalAtk = true;
+        result.isExtraHit = true;
         //如果是伤害型技能  或 指向性debuff
         //测试
         /*
@@ -58,7 +81,7 @@ public class EnemyActionAnalyse
     {
         int id = item.AttackID;
         if (item.SkillOdds>0&&Random.Range(0, 100) < item.SkillOdds)   //触发技能
-            id = item.SkillData.skillHold[Random.Range(0, item.SkillData.skillHold.Count)].id;
+            id = item.SkillData.skillHold[Random.Range(0, item.SkillData.skillHold.Count)];
         return id;
     }
 
@@ -75,8 +98,8 @@ public class EnemyActionAnalyse
     {//技能解析
         foreach(var skill in item.skillHold)
         {
-            int id = skill.id;
-            switch (skill.name)
+            int id = skill;
+            switch (skill.ToString())
             {
                 case "901": atkType.Add(id); break;
                 case "902": beneficialType.Add(id); break;
@@ -110,10 +133,9 @@ public class EnemyActionAnalyse
 public class AnalyzeResult{
     public bool isMoveInstruct; //是否移动指令
     public int moveDistance;    //移动距离
-    public bool isExtraHit;
-    public bool isNormalAtk;    //是否普通攻击
+    public bool isExtraHit;         //是否有后续指令  区分纯移动
+    public bool isNormalAtk;    //是否普通攻击(普通类型攻击 包含简单攻击 buff 和场地变化)
     public int selfNum;
     public int skillID;
-    public int skillType;   //生效类型  0自身，1己方全体，2敌方单体，3敌方全体，4全体，5特殊
     public List<int> takeNum = new List<int>();         //对象序号 
 }

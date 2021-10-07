@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class PlayerManager : DDOLController<PlayerManager>
 {
-    PlayerControl player = PlayerControl.Instance;
-    GameData data = GameData.Data;
     public void loadPlayerManager()
     {//初始化方法    我也不知道为啥起这个名
 

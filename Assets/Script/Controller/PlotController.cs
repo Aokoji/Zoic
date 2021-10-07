@@ -12,7 +12,7 @@ public class PlotController : DDOLController<PlotController>
     private bool issidePloting = false;
     public void initData()
     {
-        plotCount = GameData.Data.Playermessage.plotCount;
+        plotCount = GameData.Data.playerBridge.getplotCount();
         initPlotView();
     }
     // 初始化进入游戏事件（判断是否有剧情强制触发）（外部调用）
@@ -23,7 +23,7 @@ public class PlotController : DDOLController<PlotController>
 
     private void onGameStartCheck()
     {
-        if (GameData.Data.Playermessage.isFirstIn)
+        if (GameData.Data.playerBridge.getFirstIn())
         {//第一次进入
             //还没有想好第一次场景动画是啥  暂且就打印一下然后跳过
             Debug.Log("加载入场动画！！！");

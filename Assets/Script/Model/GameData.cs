@@ -39,6 +39,7 @@ public class GameData: DDOLData<GameData>
 
     private DataPlayMessage dataplaymessage;           //游戏配置数据
     private PlayerMessage playermessage;        //-----------------------------------------------玩家数据----------
+    public PlayerMessageBridge playerBridge;        //玩家数据桥接类
 
     private bool useTestData = true;    //使用测试数据
 
@@ -56,7 +57,6 @@ public class GameData: DDOLData<GameData>
     }
 
     //public Vector2 LastBornPos { get => lastBornPos; set => lastBornPos = value; }
-    public PlayerMessage Playermessage { get => playermessage; set => playermessage = value; }
     public DataPlayMessage DataPlaymessage { get => dataplaymessage; set => dataplaymessage = value; }
 
     //事件调用  升级
@@ -65,6 +65,10 @@ public class GameData: DDOLData<GameData>
         actorGrowthCurve(playermessage.level,playermessage.jobOrder);
         playermessage.level++;
         PubTool.Instance.addLogger("人物升级!" + playermessage.level);
+        //获得能力点  1-10  2   10-15   1  15+  2
+        int point = GameStaticParamData.getAbilityPoint(playermessage.level);
+        playermessage.data.talentPoint+=point;
+        playermessage.data.maxTalentPoint += point;
     }
     //事件调用  获得技能点
     public void skillPointGot()
@@ -186,7 +190,8 @@ public class GameData: DDOLData<GameData>
         FileStream file = File.Open(Application.dataPath + baseDataLoadPath, FileMode.Open);
         //file.Seek(0, SeekOrigin.Begin);
         playermessage = (PlayerMessage)bin.Deserialize(file);
-        playermessage.paddingData();
+        playerBridge = new PlayerMessageBridge(playermessage);
+        playerBridge.paddingData();
         if (useTestData) testDataInterface.Data.testDataAdd(ref playermessage); //测试数据
         if (playermessage != null)
         {
@@ -243,22 +248,26 @@ public class GameData: DDOLData<GameData>
         playermessage.expcur = 0;
         playermessage.expmax = expBase;
         playermessage.data.attack_base = atkBase;
-        playermessage.data.defence_base = atkBase;
+        playermessage.data.defence_base = defBase;
         playermessage.data.strike_base = 0;
         playermessage.data.dodge_base = 0;
         playermessage.data.speed_base = 30;
+        playermessage.data.hitRate_base = 100;
         playermessage.data.adPat_base = 0;
         playermessage.data.apPat_base = 0;
-        playermessage.data.physical_recBase = phyRecover;
+        playermessage.data.agility_base = 2;
+        playermessage.data.wisdom_base = 2;
+        playermessage.data.force_base = 2;
+
+        playermessage.data.physical_recBase = phyRecover;   //自然恢复
         playermessage.data.vigor_recBase = 0;
 
         playermessage.attackID = 2;
         playermessage.skills = new skillSave();
         playermessage.skills.skillPoint = 1;
-        SkillStaticData skill0 = AllUnitData.Data.getSkillStaticData(4);
-        skill0.level = 1;
 
-        playermessage.skills.skillHold.Add(skill0);
+        playermessage.skills.skillHold.Add(4);  //初始一个技能
+        playermessage.skills.skillHold.Add(5);  //初始一个技能
 
         playermessage.paddingData();
         Debug.Log("save create success!");

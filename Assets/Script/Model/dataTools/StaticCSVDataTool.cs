@@ -47,6 +47,13 @@ public class StaticCSVDataTool
             item.strike = int.Parse(mess[9]);
             item.dodge = int.Parse(mess[10]);
             item.defence = int.Parse(mess[11]);
+            item.hitRate = int.Parse(mess[12]);
+            item.force= int.Parse(mess[13]);
+            item.agility= int.Parse(mess[14]);
+            item.wisdom= int.Parse(mess[15]);
+            item.force_coefficient= int.Parse(mess[16]);
+            item.agility_coefficient= int.Parse(mess[17]);
+            item.wisdom_coefficient= int.Parse(mess[18]);
 
             data.childDic.Add(item);
         }
@@ -61,6 +68,33 @@ public class StaticCSVDataTool
         {
             SkillStaticData item = new SkillStaticData();
             item.id = int.Parse(mess[0]);
+            item.name = mess[1];
+            item.describe = mess[2];
+            item.isHit = mess[3].Equals("1");
+            item.isBuff = mess[4].Equals("1");
+            item.isDomain = mess[5].Equals("1");
+            item.isCure = mess[6].Equals("1");
+            item.isProp = mess[7].Equals("1");
+            item.effectType = int.Parse(mess[8]);
+            item.sustainType = int.Parse(mess[9]);
+            item.sustainTimeBase = int.Parse(mess[10]);
+            item.sustainRefType = int.Parse(mess[11]);
+            item.sustainMulti = int.Parse(mess[12]);
+            item.subOdds = int.Parse(mess[13]);
+            item.isFrontBuff = mess[14].Equals("1");
+            item.buffId = int.Parse(mess[15]);
+            item.buffRefer = int.Parse(mess[16]);
+            item.buffAbility = int.Parse(mess[17]);
+            item.buffConstant = int.Parse(mess[18]);
+            item.damageType = int.Parse(mess[19]);
+            item.isSpecialEffect = mess[20].Equals("1");
+            item.damageRefer = int.Parse(mess[21]);
+            item.damageMulti = int.Parse(mess[22]);
+            item.damageNum = int.Parse(mess[23]);
+            item.expend1 = int.Parse(mess[24]);
+            item.expend2 = int.Parse(mess[25]);
+            item.coolDown = int.Parse(mess[26]);
+            item.runDown = int.Parse(mess[27]);
 
             data.childDic.Add(item);
         }
@@ -71,11 +105,17 @@ public class StaticCSVDataTool
     {
         AllUnitSkillStaticData data = new AllUnitSkillStaticData();
         List<string[]> list = loadCSV(unitSkillPath);
+        int beforeCount = 3;
         foreach (string[] mess in list)
         {
             UnitSkillStaticData item = new UnitSkillStaticData();
             item.id = int.Parse(mess[0]);
-
+            item.unitId = int.Parse(mess[1]);
+            item.attackNum = int.Parse(mess[2]);
+            for(int i = beforeCount; i < mess.Length; i++)
+            {
+                item.skills.Add(int.Parse(mess[i]));
+            }
             data.childDic.Add(item);
         }
         return data;
@@ -161,7 +201,6 @@ public class StaticCSVDataTool
     {
         List<string[]> data = new List<string[]>();
         StreamReader sr = null;
-        Debug.Log(path + "==========");
         if (File.Exists(path))
         {
             sr = File.OpenText(path);

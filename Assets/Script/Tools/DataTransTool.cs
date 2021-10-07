@@ -49,6 +49,7 @@ public class DataTransTool
         mess.Data.strike_base = play.data.strike_last;
         mess.Data.dodge_base = play.data.dodge_last;
         mess.Data.defence_base = play.data.defence_fin;
+        mess.Data.hitRate_base = play.data.hitRate_last;
         mess.Data.force_base = play.data.force_last;
         mess.Data.agility_base = play.data.agility_last;
         mess.Data.wisdom_base = play.data.wisdom_last;
@@ -59,7 +60,7 @@ public class DataTransTool
         mess.NumID = 0;
         mess.AttackID = play.attackID;
         mess.SkillData = play.skills;
-
+        mess.Name1 = "player";
         mess.paddingData();
         return mess;
     }
@@ -67,6 +68,7 @@ public class DataTransTool
     {
         CombatMessage mess = new CombatMessage();
         UnitTypeStaticData play = AllUnitData.Data.getJsonData<UnitTypeStaticData>("allUnitData", id);
+        mess.Data.id = id;
         mess.Data.physical_base = play.physical;
         mess.Data.vigor_base = play.vigor;
         mess.Data.attack_base = play.attack;
@@ -76,12 +78,19 @@ public class DataTransTool
         mess.Data.strike_base = play.strike;
         mess.Data.dodge_base = play.dodge;
         mess.Data.defence_base = play.defence;
+        mess.Data.hitRate_base = play.hitRate;
+
+        mess.Data.force_base = play.force;
+        mess.Data.agility_base = play.agility;
+        mess.Data.wisdom_base = play.wisdom;
+
         mess.Data.curHp = play.physical;
         mess.Data.curMp = play.vigor;
         mess.IconName = play.name;
         mess.IsPlayer = false;
+        mess.Name1 = play.name;
         UnitSkillStaticData skills = AllUnitData.Data.getJsonData<UnitSkillStaticData>("allUnitSkillData", id);
-        mess.AttackID = skills.attakcNum;
+        mess.AttackID = skills.attackNum;
         foreach (var sk in skills.skills)
         {
             mess.SkillData.skillHold.Add(sk);

@@ -27,7 +27,7 @@ public interface CombatInterface
     //--内置判断
     bool checkCombatResult();           //判断输赢(该局战斗)
     bool checkCombatContinue();     //是否继续(该局战斗)
-    void settleActorDead(CombatMessage actor);      //目标击败
+    void settleActorDead(int intdex);      //目标击败
     //
     //----奖励
     void comulativeReword(CombatMessage actor);         //计算目标奖励
@@ -120,12 +120,13 @@ public abstract class CombatAdapter : CombatInterface
     public void hitTakeEffect(int i)
     {
         int hitfin = 0;
-        if (atkResult.isSpecial)
+        if (atkResult.isSpecial&& atkResult.specialCount.Count>0)
         {
             foreach (int k in atkResult.specialCount[i])
                 hitfin += k;
         }
-        hitfin += atkResult.hitNum[i];
+        if(atkResult.isHitRare[i])
+            hitfin += atkResult.hitNum[i];
         if (takeActors[i].hitCurPhysical(hitfin))
         {
             atkResult.willDeadActor.Add(i);
@@ -206,7 +207,7 @@ public abstract class CombatAdapter : CombatInterface
         //获得参考属性值
         int basePro = sourceActor.getCombatParamData(skill.damageRefer);
         //计算基础伤害
-        int baseDam = skill.damageMulti / 100 * basePro;
+        int baseDam = Mathf.FloorToInt(skill.damageMulti  * basePro / 100);
         //计算暴击
         baseDam = holy ? baseDam : baseDam * (Random.Range(0, 100) < sourceActor.Data.strike_last ? 2 : 1);
         //计算作用目标伤害
@@ -403,16 +404,10 @@ public abstract class CombatAdapter : CombatInterface
         return roundData;
     }
     //目标击败
-    public void settleActorDead(CombatMessage actor)
+    public void settleActorDead(int index)
     {
-        for (int i = 0; i < dataList.Count; i++)
-        {
-            if (dataList[i].Name == actor.Name)
-            {
-                //增加战利品
-                if (actor.Name != PLAYER) comulativeReword(actor);
-            }
-        }
+        //增加战利品
+        if (!dataList[index].IsPlayer) comulativeReword(dataList[index]);
     }
     //----------------------------外调------------------------------------
     //判断游戏是否继续
@@ -421,7 +416,7 @@ public abstract class CombatAdapter : CombatInterface
         bool isexit = false;
         foreach (var item in dataList)
         {
-            if (item.Name == PLAYER)
+            if (item.IsPlayer)
             {
                 if (item.IsDead) return false;
             }
@@ -437,7 +432,7 @@ public abstract class CombatAdapter : CombatInterface
     {
         foreach (var item in dataList)
         {
-            if (item.Name == PLAYER && item.IsDead) return false;
+            if (item.IsPlayer && item.IsDead) return false;
             else return true;//如果玩家存活  则玩家胜利
         }
         Debug.LogError("战斗结算错误!");

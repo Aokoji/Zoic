@@ -12,38 +12,51 @@ unit
 9，J，strike，暴击
 10，K，dodge，闪避
 11,L，def，防御11
-12,M	力量（基础）
-13,N	敏捷
-14,O	智力
-15，P	力量随等级系数（基础值+等级*系数）
-16，Q	敏捷随等级系数
-17，R	智力随等级系数
+12,M，命中
+13,N	力量（基础）
+14,O	敏捷
+15，P	智力
+16，Q	力量随等级系数（基础值+等级*系数）
+17，R	敏捷随等级系数
+18，S	智力随等级系数
 
 skill
 0，id,技能编号
 1，name,名称
-2，explain,描述
-3，type,区分类型（场地型101，增益型102，攻击型103）
-4，effect，生效类型（200自身，201己方单体，202己方全体，203敌方单体，204敌方全体，205全体，206除自身外全体,207特殊）
-5，subjoin  效果附加编号（取特殊效果id，无0，毒1，灼烧2，冰冻3，出血4，）
-6，subOdds 附加几率
-7，subCondition  条件附加（取特殊效果id，无0，毒1，灼烧2，冰冻3，出血4，）
-8，subEnhance  条件增幅  （存在该异常状态对技能的增幅）
-9，sustion，持续类型（301固定，302参考型(不可替代型)，303刷新型，304累加型）
-10，sustiontime，持续时间
-11，sustionmulti，持续参数（310不参考，311全体人数，312己方人数，313敌方人数，314异常状态敌方人数，315流血敌方人数）（目前只接受加法）
-12，specialEffectType 特殊附加（0无，1荼毒，2强化出血）
-13，specialEffectRefer 特殊附加参考（分辨末尾是0自己或1敌人)(好像没用上  留空字段)
-14，damageTypes 伤害类型
-15，specialEffect 攻击特效(是否附带，不是是否是)
-16-20，refer1-5,参考值
-21-25，multi1-5,比例
-26-28，mixEffect1-3 ，复合调用技能效果
-29-30，消耗
-31，cd
-32，固定参数
-33，airefer  ai参考类型	901攻击型 902增益型 903防御型 904恢复型 905攻防优先型 906特殊型
+2，describe,描述
+3，ishit  是否伤害01
+4，isbuff 是否buff  01
+5，isdomain  是否场地01
+6，iscure  是否治疗01
+7，isprop  是否道具效果01
+8，effecttype	生效范围类型（单体 全体 己方等）
+9，sustaintype	持续类型（固定性 累加型等）
+10，sustainTimeBase	生效基础回合
+11，sustainrefType		参考类型（参考全体人数等增加回合）
+12，sustainmulti		参考倍率
+13,N，subodds	成功率
+14,O，isfrontbuff	是否需要先判断buff（针对先buff在攻击还是先攻击再buff）
+15,P，buffid	增幅id
+16,Q，buffrefer	影响变动比例（传入buff影响参数）乘数
+17,R，buffability	影响属性编号
+18,S，buffconstant	影响固定值
+19,T，damagetype	伤害类型
+20,U，isspecialeffect	是否附带攻击特效
+21,V，damagerefer	伤害参考属性
+22,W，damagemulti	伤害比例数
+23,X，damagenum	伤害次数
+24,Y，expend1	消耗体力
+25,Z，expend2	消耗精力
+26,AA，colldown	冷却
+27,AB，rundown	跑冷却
 
+
+
+技能参照表（精英以上的boss怪会有单独的特殊技能对照表）
+1、id
+2、unit id
+3、普攻id
+4、技能顺延
 
 
 extra

@@ -25,6 +25,10 @@ public class UnitTypeStaticData
     public int force;       //力量    (人物基础值)
     public int wisdom;      //智力
     public int agility;     //敏捷
+
+    public int force_coefficient;   //力量成长系数  基础值+等级*系数
+    public int agility_coefficient;
+    public int wisdom_coefficient;
 }
 //----------------------------------------技能参数------------------------------------------
 [System.Serializable]
@@ -34,8 +38,6 @@ public class SkillStaticData
 {//ps  带*的都要参考  类型手册表 SkillType_Manual
     //几率参数都是默认要/100
     public int id;
-    public int level;
-    public int levelCost;   //升级花费
     public string name;
     public string describe;     //描述
     public bool isHit;           //技能类型(伤害 buff 场地 治疗)
@@ -53,9 +55,9 @@ public class SkillStaticData
 
     public bool isFrontBuff;    //判断先buff还是先别的
     public int buffId;
-    public int forceRefer;      //力量变动比例
-    public int wisdomRefer;     //智力变动比例    (战斗中不影响mp上限)
-    public int agilityRefer;    //敏捷变动比例
+    public int buffRefer;      //影响变动比例
+    public int buffAbility;     //影响属性编号
+    public int buffConstant;    //影响固定值
 
     //攻击 防御 速度 闪避 命中 暴击 力量 智力 敏捷
     //降属性只会降三维
@@ -83,8 +85,9 @@ public class AllUnitSkillStaticData{public List<UnitSkillStaticData> childDic = 
 public class UnitSkillStaticData
 {
     public int id;
-    public int attakcNum;
-    public List<SkillStaticData> skills = new List<SkillStaticData>();
+    public int unitId;
+    public int attackNum;
+    public List<int> skills = new List<int>();
 }
 //----------------------------------------单位爆率--------------------------------------------
 [System.Serializable]
