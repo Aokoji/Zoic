@@ -181,7 +181,7 @@ public class playerParam
 public class skillSave
 {
     public int skillPoint;
-    public List<int> skillHold = new List<int>();
+    public List<SkillStaticData> skillHold = new List<SkillStaticData>();
 }
 
 //持有物信息

@@ -46,6 +46,13 @@ public class CombatMessage
     public combatUnitProperty Data { get => data; set => data = value; }
     public GameObject ShowActor { get => showActor; set => showActor = value; }
 
+    public void initData()
+    {
+        //初始化技能
+        foreach (var sk in skillData.skillHold)
+            sk.runDown = 0;
+        paddingData();
+    }
     /// <summary>
     /// 赋完值后 拉栓 计算属性赋最终值
     /// </summary>
@@ -100,6 +107,13 @@ public class CombatMessage
             data.curHp = data.physical_last;
         }
         return false;
+    }
+    /// <summary>
+    ///播完攻击效果后 显示的掉血  1.5s
+    /// </summary>
+    public void showPhysicalChange(bool ishit)
+    {
+        prefab.GetComponent<CombatActorItem>().changePhysicalLine(ishit,(float)data.curHp/data.physical_last);
     }
 
 }

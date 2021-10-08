@@ -15,6 +15,7 @@ public class CombatView : MonoBehaviour
     public Button skill;
     public Button bag;
     public Button run;
+    public Button setbtn;   //设置按钮
     public GameObject[] actorIcon;
     public GameObject playermessBoard;      //玩家信息框（hpmp）
 
@@ -118,6 +119,8 @@ public class CombatView : MonoBehaviour
             if (item.IsPlayer)
             {
                 playerActor = item;
+                //给状态栏赋值
+                playermessBoard.GetComponent<combatPlayMessView>().initPlayerData(playerActor.Data);
             }
             else
             {
@@ -384,6 +387,11 @@ public class CombatView : MonoBehaviour
         lockBaseButton(false);
         cancelConfirmPanel();
         hideContext();
+    }
+    //刷新人物数值面板
+    public void refreshMessBoard()
+    {
+        playermessBoard.GetComponent<combatPlayMessView>().refreshNumbers();
     }
     //锁基础按钮
     private void lockBaseButton(bool islock)

@@ -6,6 +6,8 @@ public interface CombatInterface
 {
     void initData(List<CombatMessage> data);
     void roundInitData();
+    void roundCalculate(CombatMessage actor);  //回合计算（开始时计算  计算cd 持续buff等）
+
     AttackResultData doAction(AnalyzeResult action);    //行动处理器
     wholeRoundData roundAnalyzeAction();                //回合处理器
     void normalAction(AnalyzeResult action);    //攻击分析
@@ -220,14 +222,35 @@ public abstract class CombatAdapter : CombatInterface
                 israte = holy ? holy : Random.Range(0, 100) > takeActors[i].Data.dodge_last;   //true命中
                 if (israte)
                 {//命中
-                    //计算防御  
-                    int hitresult = holy ? baseDam : DataTransTool.defenceTrans(baseDam, takeActors[i].Data.defence_last);
-                    //获得减伤类型数据
+                    //记录防御和减伤
+                    int pat = 0;
+                    int def = 0;
+                    int refer = 0;  //参考属性  力或智
+                    bool ispower= false;//区分物魔
+                    int hitresult = baseDam;    //伤害（最终）
+                    if (skill.damageType == 191)
+                    {
+                        pat = takeActors[i].Data.adPat_last;
+                        refer = sourceActor.Data.force_last;
+                        def = takeActors[i].Data.defence_last;
+                        ispower = true;
+                    }
+                    if (skill.damageType == 192)
+                    {
+                        pat = takeActors[i].Data.apPat_last;
+                        refer = sourceActor.Data.wisdom_last;
+                        def = takeActors[i].Data.defence_last / 2;
+                    }
+                    //计算防御系数  
+                    float defCoef= DataTransTool.defenceTrans(refer, def);
+                    //计算伤害增幅（过高差距）
+                    float hitAmp=DataTransTool.propertyGapAmp(refer,sourceActor.Data.level,ispower);
+                    //真伤只乘增幅
+                    hitresult = (int)(baseDam * hitAmp);
                     if (!holy)
                     {
-                        int pat = 0;
-                        if (skill.damageType == 191) pat = takeActors[i].Data.adPat_last;
-                        if (skill.damageType == 192) pat = takeActors[i].Data.apPat_last;
+                        //乘防御系数
+                        hitresult = Mathf.FloorToInt(hitresult*defCoef);
                         //计算减伤
                         hitresult = (int)Mathf.Round(hitresult * (float)(1 - (pat / 100)));
                     }
@@ -308,6 +331,26 @@ public abstract class CombatAdapter : CombatInterface
             }
             atkResult.specialCount.Add(hitsp);
             atkResult.specialType.Add(typsp);
+        }
+    }
+    //=======================================       回合计算        =======================
+    //计算回合数据  冷却
+    public void roundCalculate(CombatMessage actor)
+    {
+        //计算buff
+        for(int i=actor.Abnormal.Count;i>0;i--)
+        {
+            actor.Abnormal[i].round--;
+            if (actor.Abnormal[i].round <= 0)
+            {
+                actor.Abnormal.Remove(actor.Abnormal[i]);
+            }
+        }
+        actor.paddingData();
+        //减cd
+        foreach(var sk in actor.SkillData.skillHold)
+        {
+            if (sk.runDown <= 0) sk.runDown--;
         }
     }
     //=======================================       回合处理器       ============================

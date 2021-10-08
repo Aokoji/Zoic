@@ -9,6 +9,7 @@ public class CombatController : DDOLController<CombatController>
     private AttackAnalyze attackAction;              //战斗缓存器
     public CombatView combat;
     private GameObject combatScene;
+    private CombatAnimationControl animCtl;     //战斗动画控制器
     private float pubPer = 0.05f;
     private bool iswait;    //是否进度等待
     private string logname;
@@ -30,8 +31,10 @@ public class CombatController : DDOLController<CombatController>
         messageActor = data;
         attackAction = new AttackAnalyze(messageActor);
         if (combat == null) { initCombat(messageActor); }
-        AnimationController.Instance.cleanNextStepAction(); //清空动画控制器事件
-        AnimationController.Instance.combatNextStep += roundEndAction;
+        animCtl = new CombatAnimationControl();
+        animCtl.initData(roundEndAction);
+        //AnimationController.Instance.cleanNextStepAction(); //清空动画控制器事件
+        //AnimationController.Instance.combatNextStep += roundEndAction;
         combat.transform.SetAsLastSibling();            //置顶
         ViewController.instance.setCameraVisible("combatcam", true);        //强制显示战斗场景相机（单显示）
         //ViewController.instance.setCameraVisible("uicam", false);               //补充添加战斗ui相机
@@ -141,7 +144,10 @@ public class CombatController : DDOLController<CombatController>
     //执行回合
     private void runRoundAction(CombatMessage actor)
     {
-        //+++回合-1   cd
+        //回合结算的数据（比如回合cd-1）
+        attackAction.roundCalculate(actor);
+        //+++刷新状态 buff 和技能
+
         if (!actor.IsPlayer)//敌人攻击
         {
             Debug.Log("【敌人攻击】");
@@ -150,7 +156,7 @@ public class CombatController : DDOLController<CombatController>
             //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
             AttackResultData animData =attackAction.doAction(aiAction);
             //获得的战斗数据传给动画机  动画机执行完进行回合判定
-            AnimationController.Instance.playCombatBeHit(combat, animData,messageActor,roundSettle);
+            animCtl.playCombatBeHit(combat, animData,messageActor,roundSettle);
         }
         else
         {
@@ -167,7 +173,7 @@ public class CombatController : DDOLController<CombatController>
             //获得回合结束数据
             wholeRoundData rounddata = attackAction.roundAnalyzeAction();
             //回合结算
-            AnimationController.Instance.playCombarRoundSettle(rounddata, messageActor,roundEndAction);
+            animCtl.playCombarRoundSettle(rounddata, messageActor,roundEndAction);
         }
         else
             roundEndAction();
@@ -255,7 +261,7 @@ public class CombatController : DDOLController<CombatController>
         //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
         AttackResultData animData = attackAction.doAction(aiAction);
         //获得的战斗数据传给动画机  动画机执行完进行回合判定
-        AnimationController.Instance.playCombatBeHit(combat, animData, messageActor, roundSettle);
+        animCtl.playCombatBeHit(combat, animData, messageActor, roundSettle);
         //eventManager.doattackNext(combat.playerActor, combat.chooseActor);
     }
 

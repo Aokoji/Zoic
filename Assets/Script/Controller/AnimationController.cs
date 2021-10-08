@@ -72,46 +72,6 @@ public class AnimationController : DDOLController<AnimationController>
         return 0;
     }
 
-    /// <summary>
-    /// 调用动画播放器 播放攻击回合动画
-    /// </summary>
-    /// <param name="combat">控制场景</param>
-    /// <param name="result">结果</param>
-    public void playCombatBeHit(CombatView combat, AttackResultData result,List<CombatMessage> actorList,Action action)
-    {//播放被击动画  并调用合适的视图面板变动
-        PubTool.dumpString("【战斗数据】",result);
-        //if (result.sourceActor.AtkExtra.Count != 0) { Debug.Log(result.sourceActor.AtkExtra[0].id); }
-        //if (result.extraHit!=null && result.extraHit.Length != 0) { Debug.Log(result.extraHit[0]); }
-
-        //播放攻击方动画
-        PubTool.instance.addAnimStep(delegate (Action callback)
-        {
-            playAnimation(actorList[result.sourceActor].Prefab.GetComponentInChildren<Animator>().gameObject, "playerActionAttack", false, callback);
-        });
-        //播放受击方动画
-        //播放受击方特效
-        //播放的同时显示数值
-        //全部播放完成后  播放死亡
-        if (result.willDeadActor.Count != 0)
-        {
-            //挨个播死亡动画
-        }
-        //攻击播放结束
-        PubTool.instance.addAnimStep(delegate (Action callback)
-        {
-            callback();
-            action();
-        });
-    }
-
-    public void playCombarRoundSettle(wholeRoundData rounddata, List<CombatMessage> actorList, Action action)
-    {
-        PubTool.dumpString("【统计结算】", rounddata);
-        action();
-    }
-
-
-
 
     public void playCombatSceneTransform(CombatView combat,int type)
     {//加载入场动画  普通切换  动画为 0
