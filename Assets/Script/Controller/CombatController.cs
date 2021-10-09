@@ -235,14 +235,34 @@ public class CombatController : DDOLController<CombatController>
         {
 
         }
-        else
+        else if (combat.isprop)
         {
 
         }
+        else
+        {
+            //计算消耗
+            foreach(var i in combat.playerActor.SkillData.skillHold)
+            {
+                if (combat.chooseSkill.id == i.id)
+                {
+                    i.runDown = i.coolDown;
+                    combat.playerActor.hitCurPhysical()
+                    break;
+                }
+            }
+            //生成攻击结果
+            createSkillResult();
+        }
+
+    }
+
+    private void createSkillResult()
+    {
         AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
-        SkillStaticData skill= combat.chooseSkill;
+        SkillStaticData skill = combat.chooseSkill;
         aiAction.selfNum = combat.playerActor.NumID;
-        aiAction.skillID =combat.chooseSkill.id;
+        aiAction.skillID = combat.chooseSkill.id;
         //区分类型范围
         switch (skill.effectType)
         {
@@ -251,8 +271,8 @@ public class CombatController : DDOLController<CombatController>
             case 312: aiAction.takeNum.Add(combat.playerActor.NumID); break;
             case 313: aiAction.takeNum.Add(combat.chooseActor); break;
             case 314:
-                foreach(var i in messageActor)
-                    if(!i.IsPlayer)
+                foreach (var i in messageActor)
+                    if (!i.IsPlayer)
                         aiAction.takeNum.Add(i.NumID);
                 break;
             case 315:
@@ -278,7 +298,7 @@ public class CombatController : DDOLController<CombatController>
 
     //初始显示提示弹板和出现动画没做
     //距离判断没做
-    //技能进cd显示和消耗没做
+    //技能进cd显示和消耗没做  skillBarOneView 这个脚本要挂
     //场景转换动画没做
     //未攻击的僵持状态  ai分析没做
 }

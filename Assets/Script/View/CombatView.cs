@@ -40,9 +40,10 @@ public class CombatView : MonoBehaviour
     public CombatMessage playerActor = null;        //玩家本体
     public SkillStaticData chooseSkill;                 //选择的技能   目标(仅限单体) 其他类型有自动识别
     public int chooseActor;             //在选择攻击目标时  或 释放环境技能确定窗时  提前赋值
-    private List<GameObject> skillBars;     //存储技能bar的实体*  用于刷新cd等操作
+    private List<skillBarOneView> skillBars;     //存储技能bar的实体*  用于刷新cd等操作
 
     public bool isrun;  //是否逃跑
+    public bool isprop;    //是否道具
     private int panelSkillStateRank = 0; //当前页面层级（技能）
 
     private float distance; //总的进度条长度
@@ -65,7 +66,7 @@ public class CombatView : MonoBehaviour
     {
         //icons = new List<GameObject>();
         actorBody = new List<GameObject>();
-        skillBars = new List<GameObject>();
+        skillBars = new List<skillBarOneView>();
         distance = startPos.transform.position.x - endPos.transform.position.x;
         mask.gameObject.SetActive(false);
         baseControl.SetActive(false);
@@ -140,15 +141,16 @@ public class CombatView : MonoBehaviour
         {
             skill.runDown = 0;
             GameObject bar = addContext();
-            Text[] conts=bar.GetComponentsInChildren<Text>();
-            conts[0].text = skill.name;     //技能名称
-            conts[1].text = skill.expend1 + "";     //体力消耗
-            conts[2].text = skill.expend2 + "";     //精力消耗
+            //给每个bar整一个脚本管理子项就可以了
+            var com= bar.GetComponent<skillBarOneView>();
+            //赋值
+            com.initData(skill);
+            /*      在子项脚本实现了  先不用了
             bar.GetComponent<Button>().onClick.AddListener(()=>                             //闭包写法  网上抄的
             {
                 chooseSkillMessage(skill);
-            });
-            skillBars.Add(bar);
+            });*/
+            skillBars.Add(com); //存起来
         }
         panelSkillStateRank = 0;
     }
@@ -337,6 +339,7 @@ public class CombatView : MonoBehaviour
         clearArrowState();
         panelSkillStateRank = 0;
         isrun = false;
+        isprop = false;
         chooseSkill = null;
     }
     private void attackButtonClick()
@@ -354,7 +357,7 @@ public class CombatView : MonoBehaviour
     }
     private void propButtonClick()
     {
-
+        //+++出二级页面的时候  isprop置true
     }
     private void skillButtonClick()
     {
@@ -395,6 +398,14 @@ public class CombatView : MonoBehaviour
     public void refreshMessBoard()
     {
         playermessBoard.GetComponent<combatPlayMessView>().refreshNumbers();
+    }
+    //刷新技能冷却信息
+    public void refreshSkillBoard()
+    {
+        foreach(var it in skillBars)
+        {
+            it.checkCoolDown();
+        }
     }
     //锁基础按钮
     private void lockBaseButton(bool islock)
