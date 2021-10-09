@@ -34,6 +34,10 @@ public class PlayerMessageBridge : MessageBridgeInterface
         return playermessage.data;
     }
 
+    public string getPlayerName()
+    {
+        return playermessage.name;
+    }
     public bool getFirstIn()
     {
         return playermessage.isFirstIn;

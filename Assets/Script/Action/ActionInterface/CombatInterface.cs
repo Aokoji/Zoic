@@ -226,12 +226,14 @@ public abstract class CombatAdapter : CombatInterface
                     int pat = 0;
                     int def = 0;
                     int refer = 0;  //参考属性  力或智
+                    int ampRefer = 0;   //伤害增幅参考目标属性
                     bool ispower= false;//区分物魔
                     int hitresult = baseDam;    //伤害（最终）
                     if (skill.damageType == 191)
                     {
                         pat = takeActors[i].Data.adPat_last;
                         refer = sourceActor.Data.force_last;
+                        ampRefer = takeActors[i].Data.force_last;
                         def = takeActors[i].Data.defence_last;
                         ispower = true;
                     }
@@ -239,12 +241,13 @@ public abstract class CombatAdapter : CombatInterface
                     {
                         pat = takeActors[i].Data.apPat_last;
                         refer = sourceActor.Data.wisdom_last;
+                        ampRefer = takeActors[i].Data.wisdom_last;
                         def = takeActors[i].Data.defence_last / 2;
                     }
                     //计算防御系数  
                     float defCoef= DataTransTool.defenceTrans(refer, def);
                     //计算伤害增幅（过高差距）
-                    float hitAmp=DataTransTool.propertyGapAmp(refer,sourceActor.Data.level,ispower);
+                    float hitAmp=DataTransTool.propertyGapAmp(refer, ampRefer,sourceActor.Data.level,ispower);
                     //真伤只乘增幅
                     hitresult = (int)(baseDam * hitAmp);
                     if (!holy)

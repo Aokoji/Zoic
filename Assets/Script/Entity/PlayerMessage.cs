@@ -6,8 +6,9 @@ public class PlayerMessage
 {
     //系统
     public bool isFirstIn;  //第一次进入
-    
+
     //=================================                    人物属性          ======================
+    public string name;
     public int level;               //等级
     public int expmax;         //最大经验
     public int expcur;          //当前经验

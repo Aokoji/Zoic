@@ -29,7 +29,7 @@ public class CombatActorItem : MonoBehaviour
 
     //=====================================   掉血缓动效果参数  =================
     private float timephyDec=1f;     //掉血时间参数
-    private float timephyPer=0.05f; //一秒20次刷新
+    private float timephyPer=GameStaticParamData.timePer20; //一秒20次刷新
     private float timephyRun;       //时间记录变量
     private float changtoPhy;       //改变量
     //掉血/加血 血条变动效果

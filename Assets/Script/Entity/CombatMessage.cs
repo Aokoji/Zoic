@@ -10,9 +10,11 @@ public class CombatMessage
     private combatUnitProperty data = new combatUnitProperty();
 
     private float curSpeed; //这个记录跑条位置   不进行手动更改
+    public string originalState = "";   //初始状态描述
 
     //---------以下为外部引用量
     public int id;
+    public int type;
     private int numID;          //战斗中list序号  玩家默认为0
     private GameObject prefab;      //战斗人物实体
     private GameObject showActor;       //换图的组件image

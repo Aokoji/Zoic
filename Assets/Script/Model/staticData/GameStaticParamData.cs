@@ -8,6 +8,7 @@ public static class GameStaticParamData
     {
 
     }
+    public static float timePer20=0.05f;
     private static int lowGive = 1;
     private static int midGive = 2;
     private static int highGive = 2;
@@ -16,8 +17,10 @@ public static class GameStaticParamData
     /// </summary>
     public static int getAbilityPoint(int level)
     {
-        if (level <= 10 || level > 15) return 1;
-        if (level > 10 && level <= 15) return 2;
+        if (level <= 10) return midGive;
+        if (level > 10 && level <= 15) return lowGive;
+        if (level > 15 && level<=18) return highGive;
+        if (level > 18) return lowGive;
         return 0;
     }
 

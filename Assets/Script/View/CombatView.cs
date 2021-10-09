@@ -18,6 +18,7 @@ public class CombatView : MonoBehaviour
     public Button setbtn;   //设置按钮
     public GameObject[] actorIcon;
     public GameObject playermessBoard;      //玩家信息框（hpmp）
+    public GameObject messageTips;
 
     public GameObject baseControl;
     public GameObject mask;
@@ -39,6 +40,7 @@ public class CombatView : MonoBehaviour
     public CombatMessage playerActor = null;        //玩家本体
     public SkillStaticData chooseSkill;                 //选择的技能   目标(仅限单体) 其他类型有自动识别
     public int chooseActor;             //在选择攻击目标时  或 释放环境技能确定窗时  提前赋值
+    private List<GameObject> skillBars;     //存储技能bar的实体*  用于刷新cd等操作
 
     public bool isrun;  //是否逃跑
     private int panelSkillStateRank = 0; //当前页面层级（技能）
@@ -63,12 +65,14 @@ public class CombatView : MonoBehaviour
     {
         //icons = new List<GameObject>();
         actorBody = new List<GameObject>();
+        skillBars = new List<GameObject>();
         distance = startPos.transform.position.x - endPos.transform.position.x;
         mask.gameObject.SetActive(false);
         baseControl.SetActive(false);
         tanban.SetActive(false);
         messageFather.SetActive(false);
         skillThirdFather.SetActive(false);
+        messageTips.SetActive(false);
     }
     private void initBaseButtonEvent()
     {//初始化自身基础按钮的功能   不包含最终的二级或深级界面功能按钮
@@ -132,9 +136,9 @@ public class CombatView : MonoBehaviour
     private void initLayout()
     {
         clearContext();     //清理技能列表
-        foreach(var skId in playerActor.SkillData.skillHold)
+        foreach(var skill in playerActor.SkillData.skillHold)
         {
-            var skill=AllUnitData.Data.getSkillStaticData(skId);
+            skill.runDown = 0;
             GameObject bar = addContext();
             Text[] conts=bar.GetComponentsInChildren<Text>();
             conts[0].text = skill.name;     //技能名称
@@ -144,6 +148,7 @@ public class CombatView : MonoBehaviour
             {
                 chooseSkillMessage(skill);
             });
+            skillBars.Add(bar);
         }
         panelSkillStateRank = 0;
     }
@@ -188,16 +193,14 @@ public class CombatView : MonoBehaviour
     //显示提示板（比如距离）
     public void showTips1Second(Action action)
     {
-        //提示板0.25渐显
-        //提示板1秒展示
-        //提示板0.25渐隐
-        //渐隐结束
-        action();
+        //播动画
+        AnimationController.Instance.playAnimation(messageTips, "tipShow", false, action);
     }
+
     //设置内容
     public void setTipsContext(string text)
     {
-
+        messageTips.GetComponent<Text>().text = text;
     }
     //---------------------------------------------出场动画--------------------------------
     private void playEnterScene(Action callback)

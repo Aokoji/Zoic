@@ -18,15 +18,54 @@ public class DataTransTool
         return coef;
     }
 
-    private static float magicSpecialAmp=1.45f;  //魔法伤害专用系数额外增幅
+    private static float magicSpecialAmp1=1.45f;  //魔法伤害专用系数额外增幅
+    private static float magicSpecialAmp2=1.2f;
+    private static float normalPromote=1.05f;   //强属性保底提升
+    private static float propertyGapNum = 1.5f;    //属性差值倍率
     /// <summary>
     /// 属性差距增幅
     /// </summary>
-    public static float propertyGapAmp(float property,int level,bool ispower)
+    public static float propertyGapAmp(int property,int target,int level,bool ispower)
     {
-        
-        return 1f;
+        float multi = 1f;
+        if (ispower)
+        {
+            if (target < property)
+                multi = normalPromote;
+        }
+        else
+        {
+            if (target * propertyGapNum <= property)
+            {//满足倍率
+                multi = magicSpecialAmp2;
+                if ((target * propertyGapNum + level * 2) <= property)  //满足二挡
+                    multi = magicSpecialAmp1;
+            }
+            else if (target < property)
+                multi = normalPromote;
+        }
+        return multi;
     }
+    //怪物品级转换
+    public static string unitNameTypeTrans(int rank)
+    {
+        switch (rank)
+        {
+            case 0:return GameData.Data.playerBridge.getPlayerName();
+            case 1:return "普通";
+            case 2:return "高级";
+            case 3:return "精英";
+            case 4:return "领主";
+            case 5:return "灾祸";
+            default: return "";
+        }
+    }
+    //怪物初始状态词库
+    public static string enemyOriginalStateTrans()
+    {
+        return "";
+    }
+
     /// <summary>
     /// 力量转攻击
     /// </summary>
@@ -47,17 +86,6 @@ public class DataTransTool
         return wisdom;
     }
 
-    //------------------------------------------------------------动画名称转换--------------------------
-    public static string animTypeNameTrans(int id)
-    {
-        string name = "";
-        switch (id)
-        {
-
-        }
-        return name;
-    }
-
     //--------------------------------
     //-------------------------------------------------类型转换工具类----------------------------------------
 
@@ -65,6 +93,7 @@ public class DataTransTool
     {
         CombatMessage mess = new CombatMessage();
         mess.id = 0;
+        mess.type = 0;
         mess.Data.physical_base = play.data.physical_last;
         mess.Data.vigor_base = play.data.vigor_last;
         mess.Data.attack_base = play.data.attack_fin;
@@ -94,6 +123,7 @@ public class DataTransTool
         CombatMessage mess = new CombatMessage();
         UnitTypeStaticData play = AllUnitData.Data.getJsonData<UnitTypeStaticData>("allUnitData", id);
         mess.Data.id = id;
+        mess.type = play.type;
         mess.Data.physical_base = play.physical;
         mess.Data.vigor_base = play.vigor;
         mess.Data.attack_base = play.attack;

@@ -10,7 +10,7 @@ public class CombatController : DDOLController<CombatController>
     public CombatView combat;
     private GameObject combatScene;
     private CombatAnimationControl animCtl;     //战斗动画控制器
-    private float pubPer = 0.05f;
+    private float pubPer = GameStaticParamData.timePer20;     //刷新频率
     private bool iswait;    //是否进度等待
     private string logname;
 
@@ -74,9 +74,19 @@ public class CombatController : DDOLController<CombatController>
         //布置场景数据
         combat.setSceneLayout(0);
         //AnimationController.Instance.playCombatSceneTransform(combat, 0);   //  0    默认转场
-        //+++专场结束 显示遭遇信息。
-        //+++显示距离数据信息
-        PubTool.Instance.addStep(startPrograss);    //加入序列
+        //PubTool.Instance.addAnimStep()
+        //专场结束 显示遭遇信息。
+        PubTool.Instance.addAnimStep(delegate (Action action)
+        {
+            showTips1Second("遭遇战斗", action);
+        });
+        //显示初始怪物状态
+        PubTool.Instance.addAnimStep(delegate (Action action)
+        {
+            showTips1Second(messageActor[1].originalState, action);
+        });
+        //加入序列
+        PubTool.Instance.addAnimStep(startPrograss);
         Debug.Log("布置场景数据");
     }
     //事件
@@ -266,5 +276,9 @@ public class CombatController : DDOLController<CombatController>
     }
 
 
-
+    //初始显示提示弹板和出现动画没做
+    //距离判断没做
+    //技能进cd显示和消耗没做
+    //场景转换动画没做
+    //未攻击的僵持状态  ai分析没做
 }
