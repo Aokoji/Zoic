@@ -48,6 +48,24 @@ public class AnimationController : DDOLController<AnimationController>
         }
         PubTool.Instance.laterDo(time, action);
     }
+    public void playAnimation(GameObject obj, string aniName, bool loop)
+    {
+        Animator anim = obj.GetComponent<Animator>();
+        float time = getAnimTime(anim, aniName);
+        if (time == 0)
+        {
+            Debug.LogError("animation  time  is  null  !");
+            return;
+        }
+        anim.Play(aniName, 0, 0f);
+        void action()
+        {
+            if (!loop) anim.Play(NONE);
+        }
+        PubTool.Instance.laterDo(time, action);
+    }
+    //++++动画需要单独测试  测试上一个结束重复播放和播下一个是否流畅
+
     //工具  获取动画时长
     private float getAnimTime(Animator anim, string aniName)
     {

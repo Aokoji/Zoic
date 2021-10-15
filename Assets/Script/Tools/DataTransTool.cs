@@ -65,7 +65,41 @@ public class DataTransTool
     {
         return "";
     }
-
+    //遭遇战斗提示描述转换
+    public static string combatMeetActionDescribeTrans(CombatConfigMessage config)
+    {
+        string name = "";
+        switch (config.initialDistance)
+        {
+            case 0: name = config.combatActorsDescribe+"偷袭到了面前！"; break;
+            case 1: name = config.combatActorsDescribe + "出现在了近处！"; break;
+            case 2: name = "遭遇了"+config.combatActorsDescribe; break;
+            case 3: name = "发现了不远处的" + config.combatActorsDescribe; break;
+            case 4: name = "远处发现了" + config.combatActorsDescribe; break;
+            default:Debug.LogError("遭遇战斗距离数据错误！！");break;
+        }
+        return name;
+    }
+    //战斗移动提示描述转换
+    public static string combatMoveActionDescribeTrans(int move)
+    {
+        string name = "";
+        switch (move)
+        {
+            case -3:name = "拉远了距离"; break;
+            case -2:name = "向后拉开距离"; break;
+            case -1:name = "向后撤"; break;
+            case 0:name = ""; break;
+            case 1:name = "靠近目标"; break;
+            case 2:name = "快速地靠近"; break;
+            case 3:name = "向目标猛扑"; break;
+            default:
+                if (move > 3) name = "向前瞬移";
+                if (move < -3) name = "选择逃跑";
+                break;
+        }
+        return name;
+    }
     /// <summary>
     /// 力量转攻击
     /// </summary>

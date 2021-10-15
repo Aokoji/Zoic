@@ -42,12 +42,15 @@ public class MainController : DDOLController<MainController>
             list.Add(item);
             id++;
         }
-        string combatname = "combat" + GameData.Data.DataPlaymessage.combatIDCount;
+        CombatConfigMessage config = new CombatConfigMessage();
+        config.combatLogName = "combat" + GameData.Data.DataPlaymessage.combatIDCount;
+        //根据实际情况赋距离初值
+        config.initialDistance = 2;
         PubTool.instance.addLogger("遭遇战斗,战斗序号：combat"+GameData.Data.DataPlaymessage.combatIDCount);
-        PubTool.instance.addCombatLogger(combatname, "进入战斗");
+        PubTool.instance.addCombatLogger(config.combatLogName, "进入战斗");
         GameData.Data.DataPlaymessage.combatIDCount++;
         GameData.Data.saveGameMessageData();
-        CombatController.instance.openCombat(list, combatname);
+        CombatController.instance.openCombat(list, config);
     }
 
 

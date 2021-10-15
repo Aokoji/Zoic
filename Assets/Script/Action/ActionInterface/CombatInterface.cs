@@ -5,7 +5,7 @@ using UnityEngine;
 public interface CombatInterface 
 {
     void initData(List<CombatMessage> data);
-    void roundInitData();
+    void roundInitData(AnalyzeResult action);
     void roundCalculate(CombatMessage actor);  //回合计算（开始时计算  计算cd 持续buff等）
 
     AttackResultData doAction(AnalyzeResult action);    //行动处理器
@@ -49,7 +49,6 @@ public abstract class CombatAdapter : CombatInterface
     private SkillStaticData skill;  //暂存技能数据
     CombatMessage sourceActor;          //来源
     List<CombatMessage> takeActors; //目标
-    public int distance;                //记录距离
     string PLAYER = "player";   //玩家name
     /// <summary>
     /// 初始化方法
@@ -58,7 +57,6 @@ public abstract class CombatAdapter : CombatInterface
     {
         dataList = data;
         spoils = new spoilsResult();
-        distance = 2;   //+++初始距离为2(根据怪物属性 变化)
     }
 
     /// <summary>
@@ -66,7 +64,7 @@ public abstract class CombatAdapter : CombatInterface
     /// </summary>
     public AttackResultData doAction(AnalyzeResult action)
     {
-        roundInitData();
+        roundInitData(action);
         moveAnalyze(action);
         //移动没有后续操作  则返回
         if (!action.isExtraHit) return atkResult;
@@ -81,11 +79,22 @@ public abstract class CombatAdapter : CombatInterface
     /// <summary>
     /// 初始化回合数据
     /// </summary>
-    public void roundInitData()
+    public void roundInitData(AnalyzeResult action)
     {
         skill = new SkillStaticData();
         atkResult = new AttackResultData();
         roundData = new wholeRoundData();
+        //结果目标 赋值
+        atkResult.sourceActor = action.selfNum;
+        atkResult.takenActor = action.takeNum;
+        //伤害来源目标
+        sourceActor = dataList[action.selfNum];
+        //被伤目标
+        takeActors = new List<CombatMessage>();
+        foreach (int i in action.takeNum)
+        {
+            takeActors.Add(dataList[i]);
+        }
     }
     /// <summary>
     /// 移动分析
@@ -96,9 +105,54 @@ public abstract class CombatAdapter : CombatInterface
         {
             //判断移动
             atkResult.isMoveInstruct = true;
-            atkResult.moveDistance = distance == 0 ? 0 : action.moveDistance;      //0 则代表 虽然移动了 但是距离最近了  针对强制位移的技能  主动不会移动0以内
-            atkResult.moveDistance = distance - action.moveDistance < 0 ? distance : action.moveDistance;   //防止走过头
-            distance -= atkResult.moveDistance;
+            atkResult.isfrontAll = action.isfrontMove;
+            atkResult.moveDistance = action.moveDistance;
+            atkResult.isOnlyRun = action.isonlyRun;
+            if (sourceActor.IsPlayer)
+            {
+                int minl = dataList[1].distance;
+                //算出最小距离
+                foreach(var it in dataList)
+                    if(!it.IsPlayer && !it.IsDead)
+                        if (it.distance < minl) minl = it.distance;
+                if (atkResult.moveDistance > minl)
+                {
+                    action.moveDistance = minl;
+                    atkResult.ismoveAndBlock = true;    //被阻挡
+                }
+                //后撤的趋势
+                if (action.moveDistance < 0)
+                {
+                    bool isnone = true;
+                    foreach (var it in dataList)
+                        if (!it.IsPlayer && !it.IsDead)
+                            if (it.distance - action.moveDistance >= 5)
+                                atkResult.awayActor.Add(it.NumID);
+                            else
+                                isnone = false;
+                    if (isnone) atkResult.isrun = true;     //判为逃跑
+                }
+            }
+            else
+            {
+                int movelength = action.distance - action.moveDistance;
+                if (movelength < 0)
+                {
+                    //防止走过头   针对强制位移的技能  主动不会移动0以内
+                    atkResult.moveDistance = action.distance;
+                    atkResult.finDistance = 0;
+                }
+                else if (movelength >= 5)
+                {
+                    //+++逃跑了
+                    atkResult.isrun = true;
+                    atkResult.finDistance = 5;
+                }
+                else
+                {
+                    atkResult.finDistance = movelength;
+                }
+            }
         }
     }
     /// <summary>
@@ -117,6 +171,9 @@ public abstract class CombatAdapter : CombatInterface
             //计算治疗
             if (atkResult.iscure)
                 cureTakeEffect(i);
+            //移动生效
+            if (atkResult.isMoveInstruct)
+                moveTakeEffect(i);
         }
     }
     public void hitTakeEffect(int i)
@@ -142,22 +199,25 @@ public abstract class CombatAdapter : CombatInterface
     {
         takeActors[i].hitCurPhysical(-atkResult.cureNum[i]);
     }
+    public void moveTakeEffect(int i)
+    {
+        if (sourceActor.IsPlayer)
+        {
+            foreach(var it in dataList)
+            {
+                if (!it.IsPlayer && !it.IsDead)
+                    it.changeDistance(it.distance-atkResult.moveDistance);
+            }
+        }
+        else
+            sourceActor.changeDistance(atkResult.finDistance);
+        if (atkResult.isrun) sourceActor.setDead(true);
+    }
 
 
     public void normalAction(AnalyzeResult action)
     {
         skill = AllUnitData.Data.getSkillStaticData(action.skillID);//获取技能
-        //伤害来源目标
-        sourceActor = dataList[action.selfNum];
-        //被伤目标
-        takeActors = new List<CombatMessage>();
-        foreach (int i in action.takeNum)
-        {
-            takeActors.Add(dataList[i]);
-        }
-        //结果目标 赋值
-        atkResult.sourceActor = action.selfNum;
-        atkResult.takenActor = action.takeNum;
         //分析技能类型
         if (skill.isDomain) territoryTypeAction();//场地类型处理
         if (skill.isBuff) stateTypeAction();//增益类型处理
@@ -382,7 +442,7 @@ public abstract class CombatAdapter : CombatInterface
                 if (abstate.isSettleHit)
                 {
                     int finHit = (int)Mathf.Floor((float)abstate.effectHitMulti / 100) * abstate.effectReferNum;
-                    finHit = DataTransTool.defenceTrans(finHit, abactor.Data.defence_last);
+                    //+++finHit = DataTransTool.defenceTrans(finHit, abactor.Data.defence_last);        //目前特殊伤害是全伤
                     if (abstate.effectType != 190)
                     {
                         int pat = 0;
@@ -429,7 +489,7 @@ public abstract class CombatAdapter : CombatInterface
             if (abactor.hitCurPhysical(oneSettleHit - oneSettleCure))
             {
                 actor.isRoundDead = true;
-                abactor.IsDead = true;
+                abactor.setDead(true);
             }
             else
             {

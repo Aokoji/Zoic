@@ -9,6 +9,7 @@ public class CombatActorItem : MonoBehaviour
     public GameObject hpcontrol;
     public Image hpctl;
     public Image hpaux; //hp辅助条  显示掉血的虚血格
+    public Text distanceText;       //与玩家距离
 
     //设置头顶箭头
     public void chooseArrowChange(bool isShow)
@@ -83,5 +84,12 @@ public class CombatActorItem : MonoBehaviour
                 StartCoroutine(runPhysicalChange(waitfirst, per,ishit));
             }
         }
+    }
+    /// <summary>
+    /// 改变距离显示
+    /// </summary>
+    public void changeDistance(int dis)
+    {
+        distanceText.text = dis+"";
     }
 }

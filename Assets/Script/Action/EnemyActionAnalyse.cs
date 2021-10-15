@@ -30,7 +30,7 @@ public class EnemyActionAnalyse
     /// <param name="list">所有单位信息</param>
     /// <param name="item">攻击方</param>
     /// <returns></returns>
-    public AnalyzeResult analyseCombatAttack(List<CombatMessage> list,CombatMessage item)
+    public AnalyzeResult analyseCombatAttack(List<CombatMessage> list,CombatMessage item,CombatConfigMessage config)
     {
         player = list[0];
         AnalyzeResult result = new AnalyzeResult();
@@ -133,6 +133,9 @@ public class EnemyActionAnalyse
 public class AnalyzeResult{
     public bool isMoveInstruct; //是否移动指令
     public int moveDistance;    //移动距离
+    public bool isfrontMove;        //是否先判断移动
+    public bool isonlyRun;
+    public int distance;        //移动前距离(当前距离)
     public bool isExtraHit;         //是否有后续指令  区分纯移动
     public bool isNormalAtk;    //是否普通攻击(普通类型攻击 包含简单攻击 buff 和场地变化)
     public int selfNum;

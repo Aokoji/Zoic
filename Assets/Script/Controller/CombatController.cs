@@ -12,7 +12,7 @@ public class CombatController : DDOLController<CombatController>
     private CombatAnimationControl animCtl;     //战斗动画控制器
     private float pubPer = GameStaticParamData.timePer20;     //刷新频率
     private bool iswait;    //是否进度等待
-    private string logname;
+    private CombatConfigMessage config;
 
     private List<CombatMessage> messageActor = null;         //跑进度全部单位数据
 
@@ -25,9 +25,9 @@ public class CombatController : DDOLController<CombatController>
         messageActor = new List<CombatMessage>();
     }
     //外部调用  打开界面
-    public void openCombat(List<CombatMessage> data,string logName)    //+++处理传进来的数据  敌人 玩家 战斗类型（野怪 boss或精英剧情等） 战斗场景等配置
+    public void openCombat(List<CombatMessage> data,CombatConfigMessage config)    //+++处理传进来的数据  敌人 玩家 战斗类型（野怪 boss或精英剧情等） 战斗场景等配置
     {
-        logname = logName;
+        this.config = config;
         messageActor = data;
         attackAction = new AttackAnalyze(messageActor);
         if (combat == null) { initCombat(messageActor); }
@@ -57,6 +57,7 @@ public class CombatController : DDOLController<CombatController>
         combat = mainview;
         initEvent();
         combat.init(data);          //初始化界面数据
+        combat.initConfig(config);
         GameObject scece = Resources.Load<GameObject>("Entity/CombatScene");
         var scecemain = Instantiate(scece);
         scecemain.name = "CombatScene";
@@ -78,12 +79,12 @@ public class CombatController : DDOLController<CombatController>
         //专场结束 显示遭遇信息。
         PubTool.Instance.addAnimStep(delegate (Action action)
         {
-            showTips1Second("遭遇战斗", action);
+            showTips1Second("遭遇战斗,"+DataTransTool.combatMeetActionDescribeTrans(config), action);
         });
         //显示初始怪物状态
         PubTool.Instance.addAnimStep(delegate (Action action)
         {
-            showTips1Second(messageActor[1].originalState, action);
+            showTips1Second(config.originalState, action);
         });
         //加入序列
         PubTool.Instance.addAnimStep(startPrograss);
@@ -99,8 +100,7 @@ public class CombatController : DDOLController<CombatController>
     //显示标签1秒
     public void showTips1Second(string context,Action action)
     {
-        combat.setTipsContext(context);
-        combat.showTips1Second(action);
+        combat.showTips1Second(context, action);
     }
     //-------------------------------------------------内部逻辑-----------------------------
     private void combatStart()
@@ -145,7 +145,7 @@ public class CombatController : DDOLController<CombatController>
     //跑进度方法
     public void nextStep()
     {
-        PubTool.instance.addCombatLogger(logname, "开始游戏进度");
+        PubTool.instance.addCombatLogger(config.combatLogName, "开始游戏进度");
         Debug.Log("开始计算速度..");
         iswait = false;
         StartCoroutine(doLoadPrograss());
@@ -162,7 +162,7 @@ public class CombatController : DDOLController<CombatController>
         {
             Debug.Log("【敌人攻击】");
             //轮到敌人攻击  拿到一个攻击数据组  由ai分析出结果
-            AnalyzeResult aiAction = actor.Analyse.analyseCombatAttack(messageActor, actor);
+            AnalyzeResult aiAction = actor.Analyse.analyseCombatAttack(messageActor, actor,config);
             //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
             AttackResultData animData =attackAction.doAction(aiAction);
             //获得的战斗数据传给动画机  动画机执行完进行回合判定
@@ -227,13 +227,18 @@ public class CombatController : DDOLController<CombatController>
         initController();
     }
     //////////////////-----------------------------------------EVENT----------------------
-    
+
     public void playerDoAction()
     {
+        AnalyzeResult aiAction = new AnalyzeResult();//模拟一个ai动作数据
+        aiAction.selfNum = combat.playerActor.NumID;
         //区分逃跑
-        if (combat.isrun)
+        if (combat.ismove)
         {
-
+            if (combat.isrun)
+                aiAction.isonlyRun = true;
+            //生成移动数据
+            createRunResult(aiAction);
         }
         else if (combat.isprop)
         {
@@ -247,22 +252,40 @@ public class CombatController : DDOLController<CombatController>
                 if (combat.chooseSkill.id == i.id)
                 {
                     i.runDown = i.coolDown;
-                    combat.playerActor.hitCurPhysical()
+                    //这里的判断重复  只是保险  测试用
+                    if (combat.playerActor.checkPhysical(i.expend1))
+                        if (combat.playerActor.checkPhysical(i.expend2))
+                        {
+                            combat.playerActor.hitCurPhysical(i.expend1);
+                            combat.playerActor.hitCurVigor(i.expend2);
+                        }
+                        else
+                            Debug.LogError("技能消耗计算错误！！！");
+                    else
+                        Debug.LogError("技能消耗计算错误！！！");
                     break;
                 }
             }
             //生成攻击结果
-            createSkillResult();
+            createSkillResult(aiAction);
         }
-
+        //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
+        AttackResultData animData = attackAction.doAction(aiAction);
+        //获得的战斗数据传给动画机  动画机执行完进行回合判定
+        animCtl.playCombatBeHit(combat, animData, messageActor, roundSettle);
     }
 
-    private void createSkillResult()
+    private void createSkillResult(AnalyzeResult aiAction)
     {
-        AnalyzeResult aiAction = new AnalyzeResult();//+++模拟一个ai动作数据
+        aiAction.distance = messageActor[combat.chooseActor].distance;  //和目标的距离
         SkillStaticData skill = combat.chooseSkill;
-        aiAction.selfNum = combat.playerActor.NumID;
         aiAction.skillID = combat.chooseSkill.id;
+        //分析技能移动
+        if (skill.ismove)
+        {
+            aiAction.isMoveInstruct = true;
+            aiAction.moveDistance = skill.moveDistance;
+        }
         //区分类型范围
         switch (skill.effectType)
         {
@@ -285,20 +308,24 @@ public class CombatController : DDOLController<CombatController>
                         aiAction.takeNum.Add(i.NumID);
                 break;
         }
-
         aiAction.isExtraHit = skill.isHit;
         aiAction.isNormalAtk = true;
-        //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
-        AttackResultData animData = attackAction.doAction(aiAction);
-        //获得的战斗数据传给动画机  动画机执行完进行回合判定
-        animCtl.playCombatBeHit(combat, animData, messageActor, roundSettle);
-        //eventManager.doattackNext(combat.playerActor, combat.chooseActor);
+    }
+    private void createRunResult(AnalyzeResult aiAction)
+    {
+        aiAction.isMoveInstruct = true;
+        aiAction.isfrontMove = true;
+        aiAction.moveDistance = combat.moveDistance;
+        aiAction.isExtraHit = false;
     }
 
-
+    //先把takeactor 的目标预设写好   预计在  显示人物指针箭头的时候就设置好  这里直接取值
+    //根据距离的头顶箭头  技能距离分析显示
+    //位移按钮制作    距离text没赋值
+    //技能要记录移动距离 
     //初始显示提示弹板和出现动画没做
     //距离判断没做
-    //技能进cd显示和消耗没做  skillBarOneView 这个脚本要挂
+    //技能进cd显示和消耗没做  skillBarOneView 这个脚本要挂  y
     //场景转换动画没做
     //未攻击的僵持状态  ai分析没做
 }

@@ -10,11 +10,11 @@ public class CombatMessage
     private combatUnitProperty data = new combatUnitProperty();
 
     private float curSpeed; //这个记录跑条位置   不进行手动更改
-    public string originalState = "";   //初始状态描述
 
     //---------以下为外部引用量
     public int id;
     public int type;
+    public int distance;    //与玩家距离(玩家不用这个值)
     private int numID;          //战斗中list序号  玩家默认为0
     private GameObject prefab;      //战斗人物实体
     private GameObject showActor;       //换图的组件image
@@ -93,6 +93,26 @@ public class CombatMessage
         return AllUnitData.Data.getCombatParamData(data, i);
     }
     /// <summary>
+    /// 检查可用hp
+    /// </summary>
+    public bool checkPhysical(int hit)
+    {
+        if (hit >= data.curHp)
+            return false;
+        else
+            return true;
+    }
+    /// <summary>
+    /// 检查可用mp
+    /// </summary>
+    public bool checkVigor(int hit)
+    {
+        if (hit > data.curMp)
+            return false;
+        else
+            return true;
+    }
+    /// <summary>
     /// 掉血
     /// </summary>
     /// <param name="hit">值</param>
@@ -111,13 +131,37 @@ public class CombatMessage
         return false;
     }
     /// <summary>
+    /// 扣蓝
+    /// </summary>
+    public void hitCurVigor(int hit)
+    {
+        data.curMp -= hit;
+        if (data.curMp > data.vigor_last)
+            data.curMp = data.vigor_last;
+    }
+    /// <summary>
     ///播完攻击效果后 显示的掉血  1.5s
     /// </summary>
     public void showPhysicalChange(bool ishit)
     {
         prefab.GetComponent<CombatActorItem>().changePhysicalLine(ishit,(float)data.curHp/data.physical_last);
     }
-
+    /// <summary>
+    /// 移动
+    /// </summary>
+    public void changeDistance(int dis)
+    {
+        distance = dis;
+    }
+    public void refreshDistance()
+    {
+        prefab.GetComponent<CombatActorItem>().changeDistance(distance);
+    }
+    //设置死亡
+    public void setDead(bool isdead)
+    {
+        IsDead = isdead;
+    }
 }
 
 public class abnormalState

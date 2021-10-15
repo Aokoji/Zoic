@@ -6,8 +6,10 @@ using UnityEngine;
 public class AttackResultData
 {
     public bool isMoveInstruct; //是否移动指令
+    public bool ismoveAndBlock;     //移动但是阻挡
     public int moveDistance;    //移动距离
-    public int finDistance; //最终距离
+    public int finDistance; //最终距离(针对敌人)
+    public bool isfrontAll;     //是否在所有指令前
 
     public int sourceActor;//攻击方
     public List<int> takenActor;//受击方(主攻击)      顺序001
@@ -33,8 +35,11 @@ public class AttackResultData
 
     public bool isDomain;   //是否场地变化
     public int domainId;    //场地id
-     //+++   需要完善场地数据    (目前没有这样技能  可以先跳过)
+    //+++   需要完善场地数据    (目前没有这样技能  可以先跳过)
+    public bool isOnlyRun;  //是否选择逃跑
+    public bool isrun;  //逃跑
 
+    public List<int> awayActor = new List<int>();   //脱离战斗了=isdead  被甩远了
     public List<int> willDeadActor = new List<int>();//给我死
     /*
     public string changeTarget;//变动目标(显示槽)
