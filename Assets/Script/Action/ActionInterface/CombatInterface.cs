@@ -207,7 +207,7 @@ public abstract class CombatAdapter : CombatInterface
             {
                 if (!it.IsPlayer && !it.IsDead)
                     it.changeDistance(it.distance-atkResult.moveDistance);
-            }
+            }//这个是message的change        动画的需要调用actorItem
         }
         else
             sourceActor.changeDistance(atkResult.finDistance);
@@ -419,89 +419,67 @@ public abstract class CombatAdapter : CombatInterface
     //=======================================       回合处理器       ============================
     public wholeRoundData roundAnalyzeAction()
     {
-        int count = 0;
-        void runActor()
+        //***说明：  默认使用sourceActor 自上个行动处理方法剩下的引用
+        //                因为单行动处理必须衔接回合处理   如果sourceActor值不对则回合衔接不对
+        //      ps： 回合处理只处理自身的回合数值，考虑到每个单位速度不同，因此各自根据速度回合来处理
+        roundData.index = sourceActor.NumID;
+        int oneSettleHit = 0;   //记录结算伤害
+        int oneSettleCure = 0;  //记录结算回复
+                                //计算buff伤害 倒序
+        for (int i = sourceActor.Abnormal.Count - 1; i >= 0; i--)
         {
-            //避免多层套for
-            if (count >= dataList.Count) return;
-            var abactor = dataList[count];
-            if (abactor.IsDead)
+            abnormalState abstate = sourceActor.Abnormal[i];
+            //结算伤害类型
+            if (abstate.isSettleHit)
             {
-                runActor();
-                return;
-            }
-            SettleRoundActor actor = new SettleRoundActor();
-            actor.index = count;
-            int oneSettleHit = 0;   //记录结算伤害
-            int oneSettleCure = 0;  //记录结算回复
-            //计算buff伤害 倒序
-            for (int i = abactor.Abnormal.Count - 1; i >= 0; i--)
-            {
-                abnormalState abstate = abactor.Abnormal[i];
-                //结算伤害类型
-                if (abstate.isSettleHit)
+                int finHit = (int)Mathf.Floor((float)abstate.effectHitMulti / 100) * abstate.effectReferNum;
+                //+++finHit = DataTransTool.defenceTrans(finHit, abactor.Data.defence_last);        //目前特殊伤害是全伤
+                if (abstate.effectType != 190)
                 {
-                    int finHit = (int)Mathf.Floor((float)abstate.effectHitMulti / 100) * abstate.effectReferNum;
-                    //+++finHit = DataTransTool.defenceTrans(finHit, abactor.Data.defence_last);        //目前特殊伤害是全伤
-                    if (abstate.effectType != 190)
-                    {
-                        int pat = 0;
-                        if (abstate.effectType == 191) pat = abactor.Data.adPat_last;
-                        if (abstate.effectType == 192) pat = abactor.Data.apPat_last;
-                        //计算减伤
-                        finHit = (int)Mathf.Round(finHit * (float)(1 - (pat / 100)));
-                    }
-                    //录入最终伤害
-                    actor.specialNumber.Add(finHit);
-                    actor.specialType.Add(abstate.effectTypeShow);
-                    oneSettleHit += finHit;
+                    int pat = 0;
+                    if (abstate.effectType == 191) pat = sourceActor.Data.adPat_last;
+                    if (abstate.effectType == 192) pat = sourceActor.Data.apPat_last;
+                    //计算减伤
+                    finHit = (int)Mathf.Round(finHit * (float)(1 - (pat / 100)));
                 }
-                //计算回合结束治疗
-                if (abstate.isSettleCure)
-                {
-                    int fincure = 0;
-                    if (abstate.effectRefer != 0)
-                    {
-                        //有动态参考值
-                        float ability = abactor.getCombatParamData(abstate.effectRefer);
-                        fincure = (int)Mathf.Floor(abstate.effectHitMulti / 100 * ability);
-                    }
-                    else
-                    {
-                        fincure = (int)Mathf.Floor((float)abstate.effectHitMulti / 100) * abstate.effectReferNum;
-                    }
-                    //录入最终数值
-                    actor.specialNumber.Add(fincure);
-                    actor.specialType.Add(abstate.effectTypeShow);
-                    oneSettleCure += fincure;
-                }
-                //计算 cd
-                if (abstate.isBuff)
-                {
-                    abstate.round--;
-                    if (abstate.round > 0)
-                        actor.settleBuffExist.Add(abstate);
-                }
+                //录入最终伤害
+                roundData.specialNumber.Add(finHit);
+                roundData.specialType.Add(abstate.effectTypeShow);
+                oneSettleHit += finHit;
             }
-            //结算属性
-            abactor.Abnormal = actor.settleBuffExist;
-            //结算伤害 判断死亡
-            if (abactor.hitCurPhysical(oneSettleHit - oneSettleCure))
+            //计算回合结束治疗
+            if (abstate.isSettleCure)
             {
-                actor.isRoundDead = true;
-                abactor.setDead(true);
+                int fincure = 0;
+                if (abstate.effectRefer != 0)
+                {
+                    //有动态参考值
+                    float ability = sourceActor.getCombatParamData(abstate.effectRefer);
+                    fincure = (int)Mathf.Floor(abstate.effectHitMulti / 100 * ability);
+                }
+                else
+                {
+                    fincure = (int)Mathf.Floor((float)abstate.effectHitMulti / 100) * abstate.effectReferNum;
+                }
+                //录入最终数值
+                roundData.specialNumber.Add(fincure);
+                roundData.specialType.Add(abstate.effectTypeShow);
+                oneSettleCure += fincure;
             }
-            else
+            //计算 cd
+            if (abstate.isBuff)
             {
-                abactor.paddingData();
+                abstate.round--;
+                if (abstate.round > 0)
+                    roundData.settleBuffExist.Add(abstate);
             }
-            //记录单个个体 回合结算数据
-            roundData.settleActors.Add(actor);
-            count++;
-            runActor();
         }
-        //计算伤害
-        runActor();
+        //结算伤害 判断死亡
+        if (sourceActor.hitCurPhysical(oneSettleHit - oneSettleCure))
+        {
+            roundData.isRoundDead = true;
+            sourceActor.setDead(true);
+        }
         //判断死亡
         //计算buff生效
         //判断死亡

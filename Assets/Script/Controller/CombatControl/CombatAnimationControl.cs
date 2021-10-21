@@ -22,20 +22,8 @@ public class CombatAnimationControl : MonoBehaviour
         //移动表现判断        有frontall标识代表一定有移动
         if (result.isfrontAll)
         {
-            PubTool.Instance.addAnimStep(delegate (Action callback)
-            {//显示提示
-                if (actorList[result.sourceActor].IsPlayer)
-                {
-                    //如果是玩家 则是普通提示      加称为
-                    combat.showTips1Second(actorList[result.sourceActor].Name1+DataTransTool.combatMoveActionDescribeTrans(result.moveDistance), callback);
-                }
-                else
-                {//++++++是敌方  则根据状态修饰移动动作
-                    combat.showTips1Second(actorList[result.sourceActor].Name1 + DataTransTool.combatMoveActionDescribeTrans(result.moveDistance), callback);
-                }
-                //+++移动表现       多个敌人的情况要分析
-                combat.moveCalculateRefresh(result.sourceActor);   //执行
-            });
+            //先判断移动
+            moveCalculate(combat, result, actorList);
         }
         //判断逃跑
         if (result.isrun)
@@ -87,12 +75,8 @@ public class CombatAnimationControl : MonoBehaviour
             //移动表现判断  (攻击后的移动)
             if (!result.isfrontAll&&result.isMoveInstruct)
             {
-                PubTool.Instance.addAnimStep(delegate (Action callback)
-                {
-                    combat.showTips1Second("移动", callback);
-                    //+++移动表现
-                    combat.moveCalculateRefresh(result.sourceActor);   //执行
-                });
+                //动作后移动动画
+                moveCalculate(combat,result,actorList);
             }
         }
         //全部播放完成后  播放死亡
@@ -120,12 +104,73 @@ public class CombatAnimationControl : MonoBehaviour
         });
     }
 
+    //移动测算
+    private void moveCalculate(CombatView combat, AttackResultData result, List<CombatMessage> actorList)
+    {
+        PubTool.Instance.addAnimStep(delegate (Action callback)
+        {//显示提示
+            if (actorList[result.sourceActor].IsPlayer)
+            {
+                //如果是玩家 则是普通提示      加称为
+                combat.showTips1Second(actorList[result.sourceActor].Name1 + DataTransTool.combatMoveActionDescribeTrans(result.moveDistance), callback);
+                //移动表现
+                foreach (var it in actorList)
+                {
+                    if (it.IsPlayer) continue;
+                    it.refreshDistance();  //玩家移动所有enemy都要动 (移动表现也在里边)
+                }
+            }
+            else
+            {//++++++是敌方  则根据状态修饰移动动作
+                combat.showTips1Second(actorList[result.sourceActor].Name1 + DataTransTool.combatMoveActionDescribeTrans(result.moveDistance), callback);
+                //移动表现
+                actorList[result.sourceActor].refreshDistance();
+            }
+        });
+    }
+
     /// <summary>
     /// 回合结算动画
     /// </summary>
-    public void playCombarRoundSettle(wholeRoundData rounddata, List<CombatMessage> actorList, Action action)
+    public void playCombatRoundSettle(CombatView combat, wholeRoundData rounddata, CombatMessage source, Action action)
     {
         PubTool.dumpString("【统计结算】", rounddata);
-        action();
+        //显示行动内容提示板
+        PubTool.Instance.addAnimStep(delegate (Action callback)
+        {
+            combat.showTips1Second("回合结束", callback);
+        });
+        int count = 0;
+        //计算结算伤害(自己)
+        PubTool.Instance.addAnimStep(delegate (Action callback)
+        {
+            foreach (var it in rounddata.specialNumber)
+            {
+                source.PrefabCtrl.showHitNumber();
+                //弹数字（伤害或治疗）
+                //rounddata.specialType[count]; //这是数字类型
+                count++;
+            }
+        });
+        //刷新计算buff显示
+        PubTool.Instance.addAnimStep(delegate (Action callback)
+        {
+            source.PrefabCtrl.refreshAbnormalIcon(rounddata.settleBuffExist);
+            //结算属性
+            source.Abnormal = rounddata.settleBuffExist;
+            source.paddingData();
+        });
+        //判断死亡
+        if(rounddata.isRoundDead)
+            PubTool.Instance.addAnimStep(delegate (Action callback)
+            {
+                source.PrefabCtrl.playDead(callback);
+            });
+        //结束
+        PubTool.Instance.addAnimStep(delegate (Action callback)
+        {
+            callback();
+            action();
+        });
     }
 }

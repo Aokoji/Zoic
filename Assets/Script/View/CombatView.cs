@@ -51,24 +51,24 @@ public class CombatView : MonoBehaviour
     private List<skillBarOneView> skillBars;     //存储技能bar的实体*  用于刷新cd等操作
     public CombatConfigMessage config;                //记录距离等配置
 
-    //------------动态数据------------------------------
-    public int chooseActor;             //在选择攻击目标时  或 释放环境技能确定窗时  提前赋值
+    //------------动态数据---------------------------------------------------------------------------------------------  动态数据------------------
+    public List<int> takeActor = new List<int>();//在选择攻击目标时  或 释放环境技能确定窗时  提前赋值
     public SkillStaticData chooseSkill;                 //选择的技能   目标(仅限单体) 其他类型有自动识别
     public bool isrun;  //是否逃跑
     public bool ismove;     //是否移动
     public int moveDistance;
     public bool isprop;    //是否道具
     public bool isforward;  //是否可前进  前进按钮判断位
+    private int cacheSkillId = 0;   //缓存id（防止技能重复点击）
 
     private int panelSkillStateRank = 0; //当前页面层级（技能）
-    private bool isChooseOneActor = false;      //决定选择单个目标的显示箭头 点击是否生效
     private bool haveChooseLock;        //确认按钮 锁 判断是否可点击确认按钮
     //----------固定参数--------------------
     private float lineDistance; //总的进度条长度
     private int ENEMY_NUM = 3;
     private int sceneShowType;
 
-    //===============================================================           初始化         ================
+    //=========================================           初始化         ================
     //创建的初始化方法
     public void init(List<CombatMessage> data)
     {
@@ -153,8 +153,10 @@ public class CombatView : MonoBehaviour
             loadactorBody.SetActive(false);
             item.Prefab = loadactorBody;
             item.Prefab.name = "createPrefab";
+            item.PrefabCtrl = item.Prefab.GetComponent<CombatActorItem>();
+            item.PrefabCtrl.numId = item.NumID;     //记录是哪个id
             actorBody.Add(loadactorBody);
-            loadactorBody.GetComponent<CombatActorItem>().chooseArrowChange(false);
+            item.PrefabCtrl.chooseArrowChange(false);
 
             if (item.IsPlayer)
             {
@@ -194,14 +196,13 @@ public class CombatView : MonoBehaviour
     //回合初始化
     public void roundInitFunc()
     {
-        chooseActor = -1;
+        takeActor.Clear();
         chooseSkill = null;
         isrun = false;
         ismove = false;
         moveDistance = 0;
         isprop = false;
         panelSkillStateRank = 0;
-        isChooseOneActor = false;
     }
     //外部调用  布置场景 
     public void setSceneLayout(int type)
@@ -237,12 +238,6 @@ public class CombatView : MonoBehaviour
         PubTool.Instance.addStep(playActorFirstStage);
         //面板出现短暂动画
         PubTool.Instance.addStep(playPanelFirstStage);
-    }
-    //测算移动
-    public void moveCalculateRefresh(int i)
-    {
-        //+++移动表现
-        _Data[i].refreshDistance();
     }
     
     ///--------------------------------------------------------------显示提示板的方式------------------------------
@@ -379,26 +374,38 @@ public class CombatView : MonoBehaviour
     //点击确认按钮      确认按钮肩负多项职责
     private void enterConfirmPanel()
     {
+        //关闭二级技能界面
+        if (panelSkillStateRank == 3)
+        {//选择技能才会进入三级技能界面记录
+            bool iscanNext = false;
+            //检查距离（选择否目标）
+            foreach(var it in _Data)
+            {
+                if (!it.PrefabCtrl.getGray())
+                    iscanNext = true;
+            }
+            if (!iscanNext)
+            {
+                showTips1Second("攻击范围内没有目标!");
+                return;
+            }
+            hideContext();
+            skillThirdFather.SetActive(false);
+        }
         chooseConfirmBtn();
         //确认按钮点击后
         clearArrowState();      //清理箭头
         //清理当前页面 1 攻击清理     
         tanban.SetActive(false);
         lockBaseButton(false);
-        //关闭二级技能界面
-        if (panelSkillStateRank == 3)
-        {
-            hideContext();
-            skillThirdFather.SetActive(false);
-        }
+
 
     }
     //-------------------------------------------------------------------------------关闭攻击弹板-------------------------------
     //关闭弹板会清理掉一切其他的赋值状态
     private void cancelConfirmPanel()
     {//关闭攻击面板
-        chooseActor = -1;
-        isChooseOneActor = false;
+        takeActor.Clear();
         baseControl.SetActive(true);
         tanban.SetActive(false);
         skillThirdFather.SetActive(false);
@@ -411,7 +418,6 @@ public class CombatView : MonoBehaviour
     }
     private void attackButtonClick()
     {
-        isChooseOneActor = true;    //允许出现选择箭头
         //进入二级界面
         chooseSkill = AllUnitData.Data.getSkillStaticData(playerActor.AttackID);
         //无效化 基础四个按钮  
@@ -429,6 +435,7 @@ public class CombatView : MonoBehaviour
     private void skillButtonClick()
     {
         lockBaseButton(true);
+        cacheSkillId = 0;
         refreshSkillBoard();    //刷新cd显示
         showContext();
         panelSkillStateRank = 2;
@@ -485,17 +492,19 @@ public class CombatView : MonoBehaviour
     //选择技能  显示三级 技能详情面板
     private void chooseSkillMessage(SkillStaticData skill)
     {
+        if (cacheSkillId > 0 && cacheSkillId == skill.id) return;   //防止重复点击
+        cacheSkillId = skill.id;
         skillThirdFather.SetActive(true);
         string cont;
         cont="技能详情\n"+ skill.name+"：\n    "+skill.describe;
         skillThirdFather.GetComponentInChildren<Text>().text = cont;
         //var item = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         baseControl.SetActive(false);
-        //刷新箭头指向状态（就是待选目标的状态  重置为可选目标）
-        if(panelSkillStateRank!=3)
-            resetArrowState();
         //记录技能选择
         chooseSkill = skill;
+        //刷新箭头指向状态（就是待选目标的状态  重置为可选目标）
+        if (panelSkillStateRank!=3)
+            resetArrowState();
         //显示确认弹板
         tanban.SetActive(true);
         panelSkillStateRank = 3;
@@ -541,29 +550,33 @@ public class CombatView : MonoBehaviour
     //选择目标的点击事件
     private void clickChoose()
     {
-        if (!isChooseOneActor) return;
-        Debug.Log("choose");
         var item=UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
-        item.GetComponent<CombatActorItem>().chooseArrowChange(true);
+        var script = item.GetComponent<CombatActorItem>();
+        script.onclickCustom();
+        if (!script.getLock())
+        {
+            takeActor.Clear();
+            takeActor.Add(script.numId);
+        }
     }
     //根据当前攻击距离  重置可点击目标
     private void resetArrowState()
     {
+        takeActor.Clear();
         //选择刷新的时候  chooseSkill必须有值
         if (chooseSkill == null) Debug.LogError("测试部分  刷新技能攻击距离内箭头技能为空！！！");
         int count = 0;
 
         bool isall = false; //全体
+        bool isalone = false; //敌单体
         bool isplayer = false;  //指向玩家
-        bool isctrl = false;    //是否可点
-
         //先判断技能指向类型
         switch (chooseSkill.effectType)
         {
             case 310:
             case 311:
             case 312: isplayer = true; break;
-            case 313: isctrl = true; break;     //敌方单体
+            case 313: isalone = true; break;     //敌方单体
             case 314: isall = true; break;     //敌方全体
             case 315:break;     //全体
             case 316:break;     //除自己
@@ -572,40 +585,81 @@ public class CombatView : MonoBehaviour
         //判断选择箭头（默认）
         foreach (var item in _Data)
         {
-            item.Prefab.GetComponent<CombatActorItem>().chooseArrowChange(false);
-            //先判断显不显示
+            item.PrefabCtrl.chooseArrowChange(false);
+            item.PrefabCtrl.setGray(false);
+            //目标是玩家自己
             if (isplayer)
             {
                 //指玩家的箭头（非全体  不能控制  只显示玩家）
                 if (item.IsPlayer)
                 {
-                    chooseActor = item.NumID;
+                    //玩家加到目标表
+                    takeActor.Add(item.NumID);
                 }
-                if(!item.IsDead && !item.IsPlayer)
+                else if(!item.IsDead)
                 {
-                    isreset = true;
-                    chooseActor = count;
-                    item.Prefab.GetComponent<CombatActorItem>().chooseArrowChange(true);
+                    //敌人设置不可点击
+                    item.PrefabCtrl.chooseArrowChange(false);
+                    item.PrefabCtrl.changeLock(true);
+                    item.PrefabCtrl.setGray(true);
                 }
             }
-            count++;
-        }
+            //目标是敌人状态
+            else
+            {
+                //跳过玩家
+                if (item.IsPlayer)
+                {
+                    item.PrefabCtrl.setGray(true);
+                    continue;
+                }
+                if (item.IsDead) continue;      //跳过死人
+
+                //根据距离设置箭头显不显示
+                if (item.distance <= chooseSkill.takeLength)
+                {
+                    //单体
+                    if (isalone)
+                    {
+                        item.PrefabCtrl.changeLock(false);
+                        //判断距离最小值
+                        if (takeActor.Count > 0)
+                        {
+                            if (item.distance < _Data[takeActor[0]].distance)
+                                takeActor[0] = item.NumID;
+                        }
+                        else
+                        {
+                            takeActor.Add(item.NumID);
+                        }
+                    }
+                    //全体
+                    else
+                    {
+                        //锁
+                        item.PrefabCtrl.changeLock(true);
+                        item.PrefabCtrl.chooseArrowChange(true);
+                        takeActor.Add(item.NumID);
+                    }
+                }
+                else
+                {
+                    item.PrefabCtrl.changeLock(true);
+                    //actor置灰
+                    item.PrefabCtrl.setGray(true);
+                }
+            }
+        }//foreach
+
     }
     //清理选择目标箭头
     private void clearArrowState()
     {
         foreach(var item in _Data)
         {
-            item.Prefab.GetComponent<CombatActorItem>().chooseArrowChange(false);
-        }
-    }
-    //初始化  开放选择时的 默认初始目标
-    private void setRefreshChooseActor()
-    {
-        foreach(var i in _Data)
-        {
-            if (!i.IsPlayer && !i.IsDead)
-                chooseActor = i.NumID;
+            item.PrefabCtrl.chooseArrowChange(false);
+            item.PrefabCtrl.changeLock(false);
+            item.PrefabCtrl.setGray(false);
         }
     }
 

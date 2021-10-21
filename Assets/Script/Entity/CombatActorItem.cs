@@ -1,21 +1,42 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CombatActorItem : MonoBehaviour
 {
+    public int numId;
     public GameObject arrow;
     public GameObject hpcontrol;
     public Image hpctl;
     public Image hpaux; //hp辅助条  显示掉血的虚血格
     public Text distanceText;       //与玩家距离
+    public GameObject abnormalIconBoard;        //显示异常状态的图标父级
 
+    private bool isgray=false;
+    private bool clickLock = false;
+
+    /// <summary>
+    /// 被点击 外调方法
+    /// </summary>
+    public void onclickCustom()
+    {
+        if (!clickLock)
+            chooseArrowChange(true);
+    }
     //设置头顶箭头
     public void chooseArrowChange(bool isShow)
     {
         arrow.SetActive(isShow);
     }
+    public void setGray(bool isgray)
+    {
+        this.isgray = isgray;
+        //+++变灰
+    }
+    public bool getGray() { return isgray; }
+
     //设置血条可见
     public void setHpVisible(bool isshow)
     {
@@ -26,6 +47,16 @@ public class CombatActorItem : MonoBehaviour
     {
         hpctl.fillAmount = num;
         hpaux.fillAmount = 0;
+    }
+    //================================  飞伤害=============
+    public void showHitNumber()
+    {
+
+    }
+    //------刷新异常状态
+    public void refreshAbnormalIcon(List<abnormalState> abnormals)
+    {
+
     }
 
     //=====================================   掉血缓动效果参数  =================
@@ -85,11 +116,21 @@ public class CombatActorItem : MonoBehaviour
             }
         }
     }
+    public bool getLock() { return clickLock; }
+    public void changeLock(bool clicklock)
+    {
+        clickLock = clicklock;
+    }
     /// <summary>
     /// 改变距离显示
     /// </summary>
     public void changeDistance(int dis)
     {
         distanceText.text = dis+"";
+    }
+    public void playDead(Action callback)
+    {
+        //+++播放死亡动画
+        callback();
     }
 }

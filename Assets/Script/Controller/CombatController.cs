@@ -183,7 +183,7 @@ public class CombatController : DDOLController<CombatController>
             //获得回合结束数据
             wholeRoundData rounddata = attackAction.roundAnalyzeAction();
             //回合结算
-            animCtl.playCombarRoundSettle(rounddata, messageActor,roundEndAction);
+            animCtl.playCombatRoundSettle(combat, rounddata, messageActor[rounddata.index], roundEndAction);
         }
         else
             roundEndAction();
@@ -246,26 +246,21 @@ public class CombatController : DDOLController<CombatController>
         }
         else
         {
+            SkillStaticData skill = combat.chooseSkill;
             //计算消耗
-            foreach(var i in combat.playerActor.SkillData.skillHold)
-            {
-                if (combat.chooseSkill.id == i.id)
+            skill.runDown = skill.coolDown;
+            //这里的判断重复  只是保险  测试用
+            if (combat.playerActor.checkPhysical(skill.expend1))
+                if (combat.playerActor.checkPhysical(skill.expend2))
                 {
-                    i.runDown = i.coolDown;
-                    //这里的判断重复  只是保险  测试用
-                    if (combat.playerActor.checkPhysical(i.expend1))
-                        if (combat.playerActor.checkPhysical(i.expend2))
-                        {
-                            combat.playerActor.hitCurPhysical(i.expend1);
-                            combat.playerActor.hitCurVigor(i.expend2);
-                        }
-                        else
-                            Debug.LogError("技能消耗计算错误！！！");
-                    else
-                        Debug.LogError("技能消耗计算错误！！！");
-                    break;
+                    combat.playerActor.hitCurPhysical(skill.expend1);
+                    combat.playerActor.hitCurVigor(skill.expend2);
                 }
-            }
+                else
+                    Debug.LogError("技能消耗计算错误！！！");
+            else
+                Debug.LogError("技能消耗计算错误！！！");
+            aiAction.skillID = skill.id;
             //生成攻击结果
             createSkillResult(aiAction);
         }
@@ -277,7 +272,6 @@ public class CombatController : DDOLController<CombatController>
 
     private void createSkillResult(AnalyzeResult aiAction)
     {
-        aiAction.distance = messageActor[combat.chooseActor].distance;  //和目标的距离
         SkillStaticData skill = combat.chooseSkill;
         aiAction.skillID = combat.chooseSkill.id;
         //分析技能移动
@@ -286,28 +280,7 @@ public class CombatController : DDOLController<CombatController>
             aiAction.isMoveInstruct = true;
             aiAction.moveDistance = skill.moveDistance;
         }
-        //区分类型范围
-        switch (skill.effectType)
-        {
-            case 310: aiAction.takeNum.Add(combat.playerActor.NumID); break;
-            case 311: aiAction.takeNum.Add(combat.playerActor.NumID); break;
-            case 312: aiAction.takeNum.Add(combat.playerActor.NumID); break;
-            case 313: aiAction.takeNum.Add(combat.chooseActor); break;
-            case 314:
-                foreach (var i in messageActor)
-                    if (!i.IsPlayer)
-                        aiAction.takeNum.Add(i.NumID);
-                break;
-            case 315:
-                foreach (var i in messageActor)
-                    aiAction.takeNum.Add(i.NumID);
-                break;
-            case 316:
-                foreach (var i in messageActor)
-                    if (!i.IsPlayer)
-                        aiAction.takeNum.Add(i.NumID);
-                break;
-        }
+        aiAction.takeNum = combat.takeActor;
         aiAction.isExtraHit = skill.isHit;
         aiAction.isNormalAtk = true;
     }
@@ -319,8 +292,9 @@ public class CombatController : DDOLController<CombatController>
         aiAction.isExtraHit = false;
     }
 
-    //先把takeactor 的目标预设写好   预计在  显示人物指针箭头的时候就设置好  这里直接取值
-    //根据距离的头顶箭头  技能距离分析显示
+    //先把takeactor 的目标预设写好   预计在  显示人物指针箭头的时候就设置好  这里直接取值    y
+    //根据距离的头顶箭头  技能距离分析显示   y
+    //受击粒子动画等动作
     //位移按钮制作    距离text没赋值
     //技能要记录移动距离 
     //初始显示提示弹板和出现动画没做

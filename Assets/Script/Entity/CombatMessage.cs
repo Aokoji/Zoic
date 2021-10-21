@@ -17,6 +17,7 @@ public class CombatMessage
     public int distance;    //与玩家距离(玩家不用这个值)
     private int numID;          //战斗中list序号  玩家默认为0
     private GameObject prefab;      //战斗人物实体
+    private CombatActorItem prefabCtrl;     //人物立牌控制脚本
     private GameObject showActor;       //换图的组件image
     private GameObject iconActor;   //战斗人物头像
     private List<abnormalState> abnormal=new List<abnormalState>();     //状态（buff/debuff）
@@ -47,6 +48,7 @@ public class CombatMessage
     public int SkillOdds { get => skillOdds; set => skillOdds = value; }
     public combatUnitProperty Data { get => data; set => data = value; }
     public GameObject ShowActor { get => showActor; set => showActor = value; }
+    public CombatActorItem PrefabCtrl { get => prefabCtrl; set => prefabCtrl = value; }
 
     public void initData()
     {
@@ -144,7 +146,7 @@ public class CombatMessage
     /// </summary>
     public void showPhysicalChange(bool ishit)
     {
-        prefab.GetComponent<CombatActorItem>().changePhysicalLine(ishit,(float)data.curHp/data.physical_last);
+        prefabCtrl.changePhysicalLine(ishit,(float)data.curHp/data.physical_last);
     }
     /// <summary>
     /// 移动

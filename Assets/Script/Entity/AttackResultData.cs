@@ -57,13 +57,6 @@ public class AttackResultData
 public class wholeRoundData
 {
     //------------------------------------------------（主动操作部分）-------------------------------
-    public List<SettleRoundActor> settleActors = new List<SettleRoundActor>();//结算对象
-
-}
-
-//结算时  每个被结算actor的数据
-public class SettleRoundActor
-{
     public int index;   //下标序号
     public bool isPhy;                          //伤害类型
     public List<int> specialNumber = new List<int>();       //特效挨打(受毒、出血、治疗的特效标识)
@@ -72,3 +65,4 @@ public class SettleRoundActor
     public List<abnormalState> settleBuffExist = new List<abnormalState>();         //剩余buff
     public bool isRoundDead;    //给我死
 }
+
