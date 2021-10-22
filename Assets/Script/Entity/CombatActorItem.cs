@@ -48,6 +48,17 @@ public class CombatActorItem : MonoBehaviour
         hpctl.fillAmount = num;
         hpaux.fillAmount = 0;
     }
+    //================================ 动作 ================
+    public void playAttack()
+    {
+
+    }
+    public void playDead(Action callback)
+    {
+        //+++播放死亡动画
+        callback();
+    }
+
     //================================  飞伤害=============
     public void showHitNumber()
     {
@@ -128,9 +139,5 @@ public class CombatActorItem : MonoBehaviour
     {
         distanceText.text = dis+"";
     }
-    public void playDead(Action callback)
-    {
-        //+++播放死亡动画
-        callback();
-    }
+
 }

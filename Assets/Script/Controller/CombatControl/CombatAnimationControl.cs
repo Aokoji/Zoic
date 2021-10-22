@@ -88,7 +88,7 @@ public class CombatAnimationControl : MonoBehaviour
                 //挨个播死亡动画
                 foreach (int id in result.willDeadActor)
                 {
-                    AnimationController.Instance.playAnimation(actorList[id].Prefab, GameStaticParamData.combatAnimNameList.deadName, false, delegate () {
+                    actorList[id].PrefabCtrl.playDead(delegate () {
                         count--;
                         if (count <= 0)
                             callback();

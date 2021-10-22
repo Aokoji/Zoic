@@ -292,6 +292,7 @@ public class CombatController : DDOLController<CombatController>
         aiAction.isExtraHit = false;
     }
 
+    //攻守动画判断
     //先把takeactor 的目标预设写好   预计在  显示人物指针箭头的时候就设置好  这里直接取值    y
     //根据距离的头顶箭头  技能距离分析显示   y
     //受击粒子动画等动作
