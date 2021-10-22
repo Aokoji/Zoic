@@ -49,14 +49,14 @@ public class CombatActorItem : MonoBehaviour
         hpaux.fillAmount = 0;
     }
     //================================ 动作 ================
-    public void playAttack()
+    public void playAction(string name,Action callback)
     {
-
+        AnimationController.Instance.playAnimation(gameObject, name, false, callback);
     }
     public void playDead(Action callback)
     {
         //+++播放死亡动画
-        callback();
+        AnimationController.Instance.playAnimation(gameObject, GameStaticParamData.combatAnimNameList.deadName, false, callback);
     }
 
     //================================  飞伤害=============

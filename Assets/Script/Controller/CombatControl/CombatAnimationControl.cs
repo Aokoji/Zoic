@@ -45,7 +45,7 @@ public class CombatAnimationControl : MonoBehaviour
             //播放攻击方动画  
             PubTool.Instance.addAnimStep(delegate (Action callback)
             {
-                AnimationController.Instance.playAnimation(actorList[result.sourceActor].Prefab, result.animTypeSource, false, callback);
+                actorList[result.sourceActor].PrefabCtrl.playAction(result.animTypeSource, callback);
             });
             //播放受击方动画
             PubTool.Instance.addAnimStep(delegate (Action callback)
@@ -64,7 +64,7 @@ public class CombatAnimationControl : MonoBehaviour
                     {
                         actorList[id].showPhysicalChange(true);
                     }
-                    AnimationController.Instance.playAnimation(actorList[id].Prefab, result.animTypeTaken[id], false, delegate () {
+                    actorList[id].PrefabCtrl.playAction(result.animTypeTaken[id], delegate () {
                         count--;
                         if (count <= 0)
                             callback();
