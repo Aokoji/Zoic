@@ -95,6 +95,11 @@ public class StaticCSVDataTool
             item.expend2 = int.Parse(mess[25]);
             item.coolDown = int.Parse(mess[26]);
             item.runDown = int.Parse(mess[27]);
+            item.ismove = mess[28].Equals("1");
+            item.isfrontMove = mess[29].Equals("1");
+            item.moveDistance = int.Parse(mess[30]);
+            item.takeLength = int.Parse(mess[31]);
+            item.animTypeTake = int.Parse(mess[32]);
 
             data.childDic.Add(item);
         }

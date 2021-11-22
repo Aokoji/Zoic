@@ -29,7 +29,8 @@ public class PlayerMessage
 
     //存档
     public int lastSceneNum;     //最后场景编号
-    //public Vector2 lastBornPos;     //信标位置
+    public int lastPosX;     //信标位置
+    public int lastPosY;     
 
     public void paddingData()
     {

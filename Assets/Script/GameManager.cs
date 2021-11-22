@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         PubTool.Instance.addLogger("游戏启动");
+        //+++待修改  先显示完标题  然后显示读档  读档成功再开放点击开始游戏（或是继续游戏）
         AllUnitData.Data.loadData();
         GameData.Data.initGameData();
         
@@ -33,6 +34,7 @@ public class GameManager : MonoBehaviour
     //加载游戏控制器
     public void loadBaseGameController()
     {
+        EnvironmentManager.Instance.initData(); //加载场景                                                  （ps因为awake已经读档了  否则应该先读档再加载场景）
         ViewController.Instance.initCreateViewController(); //初始化视图
         EventTransfer.Instance.initEvent();                         //初始化事件派发器
         CanvasLoad.instance.initData();                                    //UI

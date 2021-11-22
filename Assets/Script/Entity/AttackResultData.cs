@@ -14,7 +14,7 @@ public class AttackResultData
     public int sourceActor;//攻击方
     public List<int> takenActor;//受击方(主攻击)      顺序001
     public string animTypeSource;    // * 动画类型  标记播放的攻击动画
-    public List<string> animTypeTaken;     //受击方动画
+    public List<string> animTypeTaken;     //受击方动画        顺序001
 
     public bool isHit;  //是否伤害
     public List<int> hitNum = new List<int>();    //受击伤害(不包含多频)        顺序001

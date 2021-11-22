@@ -49,7 +49,11 @@ skill
 25,Z，expend2	消耗精力
 26,AA，colldown	冷却
 27,AB，rundown	跑冷却
-
+28,AC，ismove	是否移动
+29,AD，isfrontMove	是否先动
+30,AE，moveDistance	移动距离
+31,AF，takeLength	作用距离
+32,AG，animTypeTake	施放动画表现下标（动画名）
 
 
 技能参照表（精英以上的boss怪会有单独的特殊技能对照表）

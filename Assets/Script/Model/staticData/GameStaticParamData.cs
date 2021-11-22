@@ -27,6 +27,23 @@ public static class GameStaticParamData
 
     //战斗动画名称
     public static CombatAnimNameList combatAnimNameList = new CombatAnimNameList();
+    //动画序号转化
+    public static string combatAnimIDTrans(int id)
+    {
+        switch (id)
+        {
+            case 1:return combatAnimNameList.attackNormalName;
+            case 2:return combatAnimNameList.behitNormalName;
+            case 3:return combatAnimNameList.hitPhysicsName;
+            case 4:return combatAnimNameList.hitMagicName;
+            case 5:return combatAnimNameList.chantMagicName;
+            case 6:return combatAnimNameList.buffsName;
+            case 7:return combatAnimNameList.debuffsName;
+            case 8:return combatAnimNameList.dodgeName;
+            case 9:return combatAnimNameList.deadName;
+            default:return "";
+        }
+    }
 
 }
 
@@ -34,6 +51,7 @@ public class CombatAnimNameList
 {
     public string attackNormalName = "playerActionAttack";    //普攻
     public string behitNormalName = ""; //受击
+    public string hitPhysicsName = ""; //物理技能
     public string hitMagicName = "";        //伤害魔法
     public string chantMagicName = "";  //吟唱魔法
     public string buffsName = "";  //增幅

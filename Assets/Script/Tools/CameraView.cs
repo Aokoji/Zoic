@@ -26,7 +26,7 @@ public class CameraView : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         movieFollow();
     }

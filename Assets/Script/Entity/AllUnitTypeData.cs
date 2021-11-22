@@ -80,7 +80,7 @@ public class SkillStaticData
     public bool isfrontMove;        //是否先动
     public int moveDistance;
     public int takeLength;          //作用距离（距离多远可以生效，群伤的话范围内都挨打）（普攻等近身技能为0，需要distance到0才能用，其他远程可能会到2-3）
-
+    public int animTypeTake;    //使用动画
 }
 //----------------------------------------单位技能-------------------------------------------
 [System.Serializable]

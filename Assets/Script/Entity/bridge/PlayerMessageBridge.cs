@@ -33,17 +33,17 @@ public class PlayerMessageBridge : MessageBridgeInterface
     {
         return playermessage.data;
     }
-
+    //获取玩家name
     public string getPlayerName()
     {
         return playermessage.name;
     }
-    public bool getFirstIn()
-    {
-        return playermessage.isFirstIn;
-    }
-    public int getplotCount()
-    {
-        return playermessage.plotCount;
-    }
+    //获取第一次进游戏
+    public bool getFirstIn(){return playermessage.isFirstIn; }
+    //获取剧情序号
+    public int getplotCount(){return playermessage.plotCount;}
+    //获取上次场景
+    public int getLastScene() { return playermessage.lastSceneNum; }
+    //获取上次位置
+    public Vector2 getLastPos(){return new Vector2(playermessage.lastPosX, playermessage.lastPosY);}
 }

@@ -303,4 +303,11 @@ public class CombatController : DDOLController<CombatController>
     //技能进cd显示和消耗没做  skillBarOneView 这个脚本要挂  y
     //场景转换动画没做
     //未攻击的僵持状态  ai分析没做
+
+    //--  界面提示板  （文字板）                                      依附于combatView
+    //  玩家信息板  显示血条和头像和异常状态还有设置     依附于combatview       有单独的控制组件combatPlayMessView
+    //  单个技能bar  控制一个技能按钮各种状态显示         不依附                         单独控制组件skillBarOneView
+    //  逃跑按钮弹出三个移动选项                                    依附于combatview
+    //  战斗目标个体                                                      不依附                           单独控制组件CombatActorItem赋值
+    //  动画名对应动画  目前用统一配置
 }

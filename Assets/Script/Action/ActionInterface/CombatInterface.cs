@@ -272,6 +272,8 @@ public abstract class CombatAdapter : CombatInterface
         int baseDam = Mathf.FloorToInt(skill.damageMulti  * basePro / 100);
         //计算暴击
         baseDam = holy ? baseDam : baseDam * (Random.Range(0, 100) < sourceActor.Data.strike_last ? 2 : 1);
+        //施放动画
+        atkResult.animTypeSource = GameStaticParamData.combatAnimIDTrans(skill.animTypeTake);
         //计算作用目标伤害
         for (int i = 0; i < takeActors.Count; i++)
         {
@@ -337,6 +339,8 @@ public abstract class CombatAdapter : CombatInterface
                 }
             }
             atkResult.isHitRare.Add(israte);
+            //受击动画
+            atkResult.animTypeTaken.Add(israte ? GameStaticParamData.combatAnimNameList.dodgeName : GameStaticParamData.combatAnimNameList.behitNormalName);
         }
     }
 

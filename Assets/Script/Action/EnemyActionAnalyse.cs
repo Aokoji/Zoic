@@ -81,7 +81,7 @@ public class EnemyActionAnalyse
     {
         int id = item.AttackID;
         if (item.SkillOdds>0&&Random.Range(0, 100) < item.SkillOdds)   //触发技能
-            id = item.SkillData.skillHold[Random.Range(0, item.SkillData.skillHold.Count)];
+            id = item.SkillData.skillHold[Random.Range(0, item.SkillData.skillHold.Count)].id;
         return id;
     }
 
@@ -98,7 +98,7 @@ public class EnemyActionAnalyse
     {//技能解析
         foreach(var skill in item.skillHold)
         {
-            int id = skill;
+            int id = skill.id;
             switch (skill.ToString())
             {
                 case "901": atkType.Add(id); break;
