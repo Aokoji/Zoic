@@ -3,32 +3,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 //场景编号01
-//场景控制器  需要挂在场景住控上  并手动赋值
-public class SceneMap20101 : MonoBehaviour
+//场景控制器  需要挂在场景住控上(父)  并手动赋值       这种一般是view
+//目前计划改装场景通用view层 
+public class SceneMap20101 : SceneCtlMethod
 {
-    private int mapid = 20101; //地图编号
     private int curModuleId;    //当前激活资源点编号（玩家进入）   -1为没有
     //-------------------------------------------------------------资源点------------------------------------
     //资源点数据都要单独配置
     public GameObject[] moduleList;        //资源点实体（需要手动赋值）
     private ModuleType allDataList;
 
-    
-    public int Mapid { get => mapid; set => mapid = value; }
-    public int CurModuleId { get => curModuleId; set => curModuleId = value; }
-
-    //由主控制器调用  并记录
-    public void initData()
+    public SceneMap20101() { setID(10101); }   //默认 10101编号
+    public SceneMap20101(int id)
     {
-        if (GameData.Data.DataPlaymessage.resourceItemData.ContainsKey(Mapid))
+        if (id > 0) setID(id);
+    }
+    //加载场景      决定要显示的时候再初始化
+    public override void initData()
+    {
+        //从记录中读取已存用的地图信息
+        if (GameData.Data.DataPlaymessage.resourceItemData.ContainsKey(mapid))
         {
-            allDataList = GameData.Data.DataPlaymessage.resourceItemData[Mapid];
+            allDataList = GameData.Data.DataPlaymessage.resourceItemData[mapid];
         }
         else
         {
             allDataList = new ModuleType();
         }
         initSceneCollection();
+        gameObject.SetActive(true);
     }
     //初始化场景可互动资源
     private void initSceneCollection()
@@ -50,7 +53,7 @@ public class SceneMap20101 : MonoBehaviour
                 //读取到该类型 的默认配置
                 //ModuleOneCollect mod=AllUnitData.getModuleCollectionType(type.ToString());
                 ModuleOneCollect mod=AllUnitData.Data.getJsonData<ModuleOneCollect>("allCollectData",type);
-                mod.mapId = Mapid;
+                mod.mapId = mapid;
                 mod.resourceId = count;
                 count++;
                 if (script.isFirstCoolDown)
@@ -75,6 +78,8 @@ public class SceneMap20101 : MonoBehaviour
             }
         }
     }
+
+
     //给子组件设置回调事件
     private void setActionToChildModule(showContext module)
     {

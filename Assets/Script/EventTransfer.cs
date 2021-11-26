@@ -15,6 +15,8 @@ public class EventTransfer : DDOLController<EventTransfer>
     public delegate void OperationEvent();
     //场景加载事件
     public delegate void SceneLoadEvent();
+    //参数事件int
+    public delegate void ParamEventInt(int num);
 
     /// <summary>
     /// 升级事件
@@ -53,6 +55,11 @@ public class EventTransfer : DDOLController<EventTransfer>
         loadNewSceneEvent();
     }
     /// <summary>
+    /// 退出场景
+    /// </summary>
+    public event OperationEvent exitSceneEvent = new OperationEvent(nullfunction);
+    public void exitSceneAction() { exitSceneEvent(); }
+    /// <summary>
     /// 存档
     /// </summary>
     public event OperationEvent saveLoadEvent = new OperationEvent(nullfunction);
@@ -77,7 +84,18 @@ public class EventTransfer : DDOLController<EventTransfer>
         sceneNum001Event();
     }
 
+    //场景切换事件派发
+    //+++尝试不用代理事件  用简单的耦合调用实现公共单一指向事件
+    //public event ParamEventInt changeSceneEvent = new ParamEventInt(nullfunction);
+    //public void changeSceneAction(int id) { changeSceneEvent(id); }
+    public void changeSceneAction(int id,Action action)
+    {
+        EnvironmentManager.instance.changeScene(id, action);
+    }
+
+
     private static void nullfunction() { }
+    private static void nullfunction(int num) { }
     /*
      
      enemy  

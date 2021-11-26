@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
         //+++待修改  先显示完标题  然后显示读档  读档成功再开放点击开始游戏（或是继续游戏）
         AllUnitData.Data.loadData();
         GameData.Data.initGameData();
-        
+        loadBaseGameController();
     }
     //创建manager
     public static void initManager()
@@ -45,9 +45,6 @@ public class GameManager : MonoBehaviour
         PlotController.Instance.initData();                     //载入剧情组件
         initTools();
         initOverAllEvent();
-        EventTransfer.Instance.gameStartSceneAction();    //派发进入游戏事件
-        EventTransfer.Instance.loadNewSceneAction();      //派发加载新场景完成事件
-        PubTool.Instance.addLogger("加载进入基础场景完成，准备载入场景跳转。");
     }
     private void initTools()
     {
@@ -59,30 +56,19 @@ public class GameManager : MonoBehaviour
         PlotController.Instance.initStartGameEvent();
     }
     //------------------------------------------------------------------------------------------------------场景切换主动方法------------
+    //--------类似于场景管理器的职责   目前还没有单独的场景管理器
     //点击主页面的开始  切换场景
-    public void startGame()
+    public void startGame()     //赋给了开始游戏按钮
     {
         //开始界面切换到  游戏界面
-        changeScene("BaseMain");
-        StartCoroutine(waitForLoadScene("BaseMain", loadBaseGameController));
+        EnvironmentManager.Instance.checkStartGameSceneAndDo(onstartGame);
+        EventTransfer.Instance.gameStartSceneAction();    //派发进入游戏事件
     }
-    //------------------------------------------------------------------------------------------------------场景切换方法-  end  -------------------------
-    //切换场景 公共方法
-    public void changeScene(string name)
+    //开始游戏检查
+    public void onstartGame()
     {
-        SceneManager.LoadScene(name);
-    }
-    /// <summary>
-    ///     场景加载方法      场景名，回调
-    /// </summary>
-    private IEnumerator waitForLoadScene(string name, Action callback)
-    {
-        while (SceneManager.GetActiveScene().name != name)
-        {
-            yield return null;
-        }
-        PubTool.Instance.addLogger("开始场景加载完成");
-        callback();
+        //之前先加载的场景，加载完成后回调检查剧情
+        EventTransfer.Instance.gameStartSceneAction();      //派发游戏开始事件  检查剧情是否第一次进入
     }
 
     // Update is called once per frame
