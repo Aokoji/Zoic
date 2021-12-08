@@ -29,6 +29,10 @@ public class UnitTypeStaticData
     public int force_coefficient;   //力量成长系数  基础值+等级*系数
     public int agility_coefficient;
     public int wisdom_coefficient;
+
+    //---新增
+    public int touchtype;   //遇敌状态类型
+    public int moveSpeed;   //移速(一般都比玩家慢)
 }
 //----------------------------------------技能参数------------------------------------------
 [System.Serializable]

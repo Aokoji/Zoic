@@ -28,7 +28,7 @@ public class MoveControl : MonoBehaviour
     {
         selfname = transform.name;
         setChildsGameObject();
-        moveSpeed = 2.5f;
+        moveSpeed = GameStaticParamData.playerSpeed;
         movestate = (int)State.IDLE;
         moveCtrl = true;
     }

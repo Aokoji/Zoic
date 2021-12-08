@@ -8,6 +8,11 @@ public class PlayerControl : DDOLController<PlayerControl>
     private MoveControl moveCtrl=null;
     private GameObject player;
 
+    public void initData()
+    {
+
+    }
+
     public void initCreatePlayer()
     {
         if (player != null) { Destroy(player); player = null; }
@@ -18,14 +23,10 @@ public class PlayerControl : DDOLController<PlayerControl>
         baseMain.transform.SetParent(CanvasLoad.instance.actor.transform);      //待定 需要设置视图层级
         player = baseMain;
         moveCtrl = baseMain.GetComponent<MoveControl>();
-        player.SetActive(true);
-        initData();
-    }
-
-    public void initData()
-    {
+        player.SetActive(false);
         player.GetComponent<MoveControl>().initData();
     }
+
     //   人物控制开关
     public void setControl(bool ctrl)
     {
@@ -45,6 +46,11 @@ public class PlayerControl : DDOLController<PlayerControl>
     public bool getFaceLeft()
     {
         return moveCtrl.getFaceDirection();
+    }
+
+    public Vector2 getPosition()
+    {
+        return player.transform.position;
     }
     
 

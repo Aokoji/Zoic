@@ -20,7 +20,6 @@ public class GameManager : MonoBehaviour
         //+++待修改  先显示完标题  然后显示读档  读档成功再开放点击开始游戏（或是继续游戏）
         AllUnitData.Data.loadData();
         GameData.Data.initGameData();
-        loadBaseGameController();
     }
     //创建manager
     public static void initManager()
@@ -61,13 +60,14 @@ public class GameManager : MonoBehaviour
     public void startGame()     //赋给了开始游戏按钮
     {
         //开始界面切换到  游戏界面
-        EnvironmentManager.Instance.checkStartGameSceneAndDo(onstartGame);
-        EventTransfer.Instance.gameStartSceneAction();    //派发进入游戏事件
+        //+++开始游戏应该有一个后续的读档界面 或者缓冲界面  开始界面的所有操作按钮都在它的视图层完成
+        EnvironmentManager.Instance.checkStartGameSceneAndDo(onstartGame);      //这是最后的读档操作了
     }
     //开始游戏检查
     public void onstartGame()
     {
         //之前先加载的场景，加载完成后回调检查剧情
+        loadBaseGameController();
         EventTransfer.Instance.gameStartSceneAction();      //派发游戏开始事件  检查剧情是否第一次进入
     }
 
