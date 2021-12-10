@@ -21,3 +21,8 @@ public class ModuleOneCollect
     public bool isCatch;    //是否采集
     public int catchInterval;   //采集间隔
 }
+[System.Serializable] 
+public class ModuleTypeDic
+{
+    public Dictionary<int, ModuleType> sceneData;      //场景数据
+}

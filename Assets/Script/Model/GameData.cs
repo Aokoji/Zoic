@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -23,6 +24,7 @@ public class GameData: DDOLData<GameData>
     }*/
     private string baseDataLoadPath = "/Resources/Data/game/actorDataSave.txt";
     private string gameDataLoadPath = "/Resources/Data/game/gameMessageSave.json";
+    private string gameSceneLoadPath = "/Resources/Data/game/gameSceneSave.json";
     private string gameDataLoadSign = "/Resources/Data/sign.dll";
     private int expBase = 40;                           //等级经验基数
     private int hpBase = 150;
@@ -38,6 +40,7 @@ public class GameData: DDOLData<GameData>
 
 
     private DataPlayMessage dataplaymessage;           //游戏配置数据
+    private ModuleTypeDic sceneData;      //场景数据            //目前用二进制存储  可以尝试json存储
     private PlayerMessage playermessage;        //-----------------------------------------------玩家数据----------
     public PlayerMessageBridge playerBridge;        //玩家数据桥接类
 
@@ -58,6 +61,7 @@ public class GameData: DDOLData<GameData>
 
     //public Vector2 LastBornPos { get => lastBornPos; set => lastBornPos = value; }
     public DataPlayMessage DataPlaymessage { get => dataplaymessage; set => dataplaymessage = value; }
+    public ModuleTypeDic SceneData { get => sceneData; set => sceneData = value; }
 
     //事件调用  升级
     public void levelUp()
@@ -163,14 +167,31 @@ public class GameData: DDOLData<GameData>
             string read = Encoding.ASCII.GetString(jsbt);
             dataplaymessage= JsonUtility.FromJson<DataPlayMessage>(read);
         }
+        loadSceneMessageData();
     }
-    //  记录游戏部分配置数据      （自动记录）
+    //  记录游戏部分配置数据      （手动记录）
     public void saveGameMessageData()
     {
         PubTool.Instance.addLogger("保存配置");
         string json = JsonUtility.ToJson(dataplaymessage);
         byte[] js = Encoding.ASCII.GetBytes(json.ToCharArray());
         File.WriteAllBytes(Application.dataPath + gameDataLoadPath, js);
+    }
+    private void loadSceneMessageData()
+    {
+        BinaryFormatter bin = new BinaryFormatter();
+        if (!File.Exists(Application.dataPath + gameSceneLoadPath))
+            return;
+        FileStream file = File.Open(Application.dataPath + gameSceneLoadPath, FileMode.Open);
+        sceneData = (ModuleTypeDic)bin.Deserialize(file);
+        file.Close();
+    }
+    private void saveSceneMessageData()
+    {
+        BinaryFormatter bin = new BinaryFormatter();
+        FileStream file = File.Create(Application.dataPath + gameSceneLoadPath);
+        bin.Serialize(file, sceneData);
+        file.Close();
     }
     //----------------------------------------*******玩家数据******--------------------------------------
     //加载玩家数据       (手动加载 + 自动加载)

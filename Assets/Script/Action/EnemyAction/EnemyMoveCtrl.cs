@@ -2,11 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
+//这些存成复用变量池  由单独的控制器集中控制
 //实体应该是被动态创建出来的 所以应当附带初始化id     //animator应附在子集
 public class EnemyMoveCtrl : MonoBehaviour
 {
     public GameObject exclamtionTips;   //标识牌
+    public GameObject rolePic;      //显示图片（当前角色）
 
     private  Animator anim;
     private enum statelist{ idle,patrol,alert,follow,away,normal,acting}   //等待，巡逻，警戒，追击，逃跑
@@ -28,6 +31,9 @@ public class EnemyMoveCtrl : MonoBehaviour
     private float runawayTimeLimit = GameStaticParamData.runAwayTime;   //逃跑时间
     private float runawayTimeCount;     //逃跑时间计数
     private bool runningState;  //逃跑延长器
+    private bool isplayingTips;     //正在播叹号
+    private bool isSubSeq;      //后续判断（叹号专用）
+    private bool isConsum;  //耗时（所有动作的中途的等待开关）action状态下强制等待
 
     private bool isplayTips;    //感叹号期间不允许动作    (很重要的判断）虽然现在还没用上
 
@@ -41,7 +47,6 @@ public class EnemyMoveCtrl : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
         isIntrigger = false;
         updatelock = true;
-        arrivePoint = true;
         runningState = false;
         idleWaittingCount = waitStandard / 2;
     }
@@ -49,6 +54,13 @@ public class EnemyMoveCtrl : MonoBehaviour
     {
         _data = AllUnitData.Data.getJsonData<UnitTypeStaticData>(GameStaticParamData.unitName.unit, id);
         fieldData = GameStaticParamData.getFieldEnemyTypeData(_data.touchtype);
+        changeSprite();
+        isplayingTips = false;
+        isSubSeq = false;
+        isConsum = false;
+        isplayTips = false;
+        runningState = false;
+        arrivePoint = true;
         updatelock = false;
     }
     //初始化正方向
@@ -131,9 +143,6 @@ public class EnemyMoveCtrl : MonoBehaviour
             idleWaittingCount = 0;
         }
     }
-    private bool isplayingTips;     //正在播叹号
-    private bool isSubSeq;      //后续判断（叹号专用）
-    private bool isConsum;  //耗时（所有动作的中途的等待开关）
     //进入警戒
     private void alertState()
     {
@@ -150,39 +159,29 @@ public class EnemyMoveCtrl : MonoBehaviour
         if (isNearest)
         {
             if (fieldData.isrunAway)
-            {
                 //逃跑动作
                 runawayAction();
-            }
             else
-            {
                 //进攻动作
-
-            }
+                followAction();
         }
         else
         {
             if (fieldData.isAlert)
-            {
                 //警戒动作
                 alertAction();
-            }
             else
             {
                 if (fieldData.isrunAway)
-                {
                     //逃跑动作
                     runawayAction();
-                }
                 else
-                {
                     //进攻动作
-
-                }
+                    followAction();
             }
         }
     }
-    //逃跑动作实现方法
+    //逃跑动作
     private void runawayAction()
     {
         //状态普通  需要改变移动状态
@@ -200,7 +199,7 @@ public class EnemyMoveCtrl : MonoBehaviour
         if (!isConsum)
         {
             runawayTimeCount += Time.deltaTime;
-            transform.Translate((isleft ? Vector2.left : Vector2.right) * _data.moveSpeed * Time.deltaTime, Space.World);
+            transform.Translate((isleft ? Vector2.left : Vector2.right) * _data.moveSpeed *1.5f* Time.deltaTime, Space.World);
             if (runawayTimeCount >= runawayTimeLimit)
             {
                 exclamtionTips.SetActive(false);
@@ -227,6 +226,18 @@ public class EnemyMoveCtrl : MonoBehaviour
             setLeftForword(transform.position.x - PlayerControl.Instance.getPosition().x < 0);
             //+++亮警戒标
         }
+        transform.Translate((isleft ? Vector2.left : Vector2.right) * _data.moveSpeed * Time.deltaTime, Space.World);
+    }
+    //进攻动作
+    private void followAction()
+    {
+        if (curState != statelist.follow)
+        {
+            curState = statelist.follow;
+            moveState = statelist.acting;
+            setLeftForword(transform.position.x - PlayerControl.Instance.getPosition().x > 0);
+        }
+        transform.Translate((isleft ? Vector2.left : Vector2.right) * _data.moveSpeed*1.5f * Time.deltaTime, Space.World);
     }
 
     //感叹号动画
@@ -251,11 +262,16 @@ public class EnemyMoveCtrl : MonoBehaviour
     {
         if (collision.name == "player")
         {
-
+            updatelock = true;  //锁移动
+            //碰撞  发送战斗事件
         }
     }
 
     //=============     内部功能        =====================
+    private void changeSprite()
+    {
+        rolePic.GetComponent<Image>().sprite = Resources.Load("Picture/load/" + _data.name, typeof(Sprite)) as Sprite;
+    }
     private void setLeftForword(bool isleft)
     {
         this.isleft = isleft;
