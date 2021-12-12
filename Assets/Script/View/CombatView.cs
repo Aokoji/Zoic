@@ -246,12 +246,12 @@ public class CombatView : MonoBehaviour
     private void showTips1Second(Action action)
     {
         //播动画
-        AnimationController.Instance.playAnimation(messageTips, "tipShow", false, action);
+        AnimationController.Instance.playAnimation(messageTips, "tipsShow", false, action);
     }
     //设置内容
     private void setTipsContext(string text)
     {
-        messageTips.GetComponent<Text>().text = text;
+        messageTips.GetComponentInChildren<Text>().text = text;
     }
     /// <summary>
     /// 显示标签1秒  需要加入序列
@@ -267,7 +267,7 @@ public class CombatView : MonoBehaviour
     public void showTips1Second(string context)
     {
         setTipsContext(context);
-        AnimationController.Instance.playAnimation(messageTips, "tipShow", false);
+        AnimationController.Instance.playAnimation(messageTips, "tipsShow", false);
     }
     //---------------------------------------------出场动画--------------------------------
     private void playEnterScene(Action callback)

@@ -14,6 +14,7 @@ public class PlotController : DDOLController<PlotController>
     {
         plotCount = GameData.Data.playerBridge.getplotCount();
         initPlotView();
+        initStartGameEvent();
     }
     // 初始化进入游戏事件（判断是否有剧情强制触发）（外部调用）
     public void initStartGameEvent()
@@ -25,17 +26,14 @@ public class PlotController : DDOLController<PlotController>
     {
         if (GameData.Data.playerBridge.getFirstIn())
         {//第一次进入
-            //还没有想好第一次场景动画是啥  暂且就打印一下然后跳过
             Debug.Log("加载入场动画！！！");
             PubTool.instance.addLogger("载入初始入场动画。");
-            PlayerControl.instance.setVisible(false);
             PlayerControl.instance.setControl(false);
 
             Action show = delegate ()
             {
-                PlayerControl.instance.setVisible(true);
                 PlayerControl.instance.setControl(true);
-                CanvasLoad.instance.cameraFollowPlayer();
+                ViewController.instance.cameraFollowPlayer();
             };
             PubTool.instance.laterDo(2, show);
         }
@@ -63,9 +61,8 @@ public class PlotController : DDOLController<PlotController>
         GameObject loadobj = Resources.Load<GameObject>("Entity/PlotUI");
         var uiTarget = Instantiate(loadobj);
         uiTarget.name = "PlotView";
-        uiTarget.transform.SetParent(CanvasLoad.canvasui.transform, false);
-        uiTarget.transform.position = CanvasLoad.canvasui.transform.position;
+        ViewController.instance.addToUIMod(uiTarget);
         plotview = uiTarget.GetComponent<PlotView>();
-        plotview.hideInterface();
+        plotview.initData();
     }
 }

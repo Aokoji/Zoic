@@ -15,8 +15,7 @@ public class BagControl : DDOLController<BagControl>
         GameObject mode = Resources.Load<GameObject>("Entity/BagUI");
         var baseMain = Instantiate(mode);
         baseMain.name = "BagView";
-        baseMain.transform.SetParent(CanvasLoad.canvasui.transform, false);
-        baseMain.transform.position = CanvasLoad.canvasui.transform.position;
+        ViewController.instance.addToUIMod(baseMain);
         var view = baseMain.GetComponent<BagView>();
         view.initBagView();
         bag = view;

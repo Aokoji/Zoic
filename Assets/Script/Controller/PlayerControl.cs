@@ -20,10 +20,10 @@ public class PlayerControl : DDOLController<PlayerControl>
         var baseMain = Instantiate(baseain);
         baseMain.name = "Player";
         //player.transform.position = GameData.Data.LastBornPos;
-        baseMain.transform.SetParent(CanvasLoad.instance.actor.transform);      //待定 需要设置视图层级
+        ViewController.instance.addToBaseMod_Actor(baseMain);      //待定 需要设置视图层级
         player = baseMain;
         moveCtrl = baseMain.GetComponent<MoveControl>();
-        player.SetActive(false);
+        player.SetActive(true);
         player.GetComponent<MoveControl>().initData();
     }
 

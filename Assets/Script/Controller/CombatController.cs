@@ -51,7 +51,7 @@ public class CombatController : DDOLController<CombatController>
         var baseMain = Instantiate(baseain);
         baseMain.name = "CombatView";
         //baseMain.transform.SetParent(CanvasLoad.canvasui.transform, false);
-        baseMain.transform.position=CanvasLoad.canvasui.transform.position;
+        baseMain.transform.position=ViewController.instance.getUIMod().transform.position;
         var mainview = baseMain.GetComponent<CombatView>();
         mainview.gameObject.SetActive(true);       //todo  待修改
         combat = mainview;
@@ -61,9 +61,10 @@ public class CombatController : DDOLController<CombatController>
         GameObject scece = Resources.Load<GameObject>("Entity/CombatScene");
         var scecemain = Instantiate(scece);
         scecemain.name = "CombatScene";
-        var pos = CanvasLoad.canvasui.transform.position + new Vector3(0, 100);
+        var pos = ViewController.instance.getUIMod().transform.position + new Vector3(0, 100);
         scecemain.transform.position = pos;
-        scecemain.transform.SetParent(CanvasLoad.instance.uiPos.transform);
+        ViewController.instance.addToUIMod(scecemain);
+        //scecemain.transform.SetParent(ViewController.instance.getBaseMod().uiPos.transform);
         //添加相机资源
         var combatcam = scecemain.GetComponentInChildren<Camera>();
         ViewController.instance.addCameraDictionary("combatcam", combatcam);
@@ -308,6 +309,6 @@ public class CombatController : DDOLController<CombatController>
     //  玩家信息板  显示血条和头像和异常状态还有设置     依附于combatview       有单独的控制组件combatPlayMessView
     //  单个技能bar  控制一个技能按钮各种状态显示         不依附                         单独控制组件skillBarOneView
     //  逃跑按钮弹出三个移动选项                                    依附于combatview
-    //  战斗目标个体                                                      不依附                           单独控制组件CombatActorItem赋值
+    //  战斗目标个体                                                      不依附                           单独控制组件CombatActorItem赋值   abnormalIconBoard没赋值
     //  动画名对应动画  目前用统一配置
 }

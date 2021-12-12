@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
         //+++待修改  先显示完标题  然后显示读档  读档成功再开放点击开始游戏（或是继续游戏）
         AllUnitData.Data.loadData();
         GameData.Data.initGameData();
+        EventTransfer.Instance.initEvent();                         //初始化事件派发器
+        ViewController.Instance.initCreateViewController(); //初始化视图
     }
     //创建manager
     public static void initManager()
@@ -34,9 +36,6 @@ public class GameManager : MonoBehaviour
     public void loadBaseGameController()
     {
         EnvironmentManager.Instance.initData(); //加载场景                                                  （ps因为awake已经读档了  否则应该先读档再加载场景）
-        ViewController.Instance.initCreateViewController(); //初始化视图
-        EventTransfer.Instance.initEvent();                         //初始化事件派发器
-        CanvasLoad.instance.initData();                                    //UI
         PlayerControl.Instance.initCreatePlayer();          //初始化玩家
         PlayerManager.Instance.loadPlayerManager();     //加载玩家管理器
         MainController.Instance.initController();
@@ -52,7 +51,7 @@ public class GameManager : MonoBehaviour
     //初始化全局事件
     private void initOverAllEvent()
     {
-        PlotController.Instance.initStartGameEvent();
+
     }
     //------------------------------------------------------------------------------------------------------场景切换主动方法------------
     //--------类似于场景管理器的职责   目前还没有单独的场景管理器

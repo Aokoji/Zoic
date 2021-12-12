@@ -1,20 +1,48 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlotView : MonoBehaviour
 {
 
+    public GameObject backimg;
+    public GameObject undertip;
+    public Text underContext;
+
+    public Button topperClick;
+
+    private PlotListMod plotdata;       //plot数据集
+
+    public void initData()
+    {
+        plotdata = new PlotListMod();
+        initLayout();
+        initEvent();
+    }
+    private void initLayout()
+    {
+        hideInterface();
+    }
+    private void initEvent()
+    {
+        topperClick.onClick.AddListener(nextPlotDialog);
+    }
 
 
+
+    //下一段对话
+    private void nextPlotDialog()
+    {
+
+    }
 
     private void showInterface()
     {//显示界面  内部用
         gameObject.SetActive(true);
     }
-
     //隐藏界面
-    public void hideInterface()
+    private void hideInterface()
     {
         gameObject.SetActive(false);
     }
