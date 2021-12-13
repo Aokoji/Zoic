@@ -29,18 +29,27 @@ public class PlotController : DDOLController<PlotController>
             Debug.Log("加载入场动画！！！");
             PubTool.instance.addLogger("载入初始入场动画。");
             PlayerControl.instance.setControl(false);
-
-            Action show = delegate ()
-            {
-                PlayerControl.instance.setControl(true);
-                ViewController.instance.cameraFollowPlayer();
-            };
-            PubTool.instance.laterDo(2, show);
+            GameData.Data.playerBridge.initPlotCount();     //初始化玩家剧情序号
+            mainplotTrigger();
+            normalPlot();       //普通式 剧情触发
         }
         else
         {//否则判断其他剧情点
 
         }
+    }
+
+    // 普通类型剧情
+    public void normalPlot()
+    {
+        plotview.doplot(GameData.Data.playerBridge.getplotCount(),normalDelegate);
+    }
+    //普通类型回调
+    private void normalDelegate()
+    {
+        PlayerControl.instance.setControl(true);
+        ViewController.instance.cameraFollowPlayer();
+        GameData.Data.playerBridge.goonPlot();  //剧情记录
     }
 
     //触发主线!

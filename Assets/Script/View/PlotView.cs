@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,11 @@ public class PlotView : MonoBehaviour
     public Button topperClick;
 
     private PlotListMod plotdata;       //plot数据集
+    //------当局数据集  需要刷-------
+    private Action nextstep;
+    private int curplotShedule;     //当前进度
+    private int maxplotShedule;     //总进度
+
 
     public void initData()
     {
@@ -28,6 +34,28 @@ public class PlotView : MonoBehaviour
     {
         topperClick.onClick.AddListener(nextPlotDialog);
     }
+
+    //刷新变量
+    private void refreshVariate()
+    {
+        nextstep = null;
+        curplotShedule = 0;
+        maxplotShedule = 0;
+    }
+
+    //外接入口    开始剧情
+    public void doplot(int plotid,Action callback)
+    {
+        curplotShedule = 0;
+        nextstep = callback;
+
+    }
+
+    private void readConfig()
+    {
+
+    }
+
 
 
 

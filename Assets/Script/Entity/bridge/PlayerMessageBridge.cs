@@ -40,8 +40,16 @@ public class PlayerMessageBridge : MessageBridgeInterface
     }
     //获取第一次进游戏
     public bool getFirstIn() { return true; }// playermessage.isFirstIn; }
+
+    //----------------------    剧情控制------------------
     //获取剧情序号
     public int getplotCount(){return playermessage.plotCount;}
+    //初始化剧情
+    public void initPlotCount() { playermessage.plotCount = 101; }
+    //推剧情
+    public void goonPlot() { playermessage.plotCount++; }
+    //---------------------------------------------------------------
+
     //获取上次场景
     public int getLastScene() { return playermessage.lastSceneNum; }
     //获取上次位置
