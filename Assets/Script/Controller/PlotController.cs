@@ -12,7 +12,7 @@ public class PlotController : DDOLController<PlotController>
     private bool issidePloting = false;
     public void initData()
     {
-        plotCount = GameData.Data.playerBridge.getplotCount();
+        refreshPlotCount();
         initPlotView();
         initStartGameEvent();
     }
@@ -21,6 +21,7 @@ public class PlotController : DDOLController<PlotController>
     {
         EventTransfer.instance.gameStartSceneEvent += onGameStartCheck;
     }
+    private void refreshPlotCount() { plotCount = GameData.Data.playerBridge.getplotCount(); }
 
     private void onGameStartCheck()
     {
@@ -28,7 +29,6 @@ public class PlotController : DDOLController<PlotController>
         {//第一次进入
             Debug.Log("加载入场动画！！！");
             PubTool.instance.addLogger("载入初始入场动画。");
-            PlayerControl.instance.setControl(false);
             GameData.Data.playerBridge.initPlotCount();     //初始化玩家剧情序号
             mainplotTrigger();
             normalPlot();       //普通式 剧情触发
@@ -42,15 +42,30 @@ public class PlotController : DDOLController<PlotController>
     // 普通类型剧情
     public void normalPlot()
     {
+        PubTool.instance.addLogger("剧情编号：" + plotCount + "  开始剧情。");
+        normalLock();
         plotview.doplot(GameData.Data.playerBridge.getplotCount(),normalDelegate);
     }
     //普通类型回调
     private void normalDelegate()
     {
+        PubTool.instance.addLogger("剧情编号：" + plotCount + "  结束。");
         PlayerControl.instance.setControl(true);
         ViewController.instance.cameraFollowPlayer();
-        GameData.Data.playerBridge.goonPlot();  //剧情记录
+        //GameData.Data.playerBridge.goonPlot();  //剧情记录        测试中  待开放
+        if (GameData.Data.playerBridge.getFirstIn())
+        {
+            //第一次结束   赋值
+        }
+        refreshPlotCount();
     }
+    //普通剧情锁  锁部分控制和显示
+    private void normalLock()
+    {
+        PlayerControl.instance.setControl(false);
+        //+++隐藏ui操作界面（去调mainview的打包方法）
+    }
+
 
     //触发主线!
     public void mainplotTrigger()
