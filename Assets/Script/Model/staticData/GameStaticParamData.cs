@@ -92,14 +92,14 @@ namespace toolEntity
     public class CombatAnimNameList
     {
         public string attackNormalName = "playerActionAttack";    //普攻
-        public string behitNormalName = ""; //受击
-        public string hitPhysicsName = ""; //物理技能
-        public string hitMagicName = "";        //伤害魔法
-        public string chantMagicName = "";  //吟唱魔法
-        public string buffsName = "";  //增幅
-        public string debuffsName = "";  //减益
-        public string dodgeName = "";  //闪避
-        public string deadName = "";  //死亡
+        public string behitNormalName = "playerActionAttack"; //受击
+        public string hitPhysicsName = "playerActionAttack"; //物理技能
+        public string hitMagicName = "playerActionAttack";        //伤害魔法
+        public string chantMagicName = "playerActionAttack";  //吟唱魔法
+        public string buffsName = "playerActionAttack";  //增幅
+        public string debuffsName = "playerActionAttack";  //减益
+        public string dodgeName = "playerActionAttack";  //闪避
+        public string deadName = "playerActionAttack";  //死亡
     }
     //取数据 json字典的名字
     public class UnitTypeNameList

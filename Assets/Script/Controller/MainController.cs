@@ -45,7 +45,7 @@ public class MainController : DDOLController<MainController>
         CombatConfigMessage config = new CombatConfigMessage();
         config.combatLogName = "combat" + GameData.Data.DataPlaymessage.combatIDCount;
         //根据实际情况赋距离初值
-        config.initialDistance = 2;
+        config.initialDistance = 0;
         PubTool.instance.addLogger("遭遇战斗,战斗序号：combat"+GameData.Data.DataPlaymessage.combatIDCount);
         PubTool.instance.addCombatLogger(config.combatLogName, "进入战斗");
         GameData.Data.DataPlaymessage.combatIDCount++;

@@ -109,10 +109,10 @@ public class PubTool : DDOLController<PubTool>
     /// <summary>
     /// 战斗记录操作日志
     /// </summary>
-    public void addCombatLogger(string type, string context)
+    public void addCombatLogger(string logtype, string context)
     {
         if (!Directory.Exists("Logs/combat")) Directory.CreateDirectory("Logs/combat");       // 不存在则创建
-        string path = Path.Combine("Logs/combat", type + ".txt");
+        string path = Path.Combine("Logs/combat", logtype + ".txt");
         string mess = DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss    ") + context + "\n";
         File.AppendAllText(path, mess);
     }
@@ -133,5 +133,9 @@ public class PubTool : DDOLController<PubTool>
     public static void dumpString<T>(string b,T a)
     {
         Debug.Log(b+JsonUtility.ToJson(a));
+    }
+    public static string toJsonString<T>(T a)
+    {
+        return JsonUtility.ToJson(a);
     }
 }

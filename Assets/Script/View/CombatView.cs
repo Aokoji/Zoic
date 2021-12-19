@@ -65,7 +65,6 @@ public class CombatView : MonoBehaviour
     private bool haveChooseLock;        //确认按钮 锁 判断是否可点击确认按钮
     //----------固定参数--------------------
     private float lineDistance; //总的进度条长度
-    private int ENEMY_NUM = 3;
     private int sceneShowType;
 
     //=========================================           初始化         ================
@@ -97,12 +96,13 @@ public class CombatView : MonoBehaviour
         actorBody = new List<GameObject>();
         skillBars = new List<skillBarOneView>();
         lineDistance = startPos.transform.position.x - endPos.transform.position.x;
-        mask.gameObject.SetActive(false);
-        baseControl.SetActive(false);
-        tanban.SetActive(false);
-        messageFather.SetActive(false);
-        skillThirdFather.SetActive(false);
-        messageTips.SetActive(false);
+        mask.gameObject.SetActive(false);       //遮罩
+        baseControl.SetActive(false);       //一级四键
+        tanban.SetActive(false);        //一级确定窗
+        hideContext();      //隐藏技能窗
+        skillThirdFather.SetActive(false);  //隐藏技能三级窗
+        messageTips.SetActive(false);       //提示
+        hideFleeBoard();        //逃跑窗
     }
     private void initBaseButtonEvent()
     {
@@ -245,6 +245,7 @@ public class CombatView : MonoBehaviour
     //显示提示板（比如距离）
     private void showTips1Second(Action action)
     {
+        Debug.Log("播了弹板1");
         //播动画
         AnimationController.Instance.playAnimation(messageTips, "tipsShow", false, action);
     }
@@ -266,6 +267,7 @@ public class CombatView : MonoBehaviour
     /// </summary>
     public void showTips1Second(string context)
     {
+        Debug.Log("播了弹板2");
         setTipsContext(context);
         AnimationController.Instance.playAnimation(messageTips, "tipsShow", false);
     }
@@ -488,6 +490,10 @@ public class CombatView : MonoBehaviour
                 isforward = false;
         }
         runBoard.SetActive(true);
+    }
+    private void hideFleeBoard()
+    {
+        runBoard.SetActive(false);
     }
     //选择技能  显示三级 技能详情面板
     private void chooseSkillMessage(SkillStaticData skill)

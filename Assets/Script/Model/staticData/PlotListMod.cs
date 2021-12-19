@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlotListMod 
 {
     public string plotPath = "Assets/Resources/Data/plot/plot";       //路径
+    public string resPath = "Data/plot/plot";       //路径
     public List<string[]> plotdata;       //当前plot数据集
     public int plotid;
 

@@ -28,6 +28,7 @@ public class CombatController : DDOLController<CombatController>
     public void openCombat(List<CombatMessage> data,CombatConfigMessage config)    //+++处理传进来的数据  敌人 玩家 战斗类型（野怪 boss或精英剧情等） 战斗场景等配置
     {
         this.config = config;
+        PubTool.instance.addCombatLogger(config.combatLogName,"战斗数据："+PubTool.toJsonString(config));
         messageActor = data;
         attackAction = new AttackAnalyze(messageActor);
         if (combat == null) { initCombat(messageActor); }
@@ -164,6 +165,7 @@ public class CombatController : DDOLController<CombatController>
             Debug.Log("【敌人攻击】");
             //轮到敌人攻击  拿到一个攻击数据组  由ai分析出结果
             AnalyzeResult aiAction = actor.Analyse.analyseCombatAttack(messageActor, actor,config);
+            PubTool.instance.addCombatLogger(config.combatLogName, "敌方行动：" + PubTool.toJsonString(aiAction));
             //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
             AttackResultData animData =attackAction.doAction(aiAction);
             //获得的战斗数据传给动画机  动画机执行完进行回合判定
@@ -265,8 +267,11 @@ public class CombatController : DDOLController<CombatController>
             //生成攻击结果
             createSkillResult(aiAction);
         }
+        aiAction.takeNum = combat.takeActor;
+        PubTool.instance.addCombatLogger(config.combatLogName, "我方行动：" + PubTool.toJsonString(aiAction));
         //获取一个分析后数据   调用战斗数据缓存器attackAction存储缓存数据
         AttackResultData animData = attackAction.doAction(aiAction);
+        PubTool.dumpString(animData);
         //获得的战斗数据传给动画机  动画机执行完进行回合判定
         animCtl.playCombatBeHit(combat, animData, messageActor, roundSettle);
     }

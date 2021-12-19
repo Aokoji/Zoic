@@ -47,8 +47,8 @@ public class PlotView : MonoBehaviour
         hideInterface();
         back1 = backimg1.GetComponent<Image>();
         back2 = backimg2.GetComponent<Image>();
-        back1.color = new Color(0, 0, 0, 1);
-        back2.color = new Color(0, 0, 0, 1);
+        back2.color = new Color(0.125f, 0.125f, 0.125f, 1);
+        back1.color = new Color(1,1,1, 1);
         //这俩背景都显示，黑底
     }
     private void initEvent()
@@ -66,14 +66,23 @@ public class PlotView : MonoBehaviour
         islocking = false;
         dialogIsShow = false;
         bgfront = false;
+        refreshLayout();
         plot.initData();
         //+++ 刷新所有组件的内容（置空）
     }
+    public void refreshLayout()
+    {
+        hideUnderBar();
+    }
+
     //==============            外接入口    开始剧情            ==================
     public void doplot(int plotid,Action callback)
     {
+        Debug.Log(plotid + "---id---plot");
+        showInterface();
         refreshVariate();
         plot.readConfig(plotid);                 //读数据
+        PubTool.dumpString(plot.plotdata);
         maxplotShedule = plot.plotdata.Count;
         nextstep = callback;
         allowClick = true;
@@ -85,6 +94,7 @@ public class PlotView : MonoBehaviour
     {
         if (!allowClick) return;
         allowClick = false;
+        Debug.Log("当前进度序号 : " + curplotShedule);
         curplotShedule++;
         //判断结束
         if (curplotShedule >= maxplotShedule)  
@@ -107,14 +117,16 @@ public class PlotView : MonoBehaviour
     {
         string time1 = curplotData[plot.delay];
         if (!time1.Equals("0"))
+        {
             //触发延时
-            StartCoroutine(timmerLock(int.Parse(time1)));
+            float num = float.Parse(time1);
+            StartCoroutine(timmerLock(num));
+        }
         else
             StartCoroutine(timmerLock(fixTime));
     }
     IEnumerator timmerLock(float time)
     {
-        if (!islocking) Debug.Log("锁延迟时间调用存在错误！！！！！当前编号："+plot.plotid+"----步骤 "+curplotShedule);
         islocking = true;
         yield return new WaitForSeconds(time);
         islocking = false;
@@ -127,11 +139,13 @@ public class PlotView : MonoBehaviour
         //判断是否文本
         if (curplotData[plot.isDialog].Equals("0"))
         {
-            if(dialogIsShow)
+            if (dialogIsShow)
                 playAnim(undertip, "tipHide", false);
             dialogIsShow = false;
             return;
-        } 
+        }
+        else
+            showUnderBar();
         if (!dialogIsShow)
         {
             playAnim(undertip, "tipShow", false);
@@ -147,36 +161,54 @@ public class PlotView : MonoBehaviour
     private void analyzeBackGround()
     {
         if (curplotData[plot.isbg].Equals("0")) return;
+        Debug.Log("改bg");
         //渐变 显隐  处理
         bool fade = false;
         bool ishide = false;
-        if (curplotData[plot.isbg].Equals("渐隐"))
+        if (curplotData[plot.bgshowtype].Equals("渐隐"))
         {
             Debug.Log("目前没有渐隐处理===========");
             fade = true;
             ishide =true;
         }
-        else if (curplotData[plot.isbg].Equals("渐显"))
+        else if (curplotData[plot.bgshowtype].Equals("渐显"))
         {
             fade = true;
             ishide = false;
         }
+        Debug.Log(curplotData[plot.bgname]+ bgfront+fade);
         if (fade)
         {
             if (bgfront)
             {//前图渐显
                 bgstartNum = 0;
-                back1.color = new Color(back2.color.r, back2.color.g, back2.color.b, 1);
-                back2.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
-                back2.sprite = Resources.Load(plot.plotPath + plot.plotid + "//" + curplotData[plot.bgname], typeof(Sprite)) as Sprite;
+                back1.color = new Color(back1.color.r, back1.color.g, back1.color.b, 1);
+                if (curplotData[plot.bgname].Equals("0"))
+                {
+                    back2.sprite = null;
+                    back2.color = new Color(0.125f,0.125f,0.125f, bgstartNum);
+                }
+                else
+                {
+                    back2.color = new Color(1,1,1, bgstartNum);
+                    back2.sprite = Resources.Load(plot.resPath + plot.plotid + "/" + curplotData[plot.bgname], typeof(Sprite)) as Sprite;
+                }
             }
             else
             {//后图渐显
-                bgstartNum = 1;
-                back1.sprite= Resources.Load(plot.plotPath+plot.plotid+"//"+ curplotData[plot.bgname], typeof(Sprite)) as Sprite;
-                back1.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
+                bgstartNum = 2;
+                if (curplotData[plot.bgname].Equals("0"))
+                {
+                    back2.sprite = null;
+                    back2.color = new Color(0.125f, 0.125f, 0.125f, bgstartNum);
+                    Debug.Log("zhihei");
+                }
+                else
+                    back2.sprite = Resources.Load(plot.resPath + plot.plotid + "/" + curplotData[plot.bgname], typeof(Sprite)) as Sprite;
+                back1.color = new Color(back1.color.r, back1.color.g, back1.color.b, bgstartNum);
                 back2.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
             }
+            isfadeing = true;
             StartCoroutine(bgrunFade(bgfront, ishide));
         }
         //其他渐变处理
@@ -184,11 +216,13 @@ public class PlotView : MonoBehaviour
     }
     private void bgChangeComplete()
     {
+        Debug.Log("bgChangeComplete");
         bgfront = !bgfront;
     }
     /// <summary>
     /// isfront  将要换的是否前景，是否渐隐
     /// </summary>
+    private bool isfadeing = false;
     IEnumerator bgrunFade(bool isfront,bool ishide)
     {
         //渐显处理
@@ -200,7 +234,7 @@ public class PlotView : MonoBehaviour
                 bgstartNum = 1;
                 back2.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
                 bgChangeComplete();
-                yield return null;
+                isfadeing = false;
             }
             else
                 back2.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
@@ -208,25 +242,26 @@ public class PlotView : MonoBehaviour
         else
         {//后图渐显
             bgstartNum -= Time.deltaTime;
-            if (bgstartNum < bgFadeFinal)
+            if (bgstartNum < 0)
             {
                 bgstartNum = 0;
                 back2.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
                 bgChangeComplete();
-                yield return null;
+                isfadeing = false;
             }
             else
                 back2.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
         }
-        StartCoroutine(bgrunFade(isfront, ishide));
         yield return null;
+        if (isfadeing)
+            StartCoroutine(bgrunFade(isfront, ishide));
     }
 
     //=================================     工具部分        ==============
 
     private void playAnim(GameObject obj, string animname,bool isloop)
     {
-        AnimationController.Instance.playAnimation(obj, animname, isloop);
+        //AnimationController.Instance.playAnimation(obj, animname, isloop);
     }
 
     private void showInterface()
@@ -238,7 +273,8 @@ public class PlotView : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
-
+    private void showUnderBar() { undertip.SetActive(true); }
+    private void hideUnderBar() { undertip.SetActive(false); }
     /// <summary>
     ///加载全屏的剧情  || 剧情编号
     /// </summary>

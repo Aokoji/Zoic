@@ -340,6 +340,7 @@ public abstract class CombatAdapter : CombatInterface
             }
             atkResult.isHitRare.Add(israte);
             //受击动画
+            Debug.Log(israte+"---------"+ GameStaticParamData.combatAnimNameList.dodgeName);
             atkResult.animTypeTaken.Add(israte ? GameStaticParamData.combatAnimNameList.dodgeName : GameStaticParamData.combatAnimNameList.behitNormalName);
         }
     }

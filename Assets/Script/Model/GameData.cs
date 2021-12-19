@@ -290,6 +290,10 @@ public class GameData: DDOLData<GameData>
         playermessage.skills.skillHold.Add(AllUnitData.data.getSkillStaticData(4));  //初始一个技能
         playermessage.skills.skillHold.Add(AllUnitData.data.getSkillStaticData(5));  //初始一个技能
 
+        //其他配置
+        //剧情进度
+        playermessage.plotCount = 101;
+
         playermessage.paddingData();
         Debug.Log("save create success!");
         saveLoad(null);
