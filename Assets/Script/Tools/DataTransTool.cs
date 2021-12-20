@@ -14,7 +14,7 @@ public class DataTransTool
     public static float defenceTrans(int pro,int def)
     {
         float coef = 0;
-        coef = pro / pro + def * defCoefAmp;
+        coef = pro / (pro + def * defCoefAmp);
         return coef;
     }
 
@@ -30,13 +30,13 @@ public class DataTransTool
         float multi = 1f;
         if (ispower)
         {
-            if (target < property)
+            if (target < property)  //比目标属性
                 multi = normalPromote;
         }
         else
         {
             if (target * propertyGapNum <= property)
-            {//满足倍率
+            {//满足倍率1.5
                 multi = magicSpecialAmp2;
                 if ((target * propertyGapNum + level * 2) <= property)  //满足二挡
                     multi = magicSpecialAmp1;

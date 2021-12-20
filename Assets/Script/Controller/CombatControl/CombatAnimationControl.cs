@@ -50,21 +50,21 @@ public class CombatAnimationControl : MonoBehaviour
             //播放受击方动画
             PubTool.Instance.addAnimStep(delegate (Action callback)
             {
-                int count = result.animTypeTaken.Count;
-                foreach (var id in result.takenActor)
+                int count = result.takenActor.Count;
+                foreach (var item in result.takenActor)
                 {
                     if (result.isHit)
                     {   //判断命中
-                        if (result.isHitRare[id])
+                        if (item.israte)
                         {
-                            actorList[id].showPhysicalChange(true);
+                            actorList[item.index].showPhysicalChange(true);
                         }
                     }
                     else if (result.iscure)
                     {
-                        actorList[id].showPhysicalChange(true);
+                        actorList[item.index].showPhysicalChange(true);
                     }
-                    actorList[id].PrefabCtrl.playAction(result.animTypeTaken[id], delegate () {
+                    actorList[item.index].PrefabCtrl.playAction(item.animTypeTaken, delegate () {
                         count--;
                         if (count <= 0)
                             callback();

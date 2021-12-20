@@ -12,25 +12,18 @@ public class AttackResultData
     public bool isfrontAll;     //是否在所有指令前
 
     public int sourceActor;//攻击方
-    public List<int> takenActor = new List<int>();//受击方(主攻击)      顺序001
+    public List<combatSustainData> takenActor = new List<combatSustainData>();//受击方(主攻击) 
     public string animTypeSource;    // * 动画类型  标记播放的攻击动画
-    public List<string> animTypeTaken=new List<string>();     //受击方动画        顺序001
 
     public bool isHit;  //是否伤害
-    public List<int> hitNum = new List<int>();    //受击伤害(不包含多频)        顺序001
-    public List<int[]> hitCount = new List<int[]>();    //受击伤害(包含多频)        顺序001
     public int hitType;
-    public List<bool> isHitRare = new List<bool>();   //该次攻击类型技能是否命中        顺序001
     public bool isSpecial;      //是否附带攻击特效
-    public List<int[]> specialCount = new List<int[]>();    //受攻击特效数       顺序001
-    public List<int[]> specialType = new List<int[]>(); //受攻击特效类型（用于显示字体颜色）     顺序001
 
     public bool iscure;     //治疗
     public List<int> cureNum = new List<int>();
 
     public bool isBuff; //是否buff
     public int buffId;  //buffid  对应abnormal数据
-    public List<bool> isHitBuff = new List<bool>();   //该次buff类型技能是否命中
     //+++  需要完善buff的变动修改类型
 
     public bool isDomain;   //是否场地变化
@@ -69,6 +62,13 @@ public class wholeRoundData
 //战斗受指定单位 操作信息
 public class combatSustainData
 {
-
+    public int index;   //战斗四人的顺序编号
+    public bool israte; //是否被命中
+    public int hitresult;   //最终受伤
+    public int[] hitNums; //受伤次数组（终值）
+    public int[] specialCount;  //攻击特效伤害（受伤）
+    public int[] specialType;   //攻击特效类型
+    public string animTypeTaken;    //受击动画名
+    public int cureNum; //治疗量
 }
 

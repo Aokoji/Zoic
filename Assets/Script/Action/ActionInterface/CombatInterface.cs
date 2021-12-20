@@ -14,9 +14,9 @@ public interface CombatInterface
     void specialAction(AnalyzeResult action);
     void moveAnalyze(AnalyzeResult action);     //移动分析
     void takeEffectAttackResult();      //伤害生效
-    void hitTakeEffect(int i);
-    void buffTakeEffect(int i);
-    void cureTakeEffect(int i);
+    void hitTakeEffect(combatSustainData item);
+    void buffTakeEffect(combatSustainData item);
+    void cureTakeEffect(combatSustainData item);
     void territoryTypeAction(); //技能类型处理(场地)
     //
     void stateTypeAction(); //技能类型处理(增益)
@@ -24,7 +24,7 @@ public interface CombatInterface
     void harmTypeAction(); //技能类型处理(伤害)
     void executeHarmEffect();   //伤害效果分析
     //
-    void calculateSpecialEffect(CombatMessage target);  //特殊攻击计算
+    void calculateSpecialEffect(CombatMessage target,combatSustainData item);  //特殊攻击计算
     //
     //--内置判断
     bool checkCombatResult();           //判断输赢(该局战斗)
@@ -48,7 +48,7 @@ public abstract class CombatAdapter : CombatInterface
     private wholeRoundData roundData;       //回合数据**
     private SkillStaticData skill;  //暂存技能数据
     CombatMessage sourceActor;          //来源
-    List<CombatMessage> takeActors; //目标
+    List<combatSustainData> takenActors; //最终目标数据
     string PLAYER = "player";   //玩家name
     /// <summary>
     /// 初始化方法
@@ -86,14 +86,16 @@ public abstract class CombatAdapter : CombatInterface
         roundData = new wholeRoundData();
         //结果目标 赋值
         atkResult.sourceActor = action.selfNum;
-        atkResult.takenActor = action.takeNum;
         //伤害来源目标
         sourceActor = dataList[action.selfNum];
         //被伤目标
-        takeActors = new List<CombatMessage>();
+        takenActors = new List<combatSustainData>();
+        atkResult.takenActor = takenActors;
         foreach (int i in action.takeNum)
         {
-            takeActors.Add(dataList[i]);
+            combatSustainData act = new combatSustainData();
+            act.index = i;
+            takenActors.Add(act);
         }
     }
     /// <summary>
@@ -160,46 +162,46 @@ public abstract class CombatAdapter : CombatInterface
     /// </summary>
     public void takeEffectAttackResult()
     {
-        for (int i = 0; i < takeActors.Count; i++)
+        foreach(var item in takenActors)
         {
             //计算伤害
             if (atkResult.isHit)
-                hitTakeEffect(i);
+                hitTakeEffect(item);
             //叠buff
             if (atkResult.isBuff)
-                buffTakeEffect(i);
+                buffTakeEffect(item);
             //计算治疗
             if (atkResult.iscure)
-                cureTakeEffect(i);
+                cureTakeEffect(item);
             //移动生效
             if (atkResult.isMoveInstruct)
-                moveTakeEffect(i);
+                moveTakeEffect(item);
         }
     }
-    public void hitTakeEffect(int i)
+    public void hitTakeEffect(combatSustainData item)
     {
         int hitfin = 0;
-        if (atkResult.isSpecial&& atkResult.specialCount.Count>0)
+        if (atkResult.isSpecial&& item.specialCount.Length>0)
         {
-            foreach (int k in atkResult.specialCount[i])
+            foreach (int k in item.specialCount)
                 hitfin += k;
         }
-        if(atkResult.isHitRare[i])
-            hitfin += atkResult.hitNum[i];
-        if (takeActors[i].hitCurPhysical(hitfin))
+        if(item.israte)
+            hitfin += item.hitresult;
+        if (dataList[item.index].hitCurPhysical(hitfin))
         {
-            atkResult.willDeadActor.Add(i);
+            atkResult.willDeadActor.Add(item.index);
         }
     }
-    public void buffTakeEffect(int i)
+    public void buffTakeEffect(combatSustainData item)
     {
 
     }
-    public void cureTakeEffect(int i)
+    public void cureTakeEffect(combatSustainData item)
     {
-        takeActors[i].hitCurPhysical(-atkResult.cureNum[i]);
+        dataList[item.index].hitCurPhysical(-item.cureNum);
     }
-    public void moveTakeEffect(int i)
+    public void moveTakeEffect(combatSustainData item)
     {
         if (sourceActor.IsPlayer)
         {
@@ -275,47 +277,54 @@ public abstract class CombatAdapter : CombatInterface
         //施放动画
         atkResult.animTypeSource = GameStaticParamData.combatAnimIDTrans(skill.animTypeTake);
         //计算作用目标伤害
-        for (int i = 0; i < takeActors.Count; i++)
+        //记录防御和减伤 辅助参数
+        int pat = 0;
+        int def = 0;
+        int refer = 0;  //参考属性  力或智
+        int ampRefer = 0;   //伤害增幅参考目标属性
+        bool ispower = false;//区分物魔
+        int hitresult = baseDam;    //伤害（最终）
+        foreach (var item in takenActors)
         {
+            pat = 0;
+            def = 0;
+            refer = 0;
+            ampRefer = 0;
+            ispower = false;
+            hitresult = baseDam;
             //计算命中和闪避
             bool israte = holy ? holy : Random.Range(0, 100) < sourceActor.Data.hitRate_last;       //true命中
             if (israte)
             {
-                israte = holy ? holy : Random.Range(0, 100) > takeActors[i].Data.dodge_last;   //true命中
-                if (israte)
+                item.israte= holy ? holy : Random.Range(0, 100) > dataList[item.index].Data.dodge_last;   //true命中
+                if (item.israte)
                 {//命中
                     //记录防御和减伤
-                    int pat = 0;
-                    int def = 0;
-                    int refer = 0;  //参考属性  力或智
-                    int ampRefer = 0;   //伤害增幅参考目标属性
-                    bool ispower= false;//区分物魔
-                    int hitresult = baseDam;    //伤害（最终）
                     if (skill.damageType == 191)
                     {
-                        pat = takeActors[i].Data.adPat_last;
-                        refer = sourceActor.Data.force_last;
-                        ampRefer = takeActors[i].Data.force_last;
-                        def = takeActors[i].Data.defence_last;
+                        pat = dataList[item.index].Data.adPat_last; //ad减伤
+                        refer = sourceActor.Data.force_last;    //参考力量
+                        ampRefer = dataList[item.index].Data.force_last;    //目标力量
+                        def = dataList[item.index].Data.defence_last;   //防御
                         ispower = true;
                     }
                     if (skill.damageType == 192)
                     {
-                        pat = takeActors[i].Data.apPat_last;
+                        pat = dataList[item.index].Data.apPat_last;
                         refer = sourceActor.Data.wisdom_last;
-                        ampRefer = takeActors[i].Data.wisdom_last;
-                        def = takeActors[i].Data.defence_last / 2;
+                        ampRefer = dataList[item.index].Data.wisdom_last;
+                        def = dataList[item.index].Data.defence_last / 2;
                     }
                     //计算防御系数  
-                    float defCoef= DataTransTool.defenceTrans(refer, def);
+                    float defCoef = DataTransTool.defenceTrans(refer, def);     //承伤比
                     //计算伤害增幅（过高差距）
-                    float hitAmp=DataTransTool.propertyGapAmp(refer, ampRefer,sourceActor.Data.level,ispower);
+                    float hitAmp = DataTransTool.propertyGapAmp(refer, ampRefer, sourceActor.Data.level, ispower);
                     //真伤只乘增幅
                     hitresult = (int)(baseDam * hitAmp);
                     if (!holy)
                     {
                         //乘防御系数
-                        hitresult = Mathf.FloorToInt(hitresult*defCoef);
+                        hitresult = Mathf.FloorToInt(hitresult * defCoef);
                         //计算减伤
                         hitresult = (int)Mathf.Round(hitresult * (float)(1 - (pat / 100)));
                     }
@@ -326,30 +335,29 @@ public abstract class CombatAdapter : CombatInterface
                     {
                         hitnums[k] = hitper;
                     }
-                    atkResult.hitCount.Add(hitnums);
-                    atkResult.hitNum.Add(hitresult);
+                    item.hitNums = hitnums;
+                    item.hitresult = hitresult;
                     //-----------------------------------------------
                     //计算攻击特效
                     if (skill.isSpecialEffect)
                     {
                         atkResult.isSpecial = true;
-                        calculateSpecialEffect(takeActors[i]);
+                        calculateSpecialEffect(dataList[item.index],item);
                     }
                     else atkResult.isSpecial = false;
-                }
-            }
-            atkResult.isHitRare.Add(israte);
+                }//判断taken闪避
+            }//判断source命中
             //受击动画
-            Debug.Log(israte+"---------"+ GameStaticParamData.combatAnimNameList.dodgeName);
-            atkResult.animTypeTaken.Add(israte ? GameStaticParamData.combatAnimNameList.dodgeName : GameStaticParamData.combatAnimNameList.behitNormalName);
-        }
+            Debug.Log(israte + "---------" + GameStaticParamData.combatAnimNameList.dodgeName);
+            item.animTypeTaken=israte ? GameStaticParamData.combatAnimNameList.dodgeName : GameStaticParamData.combatAnimNameList.behitNormalName;
+        }//foreach循环
     }
 
     /// <summary>
     /// 计算攻击特效方法（自动）
     /// </summary>
     /// <param name="target">受害人</param>
-    public void calculateSpecialEffect(CombatMessage target)
+    public void calculateSpecialEffect(CombatMessage target,combatSustainData item)
     {
         List<int> sphit = new List<int>();    //特效次数
         List<int> sptyp = new List<int>();    //特效类型
@@ -369,7 +377,7 @@ public abstract class CombatAdapter : CombatInterface
             }
             if (abnormal.effectRefer == 150)
             {
-                refer = atkResult.hitNum[atkResult.hitNum.Count - 1];
+                refer = item.hitresult;
             }
             refer = (int)Mathf.Round(abnormal.effectHitMulti / 100 * refer);
             //计算减伤
@@ -397,8 +405,8 @@ public abstract class CombatAdapter : CombatInterface
                 hitsp[i] = sphit[i];
                 typsp[i] = sptyp[i];
             }
-            atkResult.specialCount.Add(hitsp);
-            atkResult.specialType.Add(typsp);
+            item.specialCount = hitsp;
+            item.specialType = typsp;
         }
     }
     //=======================================       回合计算        =======================
