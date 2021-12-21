@@ -5,7 +5,7 @@ using UnityEngine;
 public class CombatMessage
 {
     //--------以下为内部引用量
-    private string name;
+    private string name1;
     private string iconName;
     private combatUnitProperty data = new combatUnitProperty();
 
@@ -33,7 +33,7 @@ public class CombatMessage
     private int skillOdds;  //技能概率  (忘了是啥了)
 
     public float CurSpeed { get => curSpeed; set => curSpeed = value; }
-    public string Name1 { get => name; set => name = value; }
+    public string Name1 { get => name1; set => name1 = value; }
     public GameObject IconActor { get => iconActor; set => iconActor = value; }
     public bool IsPlayer { get => isPlayer; set => isPlayer = value; }
     public GameObject Prefab { get => prefab; set => prefab = value; }

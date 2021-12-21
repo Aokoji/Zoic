@@ -18,7 +18,7 @@ public class CombatAnimationControl : MonoBehaviour
     /// <param name="result">结果</param>
     public void playCombatBeHit(CombatView combat, AttackResultData result, List<CombatMessage> actorList, Action action)
     {//播放被击动画  并调用合适的视图面板变动
-        PubTool.dumpString("【战斗数据】", result);
+        PubTool.dumpString("播放被击动画【战斗数据】", result);
         //移动表现判断        有frontall标识代表一定有移动
         if (result.isfrontAll)
         {

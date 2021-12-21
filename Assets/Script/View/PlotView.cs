@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.IO;
 
 public class PlotView : MonoBehaviour
 {
@@ -12,15 +10,16 @@ public class PlotView : MonoBehaviour
     public GameObject backimg2;      //背景图  上
     private Image back1;
     private Image back2;
+    public GameObject importStage;  //加载组件位置
+    public PlotInterface stageMod;     //组件脚本
 
     public GameObject undertip;     //底框
     public Text underContext;       //底框文字
-
     public Button topperClick;      //全屏点击区域
 
     private PlotListMod plot;       //plot数据集
     //----静态数据
-    private float fixTime = 0.5f;
+    private float fixTime = 0.5f;   //点击间隔（最小）
     //------当局变量数据集  需要刷-------
     private bool allowClick;        //允许点击(当前是否允许点击进行下一步)
     private Action nextstep;
@@ -31,6 +30,7 @@ public class PlotView : MonoBehaviour
     private string[] curplotData;       //当次内容
     private bool bgfront;   //是否前底图
 
+    private bool isLoadCSV;     //是否是csv剧情
     //显隐变量
     private float bgstartNum;
     private float bgFadeFinal = 1;
@@ -79,14 +79,30 @@ public class PlotView : MonoBehaviour
     public void doplot(int plotid,Action callback)
     {
         Debug.Log(plotid + "---id---plot");
-        showInterface();
-        refreshVariate();
-        plot.readConfig(plotid);                 //读数据
-        PubTool.dumpString(plot.plotdata);
-        maxplotShedule = plot.plotdata.Count;
-        nextstep = callback;
-        allowClick = true;
-        nextPlotDialog();
+        plot.setID(plotid);
+        if (readPlotLoadConfig())
+        {
+            //全屏控制剧情
+            isLoadCSV = false;
+            GameObject loadobj = Resources.Load<GameObject>(plot.resPath+plotid+"/"+plotid);
+            var obj = Instantiate(loadobj);
+            obj.transform.SetParent(importStage.transform, false);
+            stageMod =obj.GetComponent<PlotInterface>();
+            stageMod.startPlot(callback);
+        }
+        else
+        {
+            //界面对话剧情
+            isLoadCSV = true;
+            showInterface();
+            refreshVariate();
+            plot.readConfig(plotid);                 //读数据
+            PubTool.dumpString(plot.plotdata);
+            maxplotShedule = plot.plotdata.Count;
+            nextstep = callback;
+            allowClick = true;
+            nextPlotDialog();
+        }
     }
 
     //下一段对话
@@ -110,6 +126,7 @@ public class PlotView : MonoBehaviour
     private void curPlotEnded()
     {
         nextstep?.Invoke();
+        nextstep = null;
     }
     //===============================       分析部分        ====================
     //锁 默认存在最低延时，保证流程通畅
@@ -275,6 +292,12 @@ public class PlotView : MonoBehaviour
     }
     private void showUnderBar() { undertip.SetActive(true); }
     private void hideUnderBar() { undertip.SetActive(false); }
+    //判断是否加载外部预制体
+    private bool readPlotLoadConfig()
+    {
+        int n = plot.startStaticNum - plot.plotid;
+        return plot.needLoadConfig[n];
+    }
     /// <summary>
     ///加载全屏的剧情  || 剧情编号
     /// </summary>

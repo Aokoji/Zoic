@@ -21,11 +21,21 @@ public class PlotListMod
     {
         plotdata = new List<string[]>();
     }
-
+    //=======================================           剧情配置            ===========
+    public int startStaticNum = 101;
+    public bool[] needLoadConfig =
+    {
+        true,//101
+        false,//102
+    };
+    //=======================================       配置end       =================
+    public void setID(int plotid)
+    {
+        this.plotid = plotid;
+    }
     //读csv数据
     public void readConfig(int plotid)
     {
-        this.plotid = plotid;
         string path = plotPath + plotid + "//" + plotid + ".csv";
         StreamReader sr = null;
         if (File.Exists(path))

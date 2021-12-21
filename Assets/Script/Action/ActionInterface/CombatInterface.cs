@@ -181,7 +181,7 @@ public abstract class CombatAdapter : CombatInterface
     public void hitTakeEffect(combatSustainData item)
     {
         int hitfin = 0;
-        if (atkResult.isSpecial&& item.specialCount.Length>0)
+        if (atkResult.isSpecial && item.specialCount.Length>0)
         {
             foreach (int k in item.specialCount)
                 hitfin += k;
@@ -265,8 +265,6 @@ public abstract class CombatAdapter : CombatInterface
         //记录伤害类型
         atkResult.hitType = skill.damageType;
         bool holy = atkResult.hitType == 190;   //临时记录是否真伤
-        //记录攻击特效
-        atkResult.isSpecial = skill.isSpecialEffect;
         //----------计算攻击----------
         //获得参考属性值
         int basePro = sourceActor.getCombatParamData(skill.damageRefer);
@@ -340,11 +338,9 @@ public abstract class CombatAdapter : CombatInterface
                     //-----------------------------------------------
                     //计算攻击特效
                     if (skill.isSpecialEffect)
-                    {
-                        atkResult.isSpecial = true;
                         calculateSpecialEffect(dataList[item.index],item);
-                    }
-                    else atkResult.isSpecial = false;
+                    else
+                        atkResult.isSpecial = false;
                 }//判断taken闪避
             }//判断source命中
             //受击动画
@@ -407,7 +403,10 @@ public abstract class CombatAdapter : CombatInterface
             }
             item.specialCount = hitsp;
             item.specialType = typsp;
+            atkResult.isSpecial = true;
         }
+        else
+            atkResult.isSpecial = false;
     }
     //=======================================       回合计算        =======================
     //计算回合数据  冷却
