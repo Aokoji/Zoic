@@ -13,6 +13,7 @@ public class CombatActorItem : MonoBehaviour
     public Image hpaux; //hp辅助条  显示掉血的虚血格
     public Text distanceText;       //与玩家距离
     public GameObject abnormalIconBoard;        //显示异常状态的图标父级
+    public GameObject picBase;  //立牌组（人物图父级）
 
     private bool isgray=false;
     private bool clickLock = false;
@@ -37,6 +38,11 @@ public class CombatActorItem : MonoBehaviour
     }
     public bool getGray() { return isgray; }
 
+    public void setHealthLineSameToData(float max,float cur)
+    {
+        hpctl.fillAmount = cur / max;
+        hpaux.fillAmount = cur / max;
+    }
     //设置血条可见
     public void setHpVisible(bool isshow)
     {
@@ -47,6 +53,10 @@ public class CombatActorItem : MonoBehaviour
     {
         hpctl.fillAmount = num;
         hpaux.fillAmount = 0;
+    }
+    public void setForward(bool isforward)
+    {
+        picBase.transform.localScale = new Vector3(isforward?1:-1, 1, 1);
     }
     //================================ 动作 ================
     public void playAction(string name,Action callback)
@@ -72,7 +82,7 @@ public class CombatActorItem : MonoBehaviour
 
     //=====================================   掉血缓动效果参数  =================
     private float timephyDec=1f;     //掉血时间参数
-    private float timephyPer=GameStaticParamData.timePer20; //一秒20次刷新
+    private float timephyPer=GameStaticParamData.timePer50; //一秒20次刷新
     private float timephyRun;       //时间记录变量
     private float changtoPhy;       //改变量
     //掉血/加血 血条变动效果

@@ -40,6 +40,7 @@ public class AnimationController : DDOLController<AnimationController>
             Debug.LogError("animation  time  is  null  !");
             return;
         }
+        obj.SetActive(true);
         anim.Play(aniName,0,0f);
         void action()
         {
@@ -57,6 +58,7 @@ public class AnimationController : DDOLController<AnimationController>
             Debug.LogError("animation  time  is  null  !");
             return;
         }
+        obj.SetActive(true);
         anim.Play(aniName, 0, 0f);
         void action()
         {

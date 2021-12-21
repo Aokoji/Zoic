@@ -13,6 +13,7 @@ public static class GameStaticParamData
     public static float playerSpeed= 2.5f;
 
     public static float timePer20=0.05f;
+    public static float timePer50=0.02f;
     private static int lowGive = 1;
     private static int midGive = 2;
     private static int highGive = 2;

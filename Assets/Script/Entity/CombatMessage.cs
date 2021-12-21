@@ -57,6 +57,10 @@ public class CombatMessage
             sk.runDown = 0;
         paddingData();
     }
+    public void initPrefab()
+    {
+        prefabCtrl.setHealthLineSameToData(data.physical_last,data.curHp);//显示血条初始化
+    }
     /// <summary>
     /// 赋完值后 拉栓 计算属性赋最终值
     /// </summary>

@@ -155,6 +155,8 @@ public class CombatView : MonoBehaviour
             item.Prefab.name = "createPrefab";
             item.PrefabCtrl = item.Prefab.GetComponent<CombatActorItem>();
             item.PrefabCtrl.numId = item.NumID;     //记录是哪个id
+            item.initData();
+            item.initPrefab();
             actorBody.Add(loadactorBody);
             item.PrefabCtrl.chooseArrowChange(false);
 
@@ -218,7 +220,7 @@ public class CombatView : MonoBehaviour
                 item.Prefab.transform.position=playSlots.transform.position;    //设置位置
                 item.ShowActor.transform.localScale = new Vector3(1, 1, 1);     //设置内图片换图大小
                 item.ShowActor.GetComponent<Image>().SetNativeSize();       //设置图片自适应
-                item.Prefab.transform.localScale = new Vector3(1, 1, 1);        //区分
+                item.PrefabCtrl.setForward(true);       //设置正方向
             }
             else
             {
@@ -226,9 +228,10 @@ public class CombatView : MonoBehaviour
                 item.Prefab.transform.position=enemySlots[num].transform.position;
                 item.ShowActor.transform.localScale = new Vector3(1, 1, 1);
                 item.ShowActor.GetComponent<Image>().SetNativeSize();
-                item.Prefab.transform.localScale = new Vector3(-1, 1, 1);
+                item.PrefabCtrl.setForward(false);       //设置正方向
                 num++;
             }
+            item.Prefab.transform.localScale = new Vector3(1, 1, 1);
             item.Prefab.SetActive(true);
         }
         sceneShowType = type;
@@ -242,14 +245,13 @@ public class CombatView : MonoBehaviour
     
     ///--------------------------------------------------------------显示提示板的方式------------------------------
     ///
-    //显示提示板（比如距离）
+    //显示提示板（比如距离）(内置)
     private void showTips1Second(Action action)
     {
-        Debug.Log("播了弹板1");
         //播动画
         AnimationController.Instance.playAnimation(messageTips, "tipsShow", false, action);
     }
-    //设置内容
+    //设置内容 (内置)
     private void setTipsContext(string text)
     {
         messageTips.GetComponentInChildren<Text>().text = text;
@@ -267,7 +269,6 @@ public class CombatView : MonoBehaviour
     /// </summary>
     public void showTips1Second(string context)
     {
-        Debug.Log("播了弹板2");
         setTipsContext(context);
         AnimationController.Instance.playAnimation(messageTips, "tipsShow", false);
     }

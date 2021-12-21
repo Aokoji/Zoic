@@ -149,7 +149,6 @@ public class DataTransTool
         mess.AttackID = play.attackID;
         mess.SkillData = play.skills;
         mess.Name1 = "player";
-        mess.initData();
         return mess;
     }
     public static CombatMessage enemyToCombat(int id)                //单位数据  转换  战斗场景数据
@@ -184,7 +183,6 @@ public class DataTransTool
         {
             mess.SkillData.skillHold.Add(AllUnitData.Data.getSkillStaticData(sk));
         }
-        mess.initData();
         return mess;
     }
 }

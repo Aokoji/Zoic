@@ -40,7 +40,7 @@ public class CombatAnimationControl : MonoBehaviour
             //显示行动内容提示板
             PubTool.Instance.addAnimStep(delegate (Action callback)
             {
-                combat.showTips1Second("", callback);
+                combat.showTips1Second("攻击行为--测试", callback);
             });
             //播放攻击方动画  
             PubTool.Instance.addAnimStep(delegate (Action callback)
@@ -151,6 +151,7 @@ public class CombatAnimationControl : MonoBehaviour
                 //rounddata.specialType[count]; //这是数字类型
                 count++;
             }
+            callback();//暂时
         });
         //刷新计算buff显示
         PubTool.Instance.addAnimStep(delegate (Action callback)
@@ -159,6 +160,7 @@ public class CombatAnimationControl : MonoBehaviour
             //结算属性
             source.Abnormal = rounddata.settleBuffExist;
             source.paddingData();
+            callback();//暂时
         });
         //判断死亡
         if(rounddata.isRoundDead)
