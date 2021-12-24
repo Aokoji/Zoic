@@ -15,7 +15,7 @@ public class SceneMapNormal : SceneCtlMethod
     public GameObject[] moduleList;        //资源点实体（需要手动赋值）
     private ModuleType allDataList;
     //加载场景      决定要显示的时候再初始化
-    public override void initData()
+    public void initData()
     {
         //从记录中读取已存用的地图信息
         if (GameData.Data.SceneData.sceneData.ContainsKey(mapid))

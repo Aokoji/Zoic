@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//针对配置型  简单版对话剧情的控制mod
 public class PlotListMod 
 {
     public string plotPath = "Assets/Resources/Data/plot/plot";       //路径
