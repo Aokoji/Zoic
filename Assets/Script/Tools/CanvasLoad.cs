@@ -19,6 +19,7 @@ public class CanvasLoad : MonoBehaviour
         camView = mainCamera.GetComponent<CameraView>();
         initLayout();
         initEvent();
+        camView.initBGQuad();
     }
     private void initLayout()
     {
@@ -28,12 +29,6 @@ public class CanvasLoad : MonoBehaviour
     {
         EventTransfer.Instance.loadNewSceneEvent += onChangeSceneRefresh;
     }
-
-
-
-
-
-
 
     private void onChangeSceneRefresh()
     {

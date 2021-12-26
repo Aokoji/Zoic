@@ -39,7 +39,7 @@ public class PlayerMessageBridge : MessageBridgeInterface
         return playermessage.name;
     }
     //获取第一次进游戏
-    public bool getFirstIn() { return true; }// playermessage.isFirstIn; }
+    public bool getFirstIn() { return false; }// playermessage.isFirstIn; }
 
     //----------------------    剧情控制------------------
     //获取剧情序号

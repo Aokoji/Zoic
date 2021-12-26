@@ -35,7 +35,7 @@ public class PlotController : DDOLController<PlotController>
         }
         else
         {//否则判断其他剧情点
-
+            ViewController.instance.cameraFollowPlayer();
         }
     }
 

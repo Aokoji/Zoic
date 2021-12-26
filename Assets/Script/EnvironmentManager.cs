@@ -7,7 +7,8 @@ using UnityEngine.SceneManagement;
 public class EnvironmentManager : DDOLController<EnvironmentManager>
 {
     private SceneInterface scenePrefab;     //暂存当前组件的实体
-    private int sceneID;
+    private int sceneID;        //当前场景id        （大环境）
+    private int loadID;         //背景组件id        （小环境）
     private bool isfirst= true;
     private Action nextStep;
 
@@ -39,6 +40,16 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
         scenePrefab.initData();
         sceneID = scenePrefab.getSceneID();
     }
+    //================================      当前场景组件管理器       ==================（小场景管理器）
+    public void changePrefabScene(int id,Action action)
+    {
+
+    }
+
+
+
+
+
 
     //------------------------------------------场景管理器   ----------------------------------------
     //-----------           目前暂定 一个地图资源对应一个场景
@@ -84,6 +95,7 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
     public void setValueSceneToStart(SceneInterface scene)
     {
         scenePrefab = scene;
+        loadEnvironment();
         nextStep?.Invoke();
         nextStep = null;
     }

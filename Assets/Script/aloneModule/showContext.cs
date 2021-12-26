@@ -113,7 +113,7 @@ public class showContext : MonoBehaviour
         if (collision.tag == "Player")
         {
             isEnterCollect = true;
-            callState(true);
+            //callState(true);
             showTips();
         }
     }
@@ -122,7 +122,7 @@ public class showContext : MonoBehaviour
         if (collision.tag == "Player")
         {
             isEnterCollect = false;
-            callState(false);
+            //callState(false);
             hideTips();
         }
     }
