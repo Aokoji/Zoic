@@ -18,6 +18,11 @@ public class StartSceneController : MonoBehaviour
 
     public void startGameClick()
     {
-        GameManager.gameManager.startGame();
+        GameManager.gameManager.startGame(closeUI);
+    }
+
+    public void closeUI()
+    {
+
     }
 }

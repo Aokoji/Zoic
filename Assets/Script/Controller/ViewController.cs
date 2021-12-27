@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -105,22 +106,44 @@ public class ViewController : DDOLController<ViewController>
         showMainCam();
         //+++刷新部分数据
     }
+    //幕布操作
+    public void playSceneChangeCurtain(bool isshow,Action callback)
+    {
+        if (isshow)
+            mainview.playSceneChangeCurtainShow(callback);
+        else
+            mainview.playSceneChangeCurtainHide(callback);
+    }
+    public void setChangeCurtainVisible(bool visit){mainview.setCurtainVisible(visit);}
 
     public void cameraFollowPlayer() { baseview.cameraFollowPlayer(); }
     public CanvasLoad getBaseMod() { return baseview; }
     public MainView getUIMod() { return mainview; }
 
+    /// <summary>
+    /// 给canvas ui 层添加组件
+    /// </summary>
     public void addToUIMod(GameObject obj)
     {
         obj.transform.SetParent(mainview.transform, false);
         obj.transform.position = mainview.transform.position;
     }
-
+    /// <summary>
+    /// 给base层 actor加组件
+    /// </summary>
     public void addToBaseMod_Actor(GameObject obj)
     {
         obj.transform.SetParent(baseview.actor.transform);      //待定 需要设置视图层级
     }
-
+    /// <summary>
+    /// 给base层load（场景上层组件）添加
+    /// </summary>
+    public void addToBaseMod_Load(GameObject obj)
+    {
+        obj.transform.SetParent(baseview.load.transform);
+        obj.transform.position = new Vector3(0, 0, 0);
+    }
+    //-------------------------------------------------------加载基础view---------------------------
     private void loadBaseModView()
     {
         GameObject obj1 = Resources.Load<GameObject>("Entity/Base");

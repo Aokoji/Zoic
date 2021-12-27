@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
         GameData.Data.initGameData();
         EventTransfer.Instance.initEvent();                         //初始化事件派发器
         ViewController.Instance.initCreateViewController(); //初始化视图
+        EnvironmentManager.Instance.initData(); //加载场景
     }
     //创建manager
     public static void initManager()
@@ -35,7 +36,6 @@ public class GameManager : MonoBehaviour
     //加载游戏控制器
     public void loadBaseGameController()
     {
-        EnvironmentManager.Instance.initData(); //加载场景                                                  （ps因为awake已经读档了  否则应该先读档再加载场景）
         PlayerControl.Instance.initCreatePlayer();          //初始化玩家
         PlayerManager.Instance.loadPlayerManager();     //加载玩家管理器
         MainController.Instance.initController();
@@ -56,11 +56,11 @@ public class GameManager : MonoBehaviour
     //------------------------------------------------------------------------------------------------------场景切换主动方法------------
     //--------类似于场景管理器的职责   目前还没有单独的场景管理器
     //点击主页面的开始  切换场景
-    public void startGame()     //赋给了开始游戏按钮
+    public void startGame(Action mid)     //赋给了开始游戏按钮
     {
         //开始界面切换到  游戏界面
         //+++开始游戏应该有一个后续的读档界面 或者缓冲界面  开始界面的所有操作按钮都在它的视图层完成
-        EnvironmentManager.Instance.checkStartGameSceneAndDo(onstartGame);      //这是最后的读档操作了
+        EnvironmentManager.Instance.checkStartGameSceneAndDo(mid,onstartGame);      //这是最后的读档操作了
     }
     //开始游戏检查
     public void onstartGame()

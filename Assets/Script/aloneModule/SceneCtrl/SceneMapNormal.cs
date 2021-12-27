@@ -7,7 +7,7 @@ public class SceneMapNormal : SceneCtlMethod
 {
     void Start()
     {
-        EnvironmentManager.Instance.setValueSceneToStart(this);
+        //EnvironmentManager.Instance.setValueSceneToStart(this);
     }
     private int curModuleId;    //当前激活资源点编号（玩家进入）   -1为没有
     //-------------------------------------------------------------资源点------------------------------------
@@ -26,7 +26,7 @@ public class SceneMapNormal : SceneCtlMethod
         {
             allDataList = new ModuleType();
         }
-        initSceneCollection();
+        //initSceneCollection();
         gameObject.SetActive(true);
     }
     //初始化场景可互动资源

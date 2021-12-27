@@ -48,7 +48,7 @@ public class PlotView : MonoBehaviour
         back1 = backimg1.GetComponent<Image>();
         back2 = backimg2.GetComponent<Image>();
         back2.color = new Color(0.125f, 0.125f, 0.125f, 1);
-        back1.color = new Color(1,1,1, 1);
+        back1.color = new Color(0.125f, 0.125f, 0.125f, 1);
         //这俩背景都显示，黑底
     }
     private void initEvent()
@@ -87,6 +87,7 @@ public class PlotView : MonoBehaviour
             GameObject loadobj = Resources.Load<GameObject>(plot.resPath+plotid+"/"+plotid);
             var obj = Instantiate(loadobj);
             obj.transform.SetParent(importStage.transform, false);
+            obj.transform.position = new Vector3(0, 0, 0);
             stageMod =obj.GetComponent<PlotInterface>();
             stageMod.startPlot(callback);
         }
