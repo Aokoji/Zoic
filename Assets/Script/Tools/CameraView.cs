@@ -65,7 +65,7 @@ public class CameraView : MonoBehaviour
     public void moveBG()
     {
         //float i = player.transform.position.x - playerX;
-        playerX = player.gameObject.transform.position.x;  //差值计算
+        playerX = player.transform.position.x;  //差值计算
 
         speed = Vector2.right * movelength.x * 1f;
         offset += speed * Time.deltaTime;

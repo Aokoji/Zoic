@@ -9,11 +9,7 @@ public class SceneMapNormal : SceneCtlMethod
     {
         //EnvironmentManager.Instance.setValueSceneToStart(this);
     }
-    private int curModuleId;    //当前激活资源点编号（玩家进入）   -1为没有
     //-------------------------------------------------------------资源点------------------------------------
-    //资源点数据都要单独配置
-    public GameObject[] moduleList;        //资源点实体（需要手动赋值）
-    private ModuleType allDataList;
     //加载场景      决定要显示的时候再初始化
     public void initData()
     {

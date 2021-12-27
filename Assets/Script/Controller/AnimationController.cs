@@ -44,7 +44,7 @@ public class AnimationController : DDOLController<AnimationController>
         anim.Play(aniName,0,0f);
         void action()
         {
-            if(!loop) anim.Play(NONE);
+            if (!loop) anim.StopPlayback();
             callBack();
         }
         PubTool.Instance.laterDo(time, action);
@@ -62,7 +62,7 @@ public class AnimationController : DDOLController<AnimationController>
         anim.Play(aniName, 0, 0f);
         void action()
         {
-            if (!loop) anim.Play(NONE);
+            if (!loop) anim.StopPlayback();
         }
         PubTool.Instance.laterDo(time, action);
     }

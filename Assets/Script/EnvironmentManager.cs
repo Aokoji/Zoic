@@ -11,6 +11,7 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
     private int sceneID;        //当前场景id        （大环境） (如果有小场景加载，大环境的scene切换显得不是很必要）
     private int loadID;         //背景组件id        （小环境）
     private bool isfirst;
+    private string sceneloadPath = "Entity/scene/scene";
 
     public void initData()
     {
@@ -24,15 +25,15 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
     ///没有场景数据  则为第一次进入  需要先加载 等待剧情结束再调用显示
     private void initalGameEnvironment()
     {
-        sceneID = 20101;
-        loadID = 20101;
-        isfirst = true;
+        sceneID = 101;
+        loadID = 101;
+        isfirst = false;
     }
     //================================      当前场景组件管理器       ==================（小场景管理器）
 
     //------------------------------------转场部分------------------
-    private float curtainRun=0;   //跑条
-    private float curtainTime = 1;  //黑幕时间（加载时间）(最低时间）
+    private float curtainRun=0f;   //跑条
+    private float curtainTime = 2f;  //黑幕时间（加载时间）(最低时间）
     private Action curtainAction;
     //切屏幕布   目前为固定时间 (仅限普通转场)           外调！
     public void changeSceneCurtain(int id,Action callback)
@@ -58,22 +59,22 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
             scenePrefab = null;
             sceneScript = null;
         }
-        GameObject loadobj = Resources.Load<GameObject>("Entity/scene/comp" + loadID);
+        GameObject loadobj = Resources.Load<GameObject>(sceneloadPath + loadID);
         scenePrefab = Instantiate(loadobj);
         ViewController.instance.addToBaseMod_Load(scenePrefab);
         sceneScript = scenePrefab.GetComponent<SceneInterface>();
-        sceneScript.initData();
+        //sceneScript.initData();
     }
     IEnumerator runCurtainSceen()
     {
         curtainRun += Time.deltaTime;
+        yield return null;
         if (curtainRun >= curtainTime)
         {
             changeWaitEnd();
         }
         else
             StartCoroutine(runCurtainSceen());
-        yield return null;
     }
     //结束
     private void changeWaitEnd()
@@ -87,7 +88,7 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
             ViewController.Instance.setChangeCurtainVisible(false);//隐藏幕布  为后续剧情准备
         }
         else
-            ViewController.Instance.playSceneChangeCurtain(true, changeCurtainEnd);
+            ViewController.Instance.playSceneChangeCurtain(false, changeCurtainEnd);
         //+++读取坐标点 纠正玩家位置(和相机位置)
     }
     //最终

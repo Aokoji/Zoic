@@ -23,6 +23,6 @@ public class StartSceneController : MonoBehaviour
 
     public void closeUI()
     {
-
+        Destroy(this.gameObject);
     }
 }
