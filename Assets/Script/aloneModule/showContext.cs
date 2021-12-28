@@ -28,16 +28,10 @@ public class showContext : MonoBehaviour
         if (showObj != null) showObj.SetActive(false);
     }
     //初始化两步走  initdata初始化  setmodule设置数据
-    public void initData()
+    public void initData(ModuleOneCollect data)
     {
+        module = data;
         initEvent();
-    }
-    /// <summary>
-    /// 设置资源点类型（最父级初始化调用）
-    /// </summary>
-    public void setModule(ModuleOneCollect type)
-    {
-        module = type;
     }
 
     private void initEvent()

@@ -63,7 +63,7 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
         scenePrefab = Instantiate(loadobj);
         ViewController.instance.addToBaseMod_Load(scenePrefab);
         sceneScript = scenePrefab.GetComponent<SceneInterface>();
-        //sceneScript.initData();
+        sceneScript.initData(loadID);
     }
     IEnumerator runCurtainSceen()
     {

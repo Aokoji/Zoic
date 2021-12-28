@@ -4,7 +4,7 @@ using UnityEngine;
 //场景组件接口
 public interface SceneInterface 
 {
-    void initData();
+    void initData(int id);
     int getSceneID();
     void loadScene();
 }
