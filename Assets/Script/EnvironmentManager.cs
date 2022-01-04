@@ -27,19 +27,17 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
     {
         sceneID = 101;
         loadID = 101;
-        isfirst = false;
+        isfirst = GameData.Data.playerBridge.getFirstIn();
     }
     //================================      当前场景组件管理器       ==================（小场景管理器）
 
     //------------------------------------转场部分------------------
-    private float curtainRun=0f;   //跑条
-    private float curtainTime = 2f;  //黑幕时间（加载时间）(最低时间）
+    private float curtainTime = 1f;  //黑幕时间（加载时间）(最低时间）
     private Action curtainAction;
     //切屏幕布   目前为固定时间 (仅限普通转场)           外调！
     public void changeSceneCurtain(int id,Action callback)
     {
         loadID = id;
-        curtainRun = 0;
         curtainAction = callback;
         ViewController.Instance.playSceneChangeCurtain(true,startRunCurtain);
     }
@@ -47,6 +45,7 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
     private void startRunCurtain()
     {
         StartCoroutine(runCurtainSceen());
+        PlotController.instance.checkOnSceneChange(loadID);
         changePrefabScene();
         sceneUnloadClear();//   清理gc工具
     }
@@ -67,14 +66,8 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
     }
     IEnumerator runCurtainSceen()
     {
-        curtainRun += Time.deltaTime;
-        yield return null;
-        if (curtainRun >= curtainTime)
-        {
-            changeWaitEnd();
-        }
-        else
-            StartCoroutine(runCurtainSceen());
+        yield return new WaitForSeconds(curtainTime);
+        changeWaitEnd();
     }
     //结束
     private void changeWaitEnd()
@@ -94,6 +87,12 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
     //最终
     private void changeCurtainEnd()
     {
+        if (!PlotController.instance.getPloting())
+        {
+            PlayerControl.instance.setControl(true);
+            PlayerControl.instance.setVisible(true);
+            ViewController.instance.cameraFollowPlayer();
+        }
         curtainAction?.Invoke();    //一般这种回调都是放开控制器什么的
         curtainAction = null;
     }
@@ -156,7 +155,6 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
     private void changeSceneCurtain(int id,Action midAction, Action callback)
     {
         loadID = id;
-        curtainRun = 0;
         curtainAction = callback;
         ViewController.Instance.playSceneChangeCurtain(true,delegate(){ startSpecialfunc(midAction); });
     }
@@ -164,6 +162,7 @@ public class EnvironmentManager : DDOLController<EnvironmentManager>
     {
         StartCoroutine(runCurtainSceen());
         step();
+        PlotController.instance.checkOnSceneChange(loadID);
         changePrefabScene();
         sceneUnloadClear();//   清理gc工具
     }

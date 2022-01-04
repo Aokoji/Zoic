@@ -98,13 +98,26 @@ public class ViewController : DDOLController<ViewController>
     {
         mainview.gameObject.SetActive(visible);
     }
+    public void setMainUINormalHide()
+    {
+        mainview.hideNormalUI();
+    }
 
     //进入场景刷新按钮集合
     public void onSceneEnterRefresh()
     {
-        showNormalUIView();
-        showMainCam();
-        //+++刷新部分数据
+        if (PlotController.instance.getPloting())
+        {
+            mainview.hideNormalUI();
+            cameraLeavePlayer();
+        }
+        else
+        {
+            showNormalUIView();
+            showMainCam();
+            cameraFollowPlayer();
+        }
+        //+++刷新部分数据  玩家位置  相机位置
     }
     //幕布操作
     public void playSceneChangeCurtain(bool isshow,Action callback)
@@ -117,6 +130,7 @@ public class ViewController : DDOLController<ViewController>
     public void setChangeCurtainVisible(bool visit){mainview.setCurtainVisible(visit);}
 
     public void cameraFollowPlayer() { baseview.cameraFollowPlayer(); }
+    public void cameraLeavePlayer() { baseview.cameraLeavePlayer(); }
     public CanvasLoad getBaseMod() { return baseview; }
     public MainView getUIMod() { return mainview; }
 

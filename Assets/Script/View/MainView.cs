@@ -49,6 +49,14 @@ public class MainView : MonoBehaviour
     {
         btnGroup.SetActive(true);
     }
+    public void hideBtnGroup()
+    {
+        btnGroup.SetActive(false);
+    }
+    public void hideNormalUI()
+    {
+        hideBtnGroup();
+    }
 
     private void openBag()
     {

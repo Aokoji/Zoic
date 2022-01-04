@@ -182,6 +182,8 @@ public class GameData: DDOLData<GameData>
     private void loadSceneMessageData()
     {
         sceneData = new Dictionary<int, ModuleType>();
+        if (!File.Exists(Application.dataPath + gameSceneLoadPath))
+            return;
         byte[] jsbt = File.ReadAllBytes(Application.dataPath + gameSceneLoadPath);
         string read = Encoding.UTF8.GetString(jsbt);
         List<ModuleType> readdata = JsonConvert.DeserializeObject<List<ModuleType>>(read);

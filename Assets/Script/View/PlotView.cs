@@ -7,10 +7,8 @@ public class PlotView : MonoBehaviour
 {
 
     public GameObject backimg1;      //背景图  底
-    public GameObject backimg2;      //背景图  上
-    private Image back1;
-    private Image back2;
     public GameObject importStage;  //加载组件位置
+    private GameObject stagePrefab;     //剧情组件实体
     public PlotInterface stageMod;     //组件脚本
 
     public GameObject undertip;     //底框
@@ -18,22 +16,23 @@ public class PlotView : MonoBehaviour
     public Button topperClick;      //全屏点击区域
 
     private PlotListMod plot;       //plot数据集
-    //----静态数据
-    private float fixTime = 0.5f;   //点击间隔（最小）
     //------当局变量数据集  需要刷-------
     private bool allowClick;        //允许点击(当前是否允许点击进行下一步)
     private Action nextstep;
     private int curplotShedule;     //当前进度
     private int maxplotShedule;     //总进度
-    private bool islocking;     //计时器锁
     private bool dialogIsShow;
     private string[] curplotData;       //当次内容
     private bool bgfront;   //是否前底图
 
+    //非csv plot ：普通连贯式全屏控制剧情，加载预制体，调用initdata 和 startplot自动执行
+    //csv plot：读取csv 仅限于对话系统，非全程控制，到达csv长度上限结束剧情。
     private bool isLoadCSV;     //是否是csv剧情
     //显隐变量
     private float bgstartNum;
     private float bgFadeFinal = 1;
+    //常量
+    private float waittime = 1f;
 
     public void initData()
     {
@@ -45,10 +44,7 @@ public class PlotView : MonoBehaviour
     private void initLayout()
     {
         hideInterface();
-        back1 = backimg1.GetComponent<Image>();
-        back2 = backimg2.GetComponent<Image>();
-        back2.color = new Color(0.125f, 0.125f, 0.125f, 1);
-        back1.color = new Color(0.125f, 0.125f, 0.125f, 1);
+        refreshLayout();
         //这俩背景都显示，黑底
     }
     private void initEvent()
@@ -63,15 +59,14 @@ public class PlotView : MonoBehaviour
         curplotShedule = 0;
         maxplotShedule = 0;
         allowClick = false;
-        islocking = false;
         dialogIsShow = false;
         bgfront = false;
-        refreshLayout();
         plot.initData();
         //+++ 刷新所有组件的内容（置空）
     }
     public void refreshLayout()
     {
+        backimg1.GetComponent<Image>().color = new Color(0.125f, 0.125f, 0.125f, 0.5f);
         hideUnderBar();
     }
 
@@ -80,21 +75,27 @@ public class PlotView : MonoBehaviour
     {
         Debug.Log(plotid + "---id---plot");
         plot.setID(plotid);
+        showInterface();
+        refreshLayout();
         if (readPlotLoadConfig())
         {
             //全屏控制剧情
             isLoadCSV = false;
-            GameObject loadobj = Resources.Load<GameObject>(plot.resPath+plotid+"/"+plotid);
+            importStage.SetActive(true);
+            GameObject loadobj = Resources.Load<GameObject>(plot.resPath+plotid+"/mainplot"+plotid);
             var obj = Instantiate(loadobj);
             obj.transform.SetParent(importStage.transform, false);
-            obj.transform.position = new Vector3(0, 0, 0);
+            //obj.transform.position = new Vector3(0, 0, 0);
+            stagePrefab = obj;
             stageMod =obj.GetComponent<PlotInterface>();
+            stageMod.initData();
             stageMod.startPlot(callback);
         }
         else
         {
             //界面对话剧情
             isLoadCSV = true;
+            importStage.SetActive(false);
             showInterface();
             refreshVariate();
             plot.readConfig(plotid);                 //读数据
@@ -106,22 +107,45 @@ public class PlotView : MonoBehaviour
         }
     }
 
+    public void checkPlotClosed()
+    {
+        if (!isLoadCSV)
+        {
+            //预制体状态   stageMod有值
+            if (stagePrefab == null) Debug.LogError("剧情组件 删除错误！！  非csv数据没有加载预制体！！！");
+            Destroy(stagePrefab);
+            stagePrefab = null;
+            stageMod = null;
+        }
+        else
+        {
+
+        }
+        hideInterface();
+    }
+
+    //下一阶段 对话强制剧情   (当前一定要记录剧情)
+    public void nextPlotRank()
+    {
+
+    }
+
     //下一段对话
     private void nextPlotDialog()
     {
         if (!allowClick) return;
         allowClick = false;
-        Debug.Log("当前进度序号 : " + curplotShedule);
         curplotShedule++;
         //判断结束
-        if (curplotShedule >= maxplotShedule)  
+        if (curplotShedule >= maxplotShedule)
+        {
             curPlotEnded();
+            return;
+        }
         curplotData = plot.plotdata[curplotShedule];
-        //分析锁
-        analyzeLock();
+        StartCoroutine(timmerLock());
         //分析操作
         analyzeDialog();
-        analyzeBackGround();
     }
     //剧情结束
     private void curPlotEnded()
@@ -130,24 +154,13 @@ public class PlotView : MonoBehaviour
         nextstep = null;
     }
     //===============================       分析部分        ====================
-    //锁 默认存在最低延时，保证流程通畅
-    private void analyzeLock()
+
+    IEnumerator timmerLock()
     {
-        string time1 = curplotData[plot.delay];
-        if (!time1.Equals("0"))
-        {
-            //触发延时
-            float num = float.Parse(time1);
-            StartCoroutine(timmerLock(num));
-        }
-        else
-            StartCoroutine(timmerLock(fixTime));
-    }
-    IEnumerator timmerLock(float time)
-    {
-        islocking = true;
-        yield return new WaitForSeconds(time);
-        islocking = false;
+        float wtime = waittime;
+        if (!curplotData[plot.iswait].Equals("0"))
+            wtime = float.Parse(curplotData[plot.iswait]);
+        yield return new WaitForSeconds(wtime);
         allowClick = true;
     }
 
@@ -171,109 +184,6 @@ public class PlotView : MonoBehaviour
         }
         underContext.text = curplotData[plot.dialog];
     }
-    /// <summary>
-    /// 渐变思路      
-    /// 渐显（后图状态）  后换图不变  前渐隐
-    /// 渐显（前图状态）后不变     前换图渐显
-    /// </summary>
-    private void analyzeBackGround()
-    {
-        if (curplotData[plot.isbg].Equals("0")) return;
-        Debug.Log("改bg");
-        //渐变 显隐  处理
-        bool fade = false;
-        bool ishide = false;
-        if (curplotData[plot.bgshowtype].Equals("渐隐"))
-        {
-            Debug.Log("目前没有渐隐处理===========");
-            fade = true;
-            ishide =true;
-        }
-        else if (curplotData[plot.bgshowtype].Equals("渐显"))
-        {
-            fade = true;
-            ishide = false;
-        }
-        Debug.Log(curplotData[plot.bgname]+ bgfront+fade);
-        if (fade)
-        {
-            if (bgfront)
-            {//前图渐显
-                bgstartNum = 0;
-                back1.color = new Color(back1.color.r, back1.color.g, back1.color.b, 1);
-                if (curplotData[plot.bgname].Equals("0"))
-                {
-                    back2.sprite = null;
-                    back2.color = new Color(0.125f,0.125f,0.125f, bgstartNum);
-                }
-                else
-                {
-                    back2.color = new Color(1,1,1, bgstartNum);
-                    back2.sprite = Resources.Load(plot.resPath + plot.plotid + "/" + curplotData[plot.bgname], typeof(Sprite)) as Sprite;
-                }
-            }
-            else
-            {//后图渐显
-                bgstartNum = 2;
-                if (curplotData[plot.bgname].Equals("0"))
-                {
-                    back2.sprite = null;
-                    back2.color = new Color(0.125f, 0.125f, 0.125f, bgstartNum);
-                    Debug.Log("zhihei");
-                }
-                else
-                    back2.sprite = Resources.Load(plot.resPath + plot.plotid + "/" + curplotData[plot.bgname], typeof(Sprite)) as Sprite;
-                back1.color = new Color(back1.color.r, back1.color.g, back1.color.b, bgstartNum);
-                back2.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
-            }
-            isfadeing = true;
-            StartCoroutine(bgrunFade(bgfront, ishide));
-        }
-        //其他渐变处理
-
-    }
-    private void bgChangeComplete()
-    {
-        Debug.Log("bgChangeComplete");
-        bgfront = !bgfront;
-    }
-    /// <summary>
-    /// isfront  将要换的是否前景，是否渐隐
-    /// </summary>
-    private bool isfadeing = false;
-    IEnumerator bgrunFade(bool isfront,bool ishide)
-    {
-        //渐显处理
-        if (isfront)
-        {//前图渐显
-            bgstartNum += Time.deltaTime;
-            if (bgstartNum > bgFadeFinal)
-            {
-                bgstartNum = 1;
-                back2.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
-                bgChangeComplete();
-                isfadeing = false;
-            }
-            else
-                back2.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
-        }
-        else
-        {//后图渐显
-            bgstartNum -= Time.deltaTime;
-            if (bgstartNum < 0)
-            {
-                bgstartNum = 0;
-                back2.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
-                bgChangeComplete();
-                isfadeing = false;
-            }
-            else
-                back2.color = new Color(back2.color.r, back2.color.g, back2.color.b, bgstartNum);
-        }
-        yield return null;
-        if (isfadeing)
-            StartCoroutine(bgrunFade(isfront, ishide));
-    }
 
     //=================================     工具部分        ==============
 
@@ -296,7 +206,7 @@ public class PlotView : MonoBehaviour
     //判断是否加载外部预制体
     private bool readPlotLoadConfig()
     {
-        int n = plot.startStaticNum - plot.plotid;
+        int n = plot.plotid - plot.startStaticNum;
         return plot.needLoadConfig[n];
     }
     /// <summary>

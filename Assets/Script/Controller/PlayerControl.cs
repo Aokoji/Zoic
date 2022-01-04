@@ -10,7 +10,12 @@ public class PlayerControl : DDOLController<PlayerControl>
 
     public void initData()
     {
-
+        initCreatePlayer();
+        initEvent();
+    }
+    public void initEvent()
+    {
+        EventTransfer.instance.loadNewSceneEvent += refreshPlayerStateOnChangeScene;
     }
 
     public void initCreatePlayer()
@@ -23,10 +28,22 @@ public class PlayerControl : DDOLController<PlayerControl>
         ViewController.instance.addToBaseMod_Actor(baseMain);      //待定 需要设置视图层级
         player = baseMain;
         moveCtrl = baseMain.GetComponent<MoveControl>();
-        player.SetActive(true);
+        player.SetActive(false);
         player.GetComponent<MoveControl>().initData();
     }
-
+    private void refreshPlayerStateOnChangeScene()
+    {
+        //+++初始化位置坐标
+        if (PlotController.instance.getPloting())
+        {
+            //即将剧情
+            player.SetActive(false);
+        }
+        else
+        {
+            player.SetActive(true);
+        }
+    }
     //   人物控制开关
     public void setControl(bool ctrl)
     {

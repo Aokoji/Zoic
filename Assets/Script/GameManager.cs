@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
         GameData.Data.initGameData();
         EventTransfer.Instance.initEvent();                         //初始化事件派发器
         ViewController.Instance.initCreateViewController(); //初始化视图
+        PlotController.Instance.initData();                     //载入剧情组件
         EnvironmentManager.Instance.initData(); //加载场景
     }
     //创建manager
@@ -36,11 +37,10 @@ public class GameManager : MonoBehaviour
     //加载游戏控制器
     public void loadBaseGameController()
     {
-        PlayerControl.Instance.initCreatePlayer();          //初始化玩家
+        PlayerControl.Instance.initData();          //初始化玩家
         PlayerManager.Instance.loadPlayerManager();     //加载玩家管理器
         MainController.Instance.initController();
         CombatController.Instance.initController();
-        PlotController.Instance.initData();                     //载入剧情组件
         initTools();
         initOverAllEvent();
     }
@@ -61,12 +61,12 @@ public class GameManager : MonoBehaviour
         //开始界面切换到  游戏界面
         //+++开始游戏应该有一个后续的读档界面 或者缓冲界面  开始界面的所有操作按钮都在它的视图层完成
         EnvironmentManager.Instance.checkStartGameSceneAndDo(mid,onstartGame);      //这是最后的读档操作了
+        loadBaseGameController();
     }
     //开始游戏检查
     public void onstartGame()
     {
         //之前先加载的场景，加载完成后回调检查剧情
-        loadBaseGameController();
         EventTransfer.Instance.gameStartSceneAction();      //派发游戏开始事件  检查剧情是否第一次进入
     }
 
@@ -85,6 +85,7 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             //CombatController.Instance.playerDoAttack2();
+            PlotController.Instance.mainplotTrigger();
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
